@@ -6,10 +6,10 @@ public class HE1 : CommonProject
 {
     public HE1()
     {
-        ResourceFilesExtensions.Add(".rc");
-        ResourceFilesExtensions.Add(".ico");
-        ResourceFilesExtensions.Add(".bmp");
-        ResourceFilesExtensions.Add(".rc2");
+        // ResourceFilesExtensions.Add(".rc");
+        // ResourceFilesExtensions.Add(".ico");
+        // ResourceFilesExtensions.Add(".bmp");
+        // ResourceFilesExtensions.Add(".rc2");
     }
     public override void ConfigureAll(Configuration conf, EngineTarget target)
     {
