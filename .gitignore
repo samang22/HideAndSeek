@@ -364,8 +364,9 @@ FodyWeavers.xsd
 
 vcpkg_installed/
 
-DreamingIsland/Intermediate/
-DreamingIsland/Saved/
-DreamingIsland/Binaries/
-DreamingIsland/Build/
-DreamingIsland/DreamingIsland.sln
+
+Binaries
+Intermediate
+Engine/Source/Programs/vcpkg
+Engine.sln
+HE.sln
