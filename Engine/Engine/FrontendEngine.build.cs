@@ -54,11 +54,7 @@ public class FrontendEngineProject : CommonProject
         conf.FastBuildMakeCommand += "devenv Intermediate\\ProjectFiles\\Engine.sln /Build \"" + conf.Name + "\"\n";
         conf.FastBuildMakeCommand += "if exist \"Intermediate\\ProjectFiles\\GameProject.vcxproj\" ( msbuild Intermediate\\ProjectFiles\\GameProject.vcxproj /t:Rebuild /p:platform=x64 /p:configuration=\"" + conf.Name + "\")\n";
 
-        if (ELaunchType.Editor == target.LaunchType)
-        {
-            conf.FastBuildMakeCommand += "if exist \"Intermediate\\ProjectFiles\\GameProject.vcxproj\" ( devenv Intermediate\\ProjectFiles\\GameProject.vcxproj /Build \"" + conf.Name + "\")\n";
-        }
-        
+      
         conf.FastReBuildMakeCommand = "devenv Intermediate\\ProjectFiles\\Engine.sln /Rebuild \"" + conf.Name + "\"";
         conf.IsFastBuild = true;
         conf.SolutionFolder = @"Engine";

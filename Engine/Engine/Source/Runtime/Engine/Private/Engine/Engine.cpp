@@ -51,17 +51,17 @@ void UEngine::Init(HWND hViewportHandle)
 void UEngine::Tick(float DeltaSeconds)
 {
     //#if WITH_EDITOR
-    DirectX::Keyboard::State KeyboardState = DirectX::Keyboard::Get().GetState();
+    //DirectX::Keyboard::State KeyboardState = DirectX::Keyboard::Get().GetState();
     //const bool bLeftAltKeyDown = KeyboardState.IsKeyDown(DirectX::Keyboard::Keys::LeftAlt);
     //const bool bPKeyDown = KeyboardState.IsKeyDown(DirectX::Keyboard::Keys::P);
-    const bool bESCKeyDown = KeyboardState.IsKeyDown(DirectX::Keyboard::Keys::Escape);
+    //const bool bESCKeyDown = KeyboardState.IsKeyDown(DirectX::Keyboard::Keys::Escape);
 
     CreateNewPlayInEditorInstance();
 
-    if (bESCKeyDown)
-    {
-        PostQuitMessage(0);
-    }
+    //if (bESCKeyDown)
+    //{
+    //    PostQuitMessage(0);
+    //}
 
     GWorld->Tick(DeltaSeconds);
 }

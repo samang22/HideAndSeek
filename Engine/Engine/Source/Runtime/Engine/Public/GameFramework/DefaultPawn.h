@@ -3,9 +3,6 @@
 #include "DefaultPawn.generated.h"
 
 //
-
-class UStaticMeshComponent;
-
 UCLASS()
 class ENGINE_API ADefaultPawn : public APawn
 {
@@ -56,9 +53,6 @@ public:
     virtual void ControlYawPitch(float Val);
 
 private:
-    /** The mesh associated with this Pawn. */
-    //UPROPERTY(Category = Pawn, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-    UStaticMeshComponent* MeshComponent = nullptr;
 
     // MovementComponent가 미구현 이므로 Speed 값을 여기에 둠
     UPROPERTY(EditAnywhere)
