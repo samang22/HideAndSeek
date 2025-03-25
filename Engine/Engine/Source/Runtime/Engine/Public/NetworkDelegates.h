@@ -56,9 +56,15 @@ public:
 	 *
 	 * @param Connection 새로 생성된 연결
 	 */
-	virtual void NotifyAcceptedConnection(class UNetConnection* Connection) { _ASSERT(false); }
+	virtual void NotifyAcceptedConnection(class UNetConnection* Connection)
+	{ 
+		E_LOG(Log, TEXT("NotifyAcceptedConnection"));
+	}
 	// 연결이 끊어진 경우
-	virtual void NotifyConnectionClosed(class UNetConnection* Connection) { _ASSERT(false); }
+	virtual void NotifyConnectionClosed(class UNetConnection* Connection)
+	{ 
+		E_LOG(Log, TEXT("NotifyConnectionClosed"));
+	}
 
 	///**
 	// * 원격 요청(Actor 생성 등)의 결과로 새로운 채널이 생성/열림을 알립니다.
