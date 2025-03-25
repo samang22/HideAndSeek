@@ -6,8 +6,8 @@
 
 #include "GenericPlatform/GenericPlatformTime.h"
 
-#include "Containers/ResourceArray.h"
 #include "Containers/JobQueue.h"
+#include "Containers/BufferedContainer.h"
 
 #include "UObject/EnginePtr.h"
 #include "UObject/Object.h"
@@ -36,3 +36,5 @@
 #include "Templates/AlignmentTemplates.h"
 
 #include "Serialization/Archive.h"
+
+#include "Task/Task.h"
