@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{875AD890-4C95-6F73-C4B0-3E9EA0AFEBB3}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "EggThiefShowdown",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ModelingToolsEditorMode",
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
+		}
+	]
+}
