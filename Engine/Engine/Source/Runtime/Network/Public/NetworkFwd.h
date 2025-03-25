@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include <boost/asio/ip/tcp.hpp>
+#include "Net/DataBunch.h"
 
 namespace boost
 {

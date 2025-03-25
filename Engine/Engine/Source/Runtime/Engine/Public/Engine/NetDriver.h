@@ -316,6 +316,9 @@ public:
         return InitBase(!bServer, InNotify, ConnectURL, false, Error);
     }
 
+    // 해당 Connection을 수동으로 끊습니다
+    virtual void CloseConnection(UNetConnection* Connection) {}
+
 protected:
     /**
      * 서버와 클라이언트 연결 설정 간의 공통 초기화
@@ -345,5 +348,4 @@ public:
     class FNetworkNotify* Notify;
     FURL URL;
     bool bServer = false;
-
 };
