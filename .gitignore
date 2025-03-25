@@ -370,3 +370,6 @@ Intermediate
 Engine/Source/Programs/vcpkg
 Engine.sln
 HE.sln
+
+UE/EggThiefShowdown/Plugins/Network/Binaries/
+UE/EggThiefShowdown/Plugins/Network/Intermediate/
