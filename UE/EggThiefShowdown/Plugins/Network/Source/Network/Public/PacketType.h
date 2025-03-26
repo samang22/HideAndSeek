@@ -15,9 +15,6 @@ class FBunch : public FPacketHeader /*: public FNetBitReader*/
 public:
     int32 ChannelIndex = 0;
     int32 MessageType = 0;
-
-public:
-    int32 Test = 0;
 };
 #pragma pack(pop)
 
