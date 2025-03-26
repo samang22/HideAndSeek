@@ -371,5 +371,8 @@ Engine/Source/Programs/vcpkg
 Engine.sln
 HE.sln
 
+UE/EggThiefShowdown/Saved/
+UE/EggThiefShowdown.sln
+UE/EggThiefShowdown/DerivedDataCache
 UE/EggThiefShowdown/Plugins/Network/Binaries/
 UE/EggThiefShowdown/Plugins/Network/Intermediate/
