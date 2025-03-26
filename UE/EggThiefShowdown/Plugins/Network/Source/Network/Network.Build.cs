@@ -28,7 +28,8 @@ public class Network : ModuleRules
 				"Core",
 				"OnlineSubsystemUtils",
 				// ... add other public dependencies that you statically link with here ...
-			}
+                "UMG",
+            }
 			);
 			
 		
@@ -38,7 +39,7 @@ public class Network : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
+                "SlateCore", "InputCore",
 				// ... add private dependencies that you statically link with here ...	
 
 				"Sockets",
