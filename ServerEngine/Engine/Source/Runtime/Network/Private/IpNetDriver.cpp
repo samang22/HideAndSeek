@@ -206,6 +206,7 @@ void UIpNetDriver::AsyncRead(UIpConnection* IpConnection)
 						E_LOG(Log, TEXT("{} [Read Failed]: {}, {}:{}"), GetName(), ANSI_TO_TCHAR(Error.message()), IpConnection->GetRemoteIP(), IpConnection->GetRemotePort());
 						return;
 					}
+					//IpConnection->ReceivedRawPacket(InRecvSize + sizeof(FPacketHeader));
 					IpConnection->ReceivedRawPacket(InRecvSize + sizeof(FPacketHeader));
 
 					AsyncRead(IpConnection);

@@ -3,6 +3,7 @@
 
 #include "NetworkGameMode.h"
 #include "HaNetDriver.h"
+#include "EchoChannel.h"
 
 void ANetworkGameMode::BeginPlay()
 {
@@ -11,8 +12,9 @@ void ANetworkGameMode::BeginPlay()
 	NetDriver = NewObject<UHaNetDriver>(this, TEXT("HaNetDriver"));
 
 	FURL URL;
-	URL.Host = TEXT("127.0.0.1");
-	URL.Port = 5555;
+	URL.Host = Host;
+	URL.Port = Port;
+
 	FString OutError;
 	if (!NetDriver->InitConnect(this, URL, OutError))
 	{
@@ -21,7 +23,10 @@ void ANetworkGameMode::BeginPlay()
 		return;
 	}
 
-	{
-		int a = 0;
-	}
+
+	FString Message = TEXT("HelloUE!");
+	UEchoChannel* EchoChannel = Cast<UEchoChannel>(NetDriver->ServerConnection->Channels[1]);
+	FEchoMessage EchoMessage;
+	std::wcsncpy(EchoMessage.Message, &Message[0], Message.Len());
+	FNetEchoMessage<NMT_Echo>::Send(NetDriver->ServerConnection, EchoMessage);
 }

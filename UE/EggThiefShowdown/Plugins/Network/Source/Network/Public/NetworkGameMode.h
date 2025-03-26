@@ -8,7 +8,7 @@
 
 
 class UHaNetDriver;
-UCLASS()
+UCLASS(config = Network)
 class NETWORK_API ANetworkGameMode : public AGameModeBase, public FNetworkNotify
 {
 	GENERATED_BODY()
@@ -20,4 +20,9 @@ protected:
 	UPROPERTY(Transient)
 	UHaNetDriver* NetDriver = nullptr;
 
+	UPROPERTY(Config)
+	FString Host;
+
+	UPROPERTY(Config)
+	int32 Port;
 };

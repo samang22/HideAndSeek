@@ -15,4 +15,6 @@ class NETWORK_API UHaConnection : public UIpConnection
 	GENERATED_BODY()
 public:
 	UHaConnection();
+	// To use TCP not UDP, we override this class
+	virtual void LowLevelSend(void* Data, int32 CountBits, FOutPacketTraits& Traits) override;
 };

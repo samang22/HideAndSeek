@@ -7,7 +7,7 @@
 #include "HaNetDriver.generated.h"
 
 class UHaConneciton;
-UCLASS()
+UCLASS(config = Network)
 class NETWORK_API UHaNetDriver : public UIpNetDriver
 {
 	GENERATED_BODY()
