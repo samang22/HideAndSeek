@@ -4,6 +4,9 @@
 #include "HaConnection.h"
 #include "Sockets.h"
 #include "Net/Common/Packets/PacketTraits.h"
+#include "PacketType.h"
+#include "SendRecvBunchChannel.h"
+#include "SocketSubsystem.h"
 
 UHaConnection::UHaConnection()
 {
@@ -44,5 +47,107 @@ void UHaConnection::LowLevelSend(void* Data, int32 CountBits, FOutPacketTraits& 
         /*UARNetDriver* ARNetDriver = Cast<UARNetDriver>(Driver);
         ARNetDriver->Shutdown();*/
         return;
+    }
+}
+
+void UHaConnection::OnConnect()
+{
+    RecvBuffer.SetNumUninitialized(4096, false);
+}
+
+FBunch* UHaConnection::GetPacket()
+{
+    FBunch* Bunch = (FBunch*)RecvBuffer.GetData();
+    return Bunch;
+}
+
+bool UHaConnection::ReadPacketSome(const uint32 InReadSize)
+{
+    if (InReadSize == 0)
+    {
+        return false;
+    }
+    const int32 MaxRecvSize = RecvPacketSize + InReadSize;
+    if (MaxRecvSize > RecvBuffer.Num())
+    {
+        UE_LOG(LogNet, Error, TEXT("MaxRecvSize > RecvBuffer.Num(): %d > %d"), MaxRecvSize, RecvBuffer.Num());
+        // Shutdown()
+        return false;
+    }
+
+    int32 BytesRead = 0;
+    if (Socket->Recv(&RecvBuffer[RecvPacketSize], InReadSize, BytesRead))
+    {
+        RecvPacketSize += BytesRead;
+
+        ISocketSubsystem* SocketSubsystem = ISocketSubsystem::Get();
+        ESocketErrors Error = SocketSubsystem->GetLastErrorCode();
+
+        if (BytesRead == 0)
+        {
+            // NonBlock Recv를 호출 했으나, 네트워크 버퍼에 읽을 데이터가 없다
+            if (Error == SE_EWOULDBLOCK)
+            {
+                return false;
+            }
+            else
+            {
+                check(false);
+            }
+        }
+
+        return true;
+    }
+    else if (BytesRead == 0)
+    {
+        // 서버가 끊어짐
+        // Shutdown();
+        return false;
+    }
+
+    check(false);
+    // Shutdown();
+
+    return false;
+}
+
+bool UHaConnection::ReadPacket()
+{
+    const bool bHeader = RecvPacketSize >= sizeof(FBunch);
+    if (bHeader)
+    {
+        FBunch* Bunch = (FBunch*)RecvBuffer.GetData();
+        const int32 PacketSize = Bunch->PacketSize;
+        const int32 ReadPacketSize = PacketSize - RecvPacketSize;
+        const bool bRead = ReadPacketSome(ReadPacketSize);
+
+        if ((bRead || ReadPacketSize == 0) && RecvPacketSize >= PacketSize)
+        {
+            // 한 Packet이 완성 됨
+            RecvPacketSize = 0;
+
+            const int32 ChannelIndex = Bunch->ChannelIndex;
+
+            if (ChannelIndex < Channels.Num() && Channels[ChannelIndex])
+            {
+                USendRecvBunchChannel* Channel = Cast<USendRecvBunchChannel>(Channels[ChannelIndex]);
+                if (Channel)
+                {
+                    Channel->ReceivedBunch(*Bunch);
+                    return true;
+                }
+                else
+                {
+                    check(false);
+                }
+            }
+            check(false);
+        }
+        return false;
+    }
+    else
+    {
+        const uint32 RemainHeaderSize = sizeof(FBunch) - RecvPacketSize;
+        return ReadPacketSome(RemainHeaderSize);
     }
 }

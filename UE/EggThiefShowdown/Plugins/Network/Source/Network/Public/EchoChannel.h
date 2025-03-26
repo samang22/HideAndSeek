@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SendBunchChannel.h"
+#include "SendRecvBunchChannel.h"
 #include "EchoChannel.generated.h"
 
 template<uint8 MessageType> class FNetEchoMessage {};
@@ -23,12 +23,15 @@ public:
  *
  */
 UCLASS()
-class NETWORK_API UEchoChannel : public USendBunchChannel
+class NETWORK_API UEchoChannel : public USendRecvBunchChannel
 {
     GENERATED_BODY()
 
 public:
     virtual void Tick() override;
 
-    virtual void SendBunch(FBunch& NewBunch);
+    virtual void SendBunch(FBunch& NewBunch) override;
+
+    /** Handle an incoming bunch. */
+    virtual void ReceivedBunch(FBunch& Bunch) override;
 };

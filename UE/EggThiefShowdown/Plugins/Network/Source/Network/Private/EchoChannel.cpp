@@ -15,3 +15,11 @@ void UEchoChannel::SendBunch(FBunch& NewBunch)
     FOutPacketTraits OutPacketTraits;
     Connection->LowLevelSend((void*)&NewBunch, NewBunch.PacketSize, OutPacketTraits);
 }
+
+void UEchoChannel::ReceivedBunch(FBunch& Bunch)
+{
+    if (FNetEchoMessage<NMT_Echo>::Receive(Bunch))
+    {
+        int a = 10;
+    }
+}

@@ -5,6 +5,11 @@
 #include "HaNetDriver.h"
 #include "EchoChannel.h"
 
+ANetworkGameMode::ANetworkGameMode()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
+
 void ANetworkGameMode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -29,4 +34,11 @@ void ANetworkGameMode::BeginPlay()
 	FEchoMessage EchoMessage;
 	std::wcsncpy(EchoMessage.Message, &Message[0], Message.Len());
 	FNetEchoMessage<NMT_Echo>::Send(NetDriver->ServerConnection, EchoMessage);
+}
+
+void ANetworkGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	NetDriver->TickDispatch(DeltaSeconds);
 }

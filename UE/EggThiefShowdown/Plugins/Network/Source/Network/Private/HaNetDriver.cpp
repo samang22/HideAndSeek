@@ -4,6 +4,7 @@
 #include "HaNetDriver.h"
 #include "SocketSubsystem.h"
 #include "Sockets.h"
+#include "PacketType.h"
 #include "HaConnection.h"
 
 bool UHaNetDriver::InitConnectionClass()
@@ -21,17 +22,20 @@ bool UHaNetDriver::InitConnect(FNetworkNotify* InNotify, const FURL& ConnectURL,
 		return bResult;
 	}
 
-	UIpConnection* IpServerConnection = Cast<UIpConnection>(ServerConnection);
-	IpServerConnection->GetSocket()->SetNonBlocking(false);
-	IpServerConnection->GetSocket()->SetNoDelay(true);
+    HaServerConnection = Cast<UHaConnection>(ServerConnection);
+    HaServerConnection->GetSocket()->SetNonBlocking(false);
+    HaServerConnection->GetSocket()->SetNoDelay(true);
 
-	if (IpServerConnection->GetSocket()->Connect(*IpServerConnection->RemoteAddr))
+	if (HaServerConnection->GetSocket()->Connect(*HaServerConnection->RemoteAddr))
 	{
-		IpServerConnection->GetSocket()->SetNonBlocking(true);
+        HaServerConnection->GetSocket()->SetNonBlocking(true);
+        HaServerConnection->OnConnect();
 		return true;
 	}
 	else
 	{
+        ServerConnection = nullptr;
+        HaServerConnection = nullptr;
 		return false;
 	}
 
@@ -129,3 +133,37 @@ FUniqueSocket UHaNetDriver::CreateAndBindSocket(TSharedRef<FInternetAddr> BindAd
     return NewSocket;
 }
 
+
+void UHaNetDriver::TickDispatch(float DeltaTime)
+{
+    UNetDriver::TickDispatch(DeltaTime);
+    //UIpNetDriver::TickDispatch(DeltaTime);
+
+    if (!HaServerConnection) { return; }
+
+    while (true)
+    {
+        if (!HaServerConnection->ReadPacket())
+        {
+            ISocketSubsystem* SocketSubsystem = GetSocketSubsystem();
+            ESocketErrors Error = SocketSubsystem->GetLastErrorCode();
+
+            // SE_ECONNRESET: 서버 접속이 끊어짐
+            if (Error == SE_ECONNRESET || Error == SE_ENOTCONN)
+            {
+                Shutdown();
+                return;
+            }
+            // NonBlock Recv를 호출 했으나, 네트워크 버퍼에 읽을 데이터가 없다
+            else if (Error == SE_EWOULDBLOCK)
+            {
+                break;
+            }
+            /*const EConnectionState ConnectionState = ARServerConnection->GetConnectionState();
+            if (ConnectionState == EConnectionState::USOCK_Closed || ConnectionState == EConnectionState::USOCK_Invalid)
+            {
+                return;
+            }*/
+        }
+    }
+}

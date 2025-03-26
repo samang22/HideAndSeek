@@ -10,12 +10,14 @@ class UHaConneciton;
 UCLASS(config = Network)
 class NETWORK_API UHaNetDriver : public UIpNetDriver
 {
+	friend class FHaPacketIterator;
+
 	GENERATED_BODY()
 	
 public:
 	virtual bool InitConnectionClass(void) override;
 	virtual bool InitConnect(FNetworkNotify* InNotify, const FURL& ConnectURL, FString& Error) override;
-
+	virtual void TickDispatch(float DeltaTime) override;
 // Override to use TCP, not UDP
 protected:
 	/**
@@ -39,4 +41,8 @@ protected:
 	 * @return if the socket could be created and bound with all the appropriate options, a pointer to the new socket is given, otherwise null
 	 */
 	virtual FUniqueSocket CreateAndBindSocket(TSharedRef<FInternetAddr> BindAddr, int32 Port, bool bReuseAddressAndPort, int32 DesiredRecvSize, int32 DesiredSendSize, FString& Error) override;
+
+
+private:
+	class UHaConnection* HaServerConnection = nullptr;
 };

@@ -18,7 +18,7 @@ public:
 };
 #pragma pack(pop)
 
-class USendBunchChannel;
+class USendRecvBunchChannel;
 
 #define DEFINE_CHANNEL_MESSAGE(ChannelName, _ChannelIndex, Name, Index) \
 enum { NMT_##Name = Index }; \
@@ -36,7 +36,7 @@ public: \
             Bunch.ChannelIndex = _ChannelIndex; \
             Bunch.MessageType = Index; \
             Bunch.PacketSize = sizeof(NewBunch); \
-            Cast<USendBunchChannel>(Conn->Channels[_ChannelIndex])->SendBunch(Bunch); \
+            Cast<USendRecvBunchChannel>(Conn->Channels[_ChannelIndex])->SendBunch(Bunch); \
         } \
     } \
     /** receives a message of this type from the passed in bunch */ \

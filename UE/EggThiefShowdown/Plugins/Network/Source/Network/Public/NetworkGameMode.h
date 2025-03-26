@@ -14,8 +14,9 @@ class NETWORK_API ANetworkGameMode : public AGameModeBase, public FNetworkNotify
 	GENERATED_BODY()
 	
 public:
+	ANetworkGameMode();
 	virtual void BeginPlay() override;
-
+	virtual void Tick(float DeltaSeconds) override;
 protected:
 	UPROPERTY(Transient)
 	UHaNetDriver* NetDriver = nullptr;

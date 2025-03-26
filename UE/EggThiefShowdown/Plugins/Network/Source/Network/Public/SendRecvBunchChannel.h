@@ -4,16 +4,18 @@
 #include "CoreMinimal.h"
 #include "Engine/Channel.h"
 #include "PacketType.h"
-#include "SendBunchChannel.generated.h"
+#include "SendRecvBunchChannel.generated.h"
 
 /**
  *
  */
 UCLASS()
-class NETWORK_API USendBunchChannel : public UChannel
+class NETWORK_API USendRecvBunchChannel : public UChannel
 {
     GENERATED_BODY()
 
 public:
     virtual void SendBunch(FBunch& NewBunch) {}
+    /** Handle an incoming bunch. */
+    virtual void ReceivedBunch(FBunch& Bunch) {}
 };
