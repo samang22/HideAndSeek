@@ -23,14 +23,20 @@ bool UHaNetDriver::InitConnect(FNetworkNotify* InNotify, const FURL& ConnectURL,
 	}
 
     HaServerConnection = Cast<UHaConnection>(ServerConnection);
-    HaServerConnection->GetSocket()->SetNonBlocking(false);
-    HaServerConnection->GetSocket()->SetNoDelay(true);
+    GetSocket()->SetNonBlocking(false);
+    GetSocket()->SetNoDelay(true);
 
-	if (HaServerConnection->GetSocket()->Connect(*HaServerConnection->RemoteAddr))
+	if (GetSocket()->Connect(*HaServerConnection->RemoteAddr))
 	{
-        HaServerConnection->GetSocket()->SetNonBlocking(true);
-        HaServerConnection->OnConnect();
-		return true;
+        GetSocket()->SetNonBlocking(true);
+
+        HaServerConnection->OnConnect(bRecvThread);
+        if (bRecvThread)
+        {
+            HaSocketReceiveThreadRunnable = MakeUnique<FHaReceiveThreadRunnable>(this);
+            HaSocketReceiveThread.Reset(FRunnableThread::Create(HaSocketReceiveThreadRunnable.Get(), *FString::Printf(TEXT("HaNetDriver Receive Thread"), *NetDriverName.ToString())));
+        }
+        return true;
 	}
 	else
 	{
@@ -141,29 +147,94 @@ void UHaNetDriver::TickDispatch(float DeltaTime)
 
     if (!HaServerConnection) { return; }
 
-    while (true)
+    if (!bRecvThread)
     {
-        if (!HaServerConnection->ReadPacket())
+        while (true)
         {
-            ISocketSubsystem* SocketSubsystem = GetSocketSubsystem();
+            if (!HaServerConnection->ReadPacket())
+            {
+                ISocketSubsystem* SocketSubsystem = GetSocketSubsystem();
+                ESocketErrors Error = SocketSubsystem->GetLastErrorCode();
+
+                // SE_ECONNRESET: 서버 접속이 끊어짐
+                if (Error == SE_ECONNRESET || Error == SE_ENOTCONN)
+                {
+                    Shutdown();
+                    return;
+                }
+                // NonBlock Recv를 호출 했으나, 네트워크 버퍼에 읽을 데이터가 없다
+                else if (Error == SE_EWOULDBLOCK)
+                {
+                    break;
+                }
+                /*const EConnectionState ConnectionState = ARServerConnection->GetConnectionState();
+                if (ConnectionState == EConnectionState::USOCK_Closed || ConnectionState == EConnectionState::USOCK_Invalid)
+                {
+                    return;
+                }*/
+            }
+        }
+    }
+
+    HaServerConnection->TickDispatch(DeltaTime);
+}
+
+void UHaNetDriver::LowLevelDestroy()
+{
+    FSocket* CurrentSocket = GetSocket();
+    if (CurrentSocket != nullptr && !HasAnyFlags(RF_ClassDefaultObject))
+    {
+        ISocketSubsystem* SocketSubsystem = GetSocketSubsystem();
+        if (HaSocketReceiveThread.IsValid() && HaSocketReceiveThread.IsValid())
+        {
+            HaSocketReceiveThreadRunnable->bIsRunning = false;
+            if (!CurrentSocket->Shutdown(ESocketShutdownMode::Read))
+            {
+                const ESocketErrors ShutdownError = SocketSubsystem->GetLastErrorCode();
+                UE_LOG(LogNet, Log, TEXT("UARNetDriver::LowLevelDestroy Socket->Shutdown returned error %s (%d) for %s"), SocketSubsystem->GetSocketError(ShutdownError), static_cast<int>(ShutdownError), *GetDescription());
+            }
+            HaSocketReceiveThread->WaitForCompletion();
+        }
+
+        if (!CurrentSocket->Close())
+        {
+            UE_LOG(LogExit, Log, TEXT("closesocket error (%i)"), (int32)SocketSubsystem->GetLastErrorCode());
+        }
+    }
+
+    Super::LowLevelDestroy();
+}
+
+UHaNetDriver::FHaReceiveThreadRunnable::FHaReceiveThreadRunnable(UHaNetDriver* InOwningNetDriver)
+    : bIsRunning(true)
+    , OwningNetDriver(InOwningNetDriver) 
+{
+    SocketSubsystem = OwningNetDriver->GetSocketSubsystem();
+}
+
+uint32 UHaNetDriver::FHaReceiveThreadRunnable::Run()
+{
+    while (bIsRunning && OwningNetDriver)
+    {
+        if (!OwningNetDriver->GetHaServerConnection()->ReadPacket())
+        {
             ESocketErrors Error = SocketSubsystem->GetLastErrorCode();
 
             // SE_ECONNRESET: 서버 접속이 끊어짐
             if (Error == SE_ECONNRESET || Error == SE_ENOTCONN)
             {
-                Shutdown();
-                return;
+                //Shutdown();
+                break;;
             }
             // NonBlock Recv를 호출 했으나, 네트워크 버퍼에 읽을 데이터가 없다
             else if (Error == SE_EWOULDBLOCK)
             {
-                break;
+                continue;
             }
-            /*const EConnectionState ConnectionState = ARServerConnection->GetConnectionState();
-            if (ConnectionState == EConnectionState::USOCK_Closed || ConnectionState == EConnectionState::USOCK_Invalid)
-            {
-                return;
-            }*/
         }
     }
+
+    UE_LOG(LogNet, Log, TEXT("UHaNetDriver::FHaReceiveThreadRunnable::Run returning."));
+
+    return 0;
 }

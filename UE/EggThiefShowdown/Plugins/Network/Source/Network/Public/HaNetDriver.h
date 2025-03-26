@@ -18,6 +18,10 @@ public:
 	virtual bool InitConnectionClass(void) override;
 	virtual bool InitConnect(FNetworkNotify* InNotify, const FURL& ConnectURL, FString& Error) override;
 	virtual void TickDispatch(float DeltaTime) override;
+
+	virtual void LowLevelDestroy() override;
+	UHaConnection* GetHaServerConnection() { return HaServerConnection; }
+
 // Override to use TCP, not UDP
 protected:
 	/**
@@ -45,4 +49,32 @@ protected:
 
 private:
 	class UHaConnection* HaServerConnection = nullptr;
+
+private:
+	/** Runnable object representing the receive thread, if enabled. */
+	class FHaReceiveThreadRunnable : public FRunnable
+	{
+	public:
+		FHaReceiveThreadRunnable(UHaNetDriver* InOwningNetDriver);
+
+		virtual uint32 Run() override;
+
+	public:
+		/** Running flag. The Run() function will return shortly after setting this to false. */
+		TAtomic<bool> bIsRunning;
+
+	private:
+		/** The NetDriver which owns the receive thread */
+		UHaNetDriver* OwningNetDriver;
+
+		/** The socket subsystem used by the receive thread */
+		ISocketSubsystem* SocketSubsystem;
+	};
+
+	/** Receive thread runnable object. */
+	TUniquePtr<FHaReceiveThreadRunnable> HaSocketReceiveThreadRunnable;
+	TUniquePtr<FRunnableThread> HaSocketReceiveThread;
+	bool bRecvThread = true;
+
+
 };

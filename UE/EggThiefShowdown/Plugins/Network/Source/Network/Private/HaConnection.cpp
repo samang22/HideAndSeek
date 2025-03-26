@@ -26,39 +26,63 @@ void UHaConnection::LowLevelSend(void* Data, int32 CountBits, FOutPacketTraits& 
     int32 SentBytes = 0;
     if (!Socket->Send((const uint8*)Data, CountBits, SentBytes))
     {
-        UE_LOG(LogNet, Warning, TEXT("UARNetConnection: LowLevelSend: Server로 Data를 보낼 수 없습니다. %d"), CountBits);
+        UE_LOG(LogNet, Warning, TEXT("UHaNetConnection: LowLevelSend: Server로 Data를 보낼 수 없습니다. %d"), CountBits);
         check(false);
     }
 
     if (SentBytes != CountBits)
     {
-        UE_LOG(LogNet, Warning, TEXT("UARNetConnection: LowLevelSend: SentBytes(%d) != CountBits(%d)"), SentBytes, CountBits);
+        UE_LOG(LogNet, Warning, TEXT("UHaNetConnection: LowLevelSend: SentBytes(%d) != CountBits(%d)"), SentBytes, CountBits);
         check(false);
-        /*UARNetDriver* ARNetDriver = Cast<UARNetDriver>(Driver);
-        ARNetDriver->Shutdown();*/
+        /*UHaNetDriver* HaNetDriver = Cast<UHaNetDriver>(Driver);
+        HaNetDriver->Shutdown();*/
         return;
     }
 
     // 서버 Recv buffer가 가득 참(너무 빨리 Packet을 보냄)
     if (SentBytes == -1)
     {
-        UE_LOG(LogNet, Warning, TEXT("UARNetConnection: LowLevelSend: SentBytes == -1"));
+        UE_LOG(LogNet, Warning, TEXT("UHaNetConnection: LowLevelSend: SentBytes == -1"));
         check(false);
-        /*UARNetDriver* ARNetDriver = Cast<UARNetDriver>(Driver);
-        ARNetDriver->Shutdown();*/
+        /*UHaNetDriver* HaNetDriver = Cast<UHaNetDriver>(Driver);
+        HaNetDriver->Shutdown();*/
         return;
     }
 }
 
-void UHaConnection::OnConnect()
+void UHaConnection::OnConnect(bool bInNetDriverRecvThread) 
 {
-    RecvBuffer.SetNumUninitialized(4096, false);
+    bNetDriverRecvThread = bInNetDriverRecvThread;
+    if (bNetDriverRecvThread)
+    {
+        ReceiveQueue = MakeUnique<TCircularQueue<FHaReceivedPacket>>(1024);
+    }
+    RecvBuffer.PacketBytes.SetNumUninitialized(4096, false);
 }
 
 FBunch* UHaConnection::GetPacket()
 {
-    FBunch* Bunch = (FBunch*)RecvBuffer.GetData();
+    FBunch* Bunch = (FBunch*)RecvBuffer.PacketBytes.GetData();
     return Bunch;
+}
+
+void UHaConnection::TickDispatch(float DeltaTime)
+{
+    if (bNetDriverRecvThread)
+    {
+        FHaReceivedPacket IncomingPacket;
+        bool bHasPacket = false;
+        do
+        {
+            bHasPacket = ReceiveQueue->Dequeue(IncomingPacket);
+
+            if (bHasPacket)
+            {
+                ProcessPacket(IncomingPacket);
+            }
+
+        } while (bHasPacket);
+    }
 }
 
 bool UHaConnection::ReadPacketSome(const uint32 InReadSize)
@@ -68,15 +92,16 @@ bool UHaConnection::ReadPacketSome(const uint32 InReadSize)
         return false;
     }
     const int32 MaxRecvSize = RecvPacketSize + InReadSize;
-    if (MaxRecvSize > RecvBuffer.Num())
+    if (MaxRecvSize > RecvBuffer.PacketBytes.Num())
     {
-        UE_LOG(LogNet, Error, TEXT("MaxRecvSize > RecvBuffer.Num(): %d > %d"), MaxRecvSize, RecvBuffer.Num());
+        UE_LOG(LogNet, Error, TEXT("MaxRecvSize > RecvBuffer.PacketBytes.Num(): %d > %d"), MaxRecvSize, RecvBuffer.PacketBytes.Num());
         // Shutdown()
         return false;
     }
 
     int32 BytesRead = 0;
-    if (Socket->Recv(&RecvBuffer[RecvPacketSize], InReadSize, BytesRead))
+
+    if (Socket->Recv(&RecvBuffer.PacketBytes[RecvPacketSize], InReadSize, BytesRead))
     {
         RecvPacketSize += BytesRead;
 
@@ -116,32 +141,31 @@ bool UHaConnection::ReadPacket()
     const bool bHeader = RecvPacketSize >= sizeof(FBunch);
     if (bHeader)
     {
-        FBunch* Bunch = (FBunch*)RecvBuffer.GetData();
+        FBunch* Bunch = (FBunch*)RecvBuffer.PacketBytes.GetData();
         const int32 PacketSize = Bunch->PacketSize;
         const int32 ReadPacketSize = PacketSize - RecvPacketSize;
         const bool bRead = ReadPacketSome(ReadPacketSize);
 
         if ((bRead || ReadPacketSize == 0) && RecvPacketSize >= PacketSize)
         {
+            if (RecvPacketSize != PacketSize)
+            {
+                // Shutdown
+                return false;
+            }
+
             // 한 Packet이 완성 됨
             RecvPacketSize = 0;
+            RecvBuffer.PlatformTimeSeconds = FPlatformTime::Seconds();
 
-            const int32 ChannelIndex = Bunch->ChannelIndex;
-
-            if (ChannelIndex < Channels.Num() && Channels[ChannelIndex])
+            if (!bNetDriverRecvThread)
             {
-                USendRecvBunchChannel* Channel = Cast<USendRecvBunchChannel>(Channels[ChannelIndex]);
-                if (Channel)
-                {
-                    Channel->ReceivedBunch(*Bunch);
-                    return true;
-                }
-                else
-                {
-                    check(false);
-                }
+                ProcessPacket(RecvBuffer);
             }
-            check(false);
+            else
+            {
+                DispatchPacket(RecvBuffer);
+            }
         }
         return false;
     }
@@ -151,3 +175,31 @@ bool UHaConnection::ReadPacket()
         return ReadPacketSome(RemainHeaderSize);
     }
 }
+
+bool UHaConnection::ProcessPacket(FHaReceivedPacket& InPacket)
+{
+    FBunch* Bunch = (FBunch*)InPacket.PacketBytes.GetData();
+    const int32 ChannelIndex = Bunch->ChannelIndex;
+
+    if (ChannelIndex < Channels.Num() && Channels[ChannelIndex])
+    {
+        USendRecvBunchChannel* Channel = Cast<USendRecvBunchChannel>(Channels[ChannelIndex]);
+        if (Channel)
+        {
+            Channel->ReceivedBunch(*Bunch);
+            return true;
+        }
+        else
+        {
+            check(false);
+        }
+    }
+    check(false);
+    return false;
+}
+bool UHaConnection::DispatchPacket(FHaReceivedPacket& IncomingPacket)
+{
+    // Add packet to queue. Since ReceiveQueue is a TCircularQueue, if the queue is full, this will simply return false without adding anything.
+    return ReceiveQueue->Enqueue(IncomingPacket);
+}
+
