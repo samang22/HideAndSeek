@@ -22,4 +22,6 @@ void UTestConnection::HandleConnectionEstablished()
 	Channels[2] = NewObject<UChannel>(this, UChatChannel::StaticClass(), TEXT("Chat"));
 	Channels[2]->Init(this, 2);
 
+	Channels[3] = NewObject<UChannel>(this, ULoginChannel::StaticClass(), TEXT("Login"));
+	Channels[3]->Init(this, 3);
 }

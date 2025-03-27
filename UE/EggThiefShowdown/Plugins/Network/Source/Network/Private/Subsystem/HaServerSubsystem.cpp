@@ -5,6 +5,7 @@
 #include "HaNetDriver.h"
 #include "Channel/EchoChannel.h"
 #include "Channel/ChatChannel.h"
+#include "Channel/LoginChannel.h"
 
 void UHaServerSubsystem::SendChatMessage(FString InMessage)
 {
@@ -39,10 +40,17 @@ void UHaServerSubsystem::ConnectToServer(FStringView InHost, int32 InPort)
         return;
     }
 
-    FString Message = TEXT("HelloUE!");
-
     EchoChannel = Cast<UEchoChannel>(NetDriver->ServerConnection->Channels[1]);
     ChatChannel = Cast<UChatChannel>(NetDriver->ServerConnection->Channels[2]);
+
+    {
+        FString UserName = TEXT("HelloUE!");
+        FString Password = TEXT("HelloUE!");
+        FARLogin Login;
+        std::wcsncpy(Login.UserName, &UserName[0], UserName.Len());
+        std::wcsncpy(Login.Password, &Password[0], Password.Len());
+        FNetLoginMessage<NMT_CTS_CreateAccount>::Send(NetDriver->ServerConnection, Login);
+    }
 
 }
 
