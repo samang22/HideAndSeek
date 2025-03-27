@@ -44,6 +44,18 @@ protected:
     UFUNCTION()
     void OnSend();
 
+    UFUNCTION(BlueprintCallable)
+    UScrollBox* GetChatScrollBox() const { return ChatScrollBox; }
+
+    UFUNCTION(BlueprintCallable)
+    UTextBlock* GetChatTextBlock() const { return ChatTextBlock; }
+
+    UFUNCTION(BlueprintCallable)
+    UEditableTextBox* GetChatInputBox() const { return ChatInputBox; }
+
+    UFUNCTION(BlueprintCallable)
+    UButton* GetSendButton() const { return SendButton; }
+
 protected:
     virtual void NativeConstruct() override;
     virtual void UpdateChatMessage();

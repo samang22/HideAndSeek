@@ -79,7 +79,7 @@ void UHaConnection::TickDispatch(float DeltaTime)
             if (bHasPacket)
             {
                 ProcessPacket(IncomingPacket);
-            }
+            } 
 
         } while (bHasPacket);
     }
