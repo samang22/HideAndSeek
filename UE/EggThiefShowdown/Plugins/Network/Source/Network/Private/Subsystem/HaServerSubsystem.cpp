@@ -3,7 +3,8 @@
 
 #include "Subsystem/HaServerSubsystem.h"
 #include "HaNetDriver.h"
-#include "EchoChannel.h"
+#include "Channel/EchoChannel.h"
+#include "Channel/ChatChannel.h"
 
 void UHaServerSubsystem::ConnectToServer(FStringView InHost, int32 InPort)
 {
@@ -11,19 +12,27 @@ void UHaServerSubsystem::ConnectToServer(FStringView InHost, int32 InPort)
     FURL URL;
     URL.Host = InHost.IsEmpty() ? Host : InHost;
     URL.Port = InPort == -1 ? Port : InPort;
+
+    check(!URL.Host.IsEmpty());
+    check(URL.Port != -1);
+
     FString OutError;
+
+
+
     if (!NetDriver->InitConnect(this, URL, OutError))
     {
+        check(false);
         UE_LOG(LogTemp, Error, TEXT("Connect Failed"));
         RequestEngineExit(TEXT("Connect Failed"));
         return;
     }
 
     FString Message = TEXT("HelloUE!");
-    UEchoChannel* EchoChannel = Cast<UEchoChannel>(NetDriver->ServerConnection->Channels[1]);
-    FEchoMessage EchoMessage;
-    std::wcsncpy(EchoMessage.Message, &Message[0], Message.Len());
-    FNetEchoMessage<NMT_Echo>::Send(NetDriver->ServerConnection, EchoMessage);
+
+    EchoChannel = Cast<UEchoChannel>(NetDriver->ServerConnection->Channels[1]);
+    ChatChannel = Cast<UChatChannel>(NetDriver->ServerConnection->Channels[2]);
+
 }
 
 void UHaServerSubsystem::Tick(float DeltaSeconds)

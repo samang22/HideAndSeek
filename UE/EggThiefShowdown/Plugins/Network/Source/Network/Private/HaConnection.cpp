@@ -5,7 +5,7 @@
 #include "Sockets.h"
 #include "Net/Common/Packets/PacketTraits.h"
 #include "PacketType.h"
-#include "SendRecvBunchChannel.h"
+#include "Channel/SendRecvBunchChannel.h"
 #include "SocketSubsystem.h"
 
 UHaConnection::UHaConnection()

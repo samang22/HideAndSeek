@@ -15,7 +15,7 @@ class NETWORK_API USendRecvBunchChannel : public UChannel
     GENERATED_BODY()
 
 public:
-    virtual void SendBunch(FBunch& NewBunch) {}
+    virtual void SendBunch(FBunch& NewBunch);
     /** Handle an incoming bunch. */
     virtual void ReceivedBunch(FBunch& Bunch) {}
 };

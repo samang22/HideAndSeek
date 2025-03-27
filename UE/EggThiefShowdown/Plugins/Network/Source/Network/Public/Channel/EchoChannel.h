@@ -19,19 +19,18 @@ public:
 };
 #pragma pack(pop)
 
-/**
- *
- */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEchoMessage, FString, Message);
+
 UCLASS()
 class NETWORK_API UEchoChannel : public USendRecvBunchChannel
 {
     GENERATED_BODY()
 
 public:
-    virtual void Tick() override;
+    UPROPERTY(BlueprintAssignable)
+    FOnEchoMessage OnEchoMessage;
 
-    virtual void SendBunch(FBunch& NewBunch) override;
-
+public:
     /** Handle an incoming bunch. */
     virtual void ReceivedBunch(FBunch& Bunch) override;
 };

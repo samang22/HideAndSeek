@@ -10,12 +10,14 @@
 #include "Components/TextBlock.h"
 #include "ChatWidget.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FChatMessage
 {
     GENERATED_USTRUCT_BODY()
 
+    UPROPERTY(BlueprintReadWrite)
     FString UserName;
+    UPROPERTY(BlueprintReadWrite)
     FString Message;
 
     FChatMessage() = default;
@@ -30,7 +32,7 @@ class NETWORK_API UChatWidget : public UUserWidget
     GENERATED_BODY()
 
 public:
-    UFUNCTION()
+    UFUNCTION(BlueprintCallable)
     virtual void AddChatMessage(const FChatMessage& NewMessage);
 
     FOnChatSend OnChatSend;
