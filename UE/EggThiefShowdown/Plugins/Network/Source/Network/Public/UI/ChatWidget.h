@@ -24,7 +24,7 @@ struct FChatMessage
     FChatMessage(FString InUserName, FString InMessage) : UserName(InUserName), Message(InMessage) {}
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChatSend, const FChatMessage&, ChatMessage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChatDelegate, const FString&, ChatMessage);
 
 UCLASS()
 class NETWORK_API UChatWidget : public UUserWidget
@@ -35,17 +35,21 @@ public:
     UFUNCTION(BlueprintCallable)
     virtual void AddChatMessage(const FChatMessage& NewMessage);
 
-    FOnChatSend OnChatSend;
-
-    void SetMyUserName(FString NewUserName) { MyUserName = NewUserName; }
+    UPROPERTY(BlueprintAssignable)
+    FChatDelegate ChatDelegate;
 
 protected:
     UFUNCTION()
     virtual void OnChatCommitted(const FText& Text, ETextCommit::Type CommitMethod);
 
     UFUNCTION()
-    void OnSend();
+    void OnChatSend();
 
+    UFUNCTION()
+    virtual void OnChatTextChanged(const FText& Text);
+
+
+protected:
     UFUNCTION(BlueprintCallable)
     UScrollBox* GetChatScrollBox() const { return ChatScrollBox; }
 
@@ -80,6 +84,4 @@ protected:
 protected:
     int32 MaxChatCount = 10;
     TArray<FChatMessage> ChatMessages;
-
-    FString MyUserName;
 };

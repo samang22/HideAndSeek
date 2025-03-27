@@ -9,14 +9,12 @@ void UChatWidget::NativeConstruct()
     Super::NativeConstruct();
     SetIsFocusable(true);
 
-    SendButton->OnClicked.AddDynamic(this, &ThisClass::OnSend);
-    OnChatSend.AddDynamic(this, &ThisClass::AddChatMessage);
+    SendButton->OnClicked.AddDynamic(this, &ThisClass::OnChatSend);
 
     ChatInputBox->OnTextCommitted.AddDynamic(this, &ThisClass::OnChatCommitted);
+    ChatInputBox->OnTextChanged.AddDynamic(this, &ThisClass::OnChatTextChanged);
     ChatInputBox->SetText(FText::FromString(TEXT("")));
     ChatTextBlock->SetText(FText::FromString(TEXT("")));
-
-    SetMyUserName(TEXT("Test"));
 }
 
 void UChatWidget::AddChatMessage(const FChatMessage& NewMessage)
@@ -42,29 +40,28 @@ void UChatWidget::UpdateChatMessage()
     ChatScrollBox->ScrollToEnd();
 }
 
-void UChatWidget::OnSend()
+void UChatWidget::OnChatSend()
 {
     FText InputText = ChatInputBox->GetText();
     if (InputText.IsEmpty()) { return; }
 
     ChatInputBox->SetText(FText::FromString(TEXT("")));
 
-    FChatMessage NewChatMessage = FChatMessage(MyUserName, InputText.ToString());
-    OnChatSend.Broadcast(NewChatMessage);
+    ChatDelegate.Broadcast(InputText.ToString());
 }
 
 FReply UChatWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
     if (InKeyEvent.GetKey() == EKeys::Up)
     {
-        for (auto It = ChatMessages.rbegin(); It != ChatMessages.rend(); ++It)
-        {
-            if ((*It).UserName == MyUserName)
-            {
-                ChatInputBox->SetText(FText::FromString((*It).Message));
-                break;
-            }
-        }
+        //for (auto It = ChatMessages.rbegin(); It != ChatMessages.rend(); ++It)
+        //{
+        //    if ((*It).UserName == MyUserName)
+        //    {
+        //        ChatInputBox->SetText(FText::FromString((*It).Message));
+        //        break;
+        //    }
+        //}
         return FReply::Handled();
     }
 
@@ -75,6 +72,17 @@ void UChatWidget::OnChatCommitted(const FText& Text, ETextCommit::Type CommitMet
 {
     if (ETextCommit::OnEnter == CommitMethod)
     {
-        OnSend();
+        OnChatSend();
+    }
+}
+
+void UChatWidget::OnChatTextChanged(const FText& Text)
+{
+    const int32 MaxChar = 50;
+    FString TextString = Text.ToString();
+    if (TextString.Len() > MaxChar)
+    {
+        TextString = TextString.Left(MaxChar);
+        ChatInputBox->SetText(FText::FromString(TextString));
     }
 }

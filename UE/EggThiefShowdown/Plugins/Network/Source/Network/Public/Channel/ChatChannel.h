@@ -8,7 +8,7 @@
 
 template<uint8 MessageType> class FNetChatMessage {};
 
-#define DEFINE_CHAT_CHANNEL_MESSAGE(Name, Index) DEFINE_CHANNEL_MESSAGE(Chat, 1, Name, Index)
+#define DEFINE_CHAT_CHANNEL_MESSAGE(Name, Index) DEFINE_CHANNEL_MESSAGE(Chat, 2, Name, Index)
 
 DEFINE_CHAT_CHANNEL_MESSAGE(CTS_Chat, 0);
 DEFINE_CHAT_CHANNEL_MESSAGE(STC_Chat, 1);

@@ -20,7 +20,8 @@ public:
     UEchoChannel* GetEchoChannel() { return EchoChannel; }
     UFUNCTION(BlueprintCallable, BlueprintPure)
     UChatChannel* GetChatChannel() { return ChatChannel; }
-
+    UFUNCTION(BlueprintCallable)
+    void SendChatMessage(FString InMessage);
 public:
     // 기본값으로 인자를 주는 경우 DefaultNetwork.ini설정을 따릅니다
     virtual void ConnectToServer(FStringView InHost = TEXT(""), int32 InPort = -1);

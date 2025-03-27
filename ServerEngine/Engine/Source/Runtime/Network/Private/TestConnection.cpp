@@ -18,4 +18,8 @@ void UTestConnection::HandleConnectionEstablished()
 
 	Channels[1] = NewObject<UChannel>(this, UEchoChannel::StaticClass(), TEXT("Echo"));
 	Channels[1]->Init(this, 1);
+
+	Channels[2] = NewObject<UChannel>(this, UChatChannel::StaticClass(), TEXT("Chat"));
+	Channels[2]->Init(this, 2);
+
 }

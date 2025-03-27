@@ -6,6 +6,19 @@
 #include "Channel/EchoChannel.h"
 #include "Channel/ChatChannel.h"
 
+void UHaServerSubsystem::SendChatMessage(FString InMessage)
+{
+    if (InMessage.IsEmpty() || InMessage.Len() > UE_ARRAY_COUNT(FHaChatMessage::Message))
+    {
+        return;
+    }
+
+    FHaChatMessage HaChatMessage;
+    std::wcsncpy(HaChatMessage.Message, &InMessage[0], InMessage.Len());
+    FNetChatMessage<NMT_CTS_Chat>::Send(NetDriver->ServerConnection, HaChatMessage);
+}
+
+
 void UHaServerSubsystem::ConnectToServer(FStringView InHost, int32 InPort)
 {
     NetDriver = NewObject<UHaNetDriver>(this, TEXT("Ha NetDriver"));
@@ -17,8 +30,6 @@ void UHaServerSubsystem::ConnectToServer(FStringView InHost, int32 InPort)
     check(URL.Port != -1);
 
     FString OutError;
-
-
 
     if (!NetDriver->InitConnect(this, URL, OutError))
     {
