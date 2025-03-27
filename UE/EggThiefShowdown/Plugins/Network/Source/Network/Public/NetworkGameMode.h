@@ -7,8 +7,7 @@
 #include "NetworkGameMode.generated.h"
 
 
-class UHaNetDriver;
-UCLASS(config = Network)
+UCLASS()
 class NETWORK_API ANetworkGameMode : public AGameModeBase, public FNetworkNotify
 {
 	GENERATED_BODY()
@@ -17,13 +16,4 @@ public:
 	ANetworkGameMode();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
-protected:
-	UPROPERTY(Transient)
-	UHaNetDriver* NetDriver = nullptr;
-
-	UPROPERTY(Config)
-	FString Host;
-
-	UPROPERTY(Config)
-	int32 Port;
 };

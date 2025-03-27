@@ -167,7 +167,7 @@ void UHaNetDriver::TickDispatch(float DeltaTime)
                 {
                     break;
                 }
-                /*const EConnectionState ConnectionState = ARServerConnection->GetConnectionState();
+                /*const EConnectionState ConnectionState = HaServerConnection->GetConnectionState();
                 if (ConnectionState == EConnectionState::USOCK_Closed || ConnectionState == EConnectionState::USOCK_Invalid)
                 {
                     return;
@@ -191,7 +191,7 @@ void UHaNetDriver::LowLevelDestroy()
             if (!CurrentSocket->Shutdown(ESocketShutdownMode::Read))
             {
                 const ESocketErrors ShutdownError = SocketSubsystem->GetLastErrorCode();
-                UE_LOG(LogNet, Log, TEXT("UARNetDriver::LowLevelDestroy Socket->Shutdown returned error %s (%d) for %s"), SocketSubsystem->GetSocketError(ShutdownError), static_cast<int>(ShutdownError), *GetDescription());
+                UE_LOG(LogNet, Log, TEXT("UHaNetDriver::LowLevelDestroy Socket->Shutdown returned error %s (%d) for %s"), SocketSubsystem->GetSocketError(ShutdownError), static_cast<int>(ShutdownError), *GetDescription());
             }
             HaSocketReceiveThread->WaitForCompletion();
         }
