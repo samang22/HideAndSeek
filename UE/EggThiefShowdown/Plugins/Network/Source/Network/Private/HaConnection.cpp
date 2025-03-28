@@ -52,6 +52,8 @@ void UHaConnection::LowLevelSend(void* Data, int32 CountBits, FOutPacketTraits& 
 
 void UHaConnection::OnConnect(bool bInNetDriverRecvThread) 
 {
+    SetConnectionState(EConnectionState::USOCK_Open);
+
     bNetDriverRecvThread = bInNetDriverRecvThread;
     if (bNetDriverRecvThread)
     {
@@ -82,6 +84,11 @@ void UHaConnection::TickDispatch(float DeltaTime)
             } 
 
         } while (bHasPacket);
+    }
+
+    if (GetConnectionState() == EConnectionState::USOCK_Closed)
+    {
+        RequestEngineExit(TEXT("Server Connection lost"));
     }
 }
 
@@ -127,6 +134,7 @@ bool UHaConnection::ReadPacketSome(const uint32 InReadSize)
     {
         // 서버가 끊어짐
         // Shutdown();
+        SetConnectionState(EConnectionState::USOCK_Closed);
         return false;
     }
 

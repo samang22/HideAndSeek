@@ -136,9 +136,9 @@ void UDBChannel::CreateAccount(const FAccount& InAccount, function<void(bool)> R
 					boost::mysql::error_code ErrorCode;
 					boost::mysql::diagnostics Diagnostics;
 					boost::mysql::results Result;
-					DBNetDriver->SendSQL(NewConnection, "USE AccountDB", Result, ErrorCode, Diagnostics);
+					DBNetDriver->SendSQL(NewConnection, "USE userinfo", Result, ErrorCode, Diagnostics);
 
-					string STMT = "INSERT INTO Account VALUES(?, ?)";
+					string STMT = "INSERT INTO Accounts VALUES(?, ?)";
 					FStatement Statement;
 					// SQL Inejction 방어 코드가 들어가 있는 Statement 쿼리를 사용 하면 안전하게 파라미터를 전달 할 수 있다
 					if (!DBNetDriver->CreateStatement(NewConnection, STMT, Statement, ErrorCode, Diagnostics))
