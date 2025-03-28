@@ -10,7 +10,7 @@ template<uint8 MessageType> class FNetDediServerChannelMessage {};
 
 #pragma pack(push, 1)
 DEFINE_UEDEDI_CHANNEL_MESSAGE(UETS_Info, 0);
-class FARDediServerChannelInfo : public FBunch
+class FHaDediServerChannelInfo : public FBunch
 {
 public:
 	uint16 MaxPlayers;
@@ -19,7 +19,7 @@ public:
 };
 
 DEFINE_UEDEDI_CHANNEL_MESSAGE(UETS_CheckAccountValid, 1);
-class FAR_DEDI_TO_LOGIN_SERVER_CheckAccountValid : public FBunch
+class FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValid : public FBunch
 {
 public:
 	WIDECHAR UserName[15] = {};
@@ -27,7 +27,7 @@ public:
 };
 
 DEFINE_UEDEDI_CHANNEL_MESSAGE(STUE_CheckAccountValid, 2);
-class FAR_DEDI_TO_LOGIN_SERVER_CheckAccountValidResult : public FBunch
+class FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValidResult : public FBunch
 {
 public:
 	bool bResult;
@@ -37,7 +37,7 @@ public:
 
 // 데디 서버에서 해당 유저가 있는 경우 킥합니다
 DEFINE_UEDEDI_CHANNEL_MESSAGE(STUE_KickUser, 3);
-class FAR_DEDI_TO_LOGIN_SERVER_KickUser : public FBunch
+class FHa_DEDI_TO_LOGIN_SERVER_KickUser : public FBunch
 {
 public:
 	WIDECHAR UserName[15] = {};
@@ -56,7 +56,7 @@ public:
 	/** Handle an incoming bunch. */
 	virtual void ReceivedBunch(FBunch& Bunch) override;
 
-	FSafeDelegate<UIpConnection*, FAR_DEDI_TO_LOGIN_SERVER_CheckAccountValid&> RequestCheckAccountDelegate;
+	FSafeDelegate<UIpConnection*, FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValid&> RequestCheckAccountDelegate;
 
 public:
 	uint16 Port = (uint16)-1;

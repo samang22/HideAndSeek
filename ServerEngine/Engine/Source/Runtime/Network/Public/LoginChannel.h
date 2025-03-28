@@ -51,7 +51,7 @@ class FARRequestDediServerInfo : public FBunch
 
 // 서버가 클라로 데디서버 정보를 전달하는 Packet
 DEFINE_LOGIN_CHANNEL_MESSAGE(STC_DediServerInfo, 4);
-class FARDediServerInfo : public FBunch
+class FHaDediServerInfo : public FBunch
 {
 public:
 	// 최대 서버 수가 20으로 가정

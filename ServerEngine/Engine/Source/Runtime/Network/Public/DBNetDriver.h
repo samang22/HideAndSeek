@@ -4,7 +4,6 @@
 #include <boost/mysql.hpp>
 #include "DBNetDriver.generated.h"
 
-class UDBConnection;
 using FDBConnection = boost::mysql::pooled_connection;
 using FStatement = boost::mysql::statement;
 
