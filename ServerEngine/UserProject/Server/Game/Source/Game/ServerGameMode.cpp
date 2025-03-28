@@ -72,19 +72,80 @@ void AServerGameMode::Tick(float DeltaSceonds)
 	LoginNetDriver->Tick(DeltaSceonds);
 }
 
-void AServerGameMode::OnLogin(const FAccount& NewAccount, UIpConnection* Connection)
+void AServerGameMode::NotifyAcceptedConnection(UNetConnection* Connection)
 {
-	LoginUsers.emplace(NewAccount.UserName, Connection);
+	if (Connection->GetNetDriver() == LoginNetDriver.get())
+	{
+		// 신규 클라 접속
+		UChatChannel* ChatChannel = dynamic_cast<UChatChannel*>(Connection->Channels[2].get());
+		ChatChannel->OnCTS_Chat.AddUObject(this, &AServerGameMode::OnChatMessage);
+		ULoginChannel* LoginChannel = dynamic_cast<ULoginChannel*>(Connection->Channels[3].get());
+		LoginChannel->ReceivedDelegate.AddUObject(this, &AServerGameMode::OnReceivedLogin);
+		//LoginChannel->RequestDediServerInfo.AddUObject(this, &AServerGameMode::OnRequestDediServerInfo);
+	}
+	else
+	{
+		assert(false);
+	}
+	//else if (Connection->GetNetDriver() == UEServerChannelNetDriver.get())
+	//{
+	//	// 신규 데디 서버 접속
+	//	UIpConnection* UEDediServer = dynamic_cast<UIpConnection*>(Connection);
+	//	_ASSERT(UEDediServer);
+	//	if (UEDediServer)
+	//	{
+	//		UUEDediServerChannel* DediServerChannel = dynamic_cast<UUEDediServerChannel*>(UEDediServer->Channels[4].get());
+	//		DediServerChannel->RequestCheckAccountDelegate.AddUObject(this, &ThisClass::OnRequestCheckAccount);
+	//		UEDediServers.push_back(UEDediServer);
+	//	}
+	//}
 }
 
-void AServerGameMode::OnReceivedLogin(UIpConnection* Connection, FARLogin& LoginPacket)
+void AServerGameMode::NotifyConnectionClosed(UNetConnection* Connection)
+{
+	if (Connection->GetNetDriver() == LoginNetDriver.get())
+	{
+		// 클라가 접속이 끊어짐
+		for (auto& It : LoginUsers)
+		{
+			if (It.second == Connection)
+			{
+				LoginUsers.erase(It.first);
+				break;
+			}
+		}
+	}
+	else
+	{
+		assert(false);
+	}
+	//else if (Connection->GetNetDriver() == UEServerChannelNetDriver.get())
+	//{
+	//	// 데디 서버 연결이 끊어짐 (비정상 상황)
+	//	for (int32 i = 0; i < UEDediServers.size(); ++i)
+	//	{
+	//		if (UEDediServers[i] == Connection)
+	//		{
+	//			UEDediServers.erase(UEDediServers.begin() + i);
+	//			break;
+	//		}
+	//	}
+	//}
+}
+
+void AServerGameMode::OnLogin(const FAccount& NewAccount, UIpConnection* Connection)
+{
+	LoginUsers.emplace(NewAccount.ID, Connection);
+}
+
+void AServerGameMode::OnReceivedLogin(UIpConnection* Connection, FHaLogin& LoginPacket)
 {
 	FAccount Account;
-	Account.UserName = TCHAR_TO_ANSI((FString)LoginPacket.UserName);
+	Account.ID = TCHAR_TO_ANSI((FString)LoginPacket.UserName);
 	Account.Password = TCHAR_TO_ANSI((FString)LoginPacket.Password);
 
 	bool bFailed = false;
-	if (Account.UserName.size() > 15 || Account.UserName.empty() ||
+	if (Account.ID.size() > 15 || Account.ID.empty() ||
 		Account.Password.size() > 15 || Account.Password.empty())
 	{
 		// TODO: 실패 패킷 전송
@@ -98,15 +159,15 @@ void AServerGameMode::OnReceivedLogin(UIpConnection* Connection, FARLogin& Login
 			{
 				if (bResult)
 				{
-					FARCreateAccountResult ARLoginResult;
-					ARLoginResult.ResultCode = 1;
-					FNetLoginMessage<NMT_STC_CreateAccountResult>::Send(Connection, ARLoginResult);
+					FHaCreateAccountResult HaLoginResult;
+					HaLoginResult.ResultCode = 1;
+					FNetLoginMessage<NMT_STC_CreateAccountResult>::Send(Connection, HaLoginResult);
 				}
 				else
 				{
-					FARCreateAccountResult ARLoginResult;
-					ARLoginResult.ResultCode = 0;
-					FNetLoginMessage<NMT_STC_CreateAccountResult>::Send(Connection, ARLoginResult);
+					FHaCreateAccountResult HaLoginResult;
+					HaLoginResult.ResultCode = 0;
+					FNetLoginMessage<NMT_STC_CreateAccountResult>::Send(Connection, HaLoginResult);
 				}
 			}
 		);
@@ -116,16 +177,16 @@ void AServerGameMode::OnReceivedLogin(UIpConnection* Connection, FARLogin& Login
 		DBChannel->Login(Account,
 			[this, Connection, Account](ELoginResult LoginResult)
 			{
-				FARLoginResult ARLoginResult;
-				ARLoginResult.ResultCode = LoginResult;
-				FString UserName = ANSI_TO_TCHAR(Account.UserName);
+				FHaLoginResult HaLoginResult;
+				HaLoginResult.ResultCode = LoginResult;
+				FString UserName = ANSI_TO_TCHAR(Account.ID);
 				FString Password = ANSI_TO_TCHAR(Account.Password);
-				wmemcpy_s(ARLoginResult.UserName, ARRAYSIZE(ARLoginResult.UserName), UserName.data(), UserName.size());
-				wmemcpy_s(ARLoginResult.Password, ARRAYSIZE(ARLoginResult.Password), Password.data(), Password.size());
-				FNetLoginMessage<NMT_STC_LoginResult>::Send(Connection, ARLoginResult);
+				wmemcpy_s(HaLoginResult.UserName, ARRAYSIZE(HaLoginResult.UserName), UserName.data(), UserName.size());
+				wmemcpy_s(HaLoginResult.Password, ARRAYSIZE(HaLoginResult.Password), Password.data(), Password.size());
+				FNetLoginMessage<NMT_STC_LoginResult>::Send(Connection, HaLoginResult);
 				if (LoginResult == ELoginResult::Success)
 				{
-					auto It = LoginUsers.find(Account.UserName);
+					auto It = LoginUsers.find(Account.ID);
 					if (It != LoginUsers.end())
 					{
 						if (It->second == Connection)
@@ -135,9 +196,9 @@ void AServerGameMode::OnReceivedLogin(UIpConnection* Connection, FARLogin& Login
 							return;
 						}
 						// 이미 로그인 되어 있는 경우
-						E_LOG(Warning, TEXT("다른 곳에서 로그인 하여 기존 접속을 끊습니다: {}"), ANSI_TO_TCHAR(Account.UserName));
+						E_LOG(Warning, TEXT("다른 곳에서 로그인 하여 기존 접속을 끊습니다: {}"), ANSI_TO_TCHAR(Account.ID));
 						UIpConnection* OldConnection = It->second;
-						LoginUsers.erase(Account.UserName);
+						LoginUsers.erase(Account.ID);
 						OldConnection->Shutdown(); OldConnection = nullptr;
 
 						// @TODO : Logout from DediServer
@@ -172,7 +233,7 @@ void AServerGameMode::OnChatMessage(UIpConnection* Connection, FChatMessage& Cha
 	}
 }
 
-void AServerGameMode::OnRequestCheckAccount(UIpConnection* Connection, FAR_DEDI_TO_LOGIN_SERVER_CheckAccountValid& Bunch)
+void AServerGameMode::OnRequestCheckAccount(UIpConnection* Connection, FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValid& Bunch)
 {
 	// @TODO : Send Login packet to UE DediServer
 }

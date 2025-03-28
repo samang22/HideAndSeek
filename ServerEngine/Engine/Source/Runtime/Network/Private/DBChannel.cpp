@@ -38,12 +38,12 @@ void UDBChannel::Init(UNetConnection* InConnection, int32 InChIndex)
 	E_LOG(Log, TEXT("{} IP:{}:{} ID:{}, PW:{} connected!"), GetName(), URL.Host, to_wstring(URL.Port), ANSI_TO_TCHAR(ID), ANSI_TO_TCHAR(Password));
 
 	boost::mysql::results Result;
-	Connection.execute("CREATE DATABASE IF NOT EXISTS AccountDB", Result, ErrorCode, Diagnostics);
-	Connection.execute("USE AccountDB", Result, ErrorCode, Diagnostics);
+	Connection.execute("CREATE DATABASE IF NOT EXISTS userinfo", Result, ErrorCode, Diagnostics);
+	Connection.execute("USE userinfo", Result, ErrorCode, Diagnostics);
 	Connection.execute(R"(
-					CREATE TABLE IF NOT EXISTS Account
+					CREATE TABLE IF NOT EXISTS Accounts
 					(
-						UserName VARCHAR(15) PRIMARY KEY,
+						ID VARCHAR(15) PRIMARY KEY,
 						Password VARCHAR(15) NOT NULL
 					);
 				)", Result, ErrorCode, Diagnostics);
@@ -105,10 +105,10 @@ void UDBChannel::Init(UNetConnection* InConnection, int32 InChIndex)
 	//		for (const auto& Row : Result.rows())
 	//		{
 	//			FAccount Account;
-	//			Account.UserName = Row[0].as_string();
+	//			Account.ID = Row[0].as_string();
 	//			Account.Password = Row[1].as_string();
 
-	//			E_LOG(Log, TEXT("UserName: {}, Password: {}"), ANSI_TO_TCHAR(Account.UserName), ANSI_TO_TCHAR(Account.Password));
+	//			E_LOG(Log, TEXT("UserName: {}, Password: {}"), ANSI_TO_TCHAR(Account.ID), ANSI_TO_TCHAR(Account.Password));
 	//		}
 	//	}
 	//	{
@@ -116,7 +116,7 @@ void UDBChannel::Init(UNetConnection* InConnection, int32 InChIndex)
 	//		Connection.execute("SELECT UserName, Password FROM Account", Accounts, ErrorCode, Diagnostics);
 	//		for(const FAccount& Account : Accounts.rows())
 	//		{
-	//			E_LOG(Log, TEXT("UserName: {}, Password: {}"), ANSI_TO_TCHAR(Account.UserName), ANSI_TO_TCHAR(Account.Password));
+	//			E_LOG(Log, TEXT("UserName: {}, Password: {}"), ANSI_TO_TCHAR(Account.ID), ANSI_TO_TCHAR(Account.Password));
 	//		}
 	//	}
 	//}
@@ -146,17 +146,17 @@ void UDBChannel::CreateAccount(const FAccount& InAccount, function<void(bool)> R
 						return;
 					}
 					TArray<boost::mysql::field> Fields; Fields.reserve(2);
-					Fields.emplace_back(InAccount.UserName);
+					Fields.emplace_back(InAccount.ID);
 					Fields.emplace_back(InAccount.Password);
 					bool bResult = DBNetDriver->SendSQL(NewConnection, Statement.bind(Fields.begin(), Fields.end()), Result, ErrorCode, Diagnostics);
 
 					if (bResult)
 					{
-						E_LOG(Log, TEXT("Create account: {}, {}"), ANSI_TO_TCHAR(InAccount.UserName), ANSI_TO_TCHAR(InAccount.Password));
+						E_LOG(Log, TEXT("Create account: {}, {}"), ANSI_TO_TCHAR(InAccount.ID), ANSI_TO_TCHAR(InAccount.Password));
 					}
 					else
 					{
-						E_LOG(Warning, TEXT("Create account Failed: {}, {}"), ANSI_TO_TCHAR(InAccount.UserName), ANSI_TO_TCHAR(InAccount.Password));
+						E_LOG(Warning, TEXT("Create account Failed: {}, {}"), ANSI_TO_TCHAR(InAccount.ID), ANSI_TO_TCHAR(InAccount.Password));
 					}
 
 					AsyncTask<ENamedThreads::GameThread>(
@@ -185,9 +185,9 @@ void UDBChannel::Login(const FAccount& InAccount, function<void(ELoginResult)> R
 					boost::mysql::error_code ErrorCode;
 					boost::mysql::diagnostics Diagnostics;
 					boost::mysql::results Result;
-					DBNetDriver->SendSQL(NewConnection, "USE AccountDB", Result, ErrorCode, Diagnostics);
+					bool bResult =DBNetDriver->SendSQL(NewConnection, "USE userinfo", Result, ErrorCode, Diagnostics);
 
-					string STMT = "SELECT UserName, Password FROM Account WHERE UserName=?";
+					string STMT = "SELECT ID, Password FROM Accounts WHERE ID=?";
 					FStatement Statement;
 					// SQL Inejction 방어 코드가 들어가 있는 Statement 쿼리를 사용 하면 안전하게 파라미터를 전달 할 수 있다
 					if (!DBNetDriver->CreateStatement(NewConnection, STMT, Statement, ErrorCode, Diagnostics))
@@ -195,18 +195,18 @@ void UDBChannel::Login(const FAccount& InAccount, function<void(ELoginResult)> R
 						return;
 					}
 					TArray<boost::mysql::field> Fields; Fields.reserve(2);
-					Fields.emplace_back(InAccount.UserName);
+					Fields.emplace_back(InAccount.ID);
 					boost::mysql::static_results<FAccount> Accounts;
-					bool bResult = DBNetDriver->SendSQL(NewConnection, Statement.bind(Fields.begin(), Fields.end()), Accounts, ErrorCode, Diagnostics);
+					bResult = DBNetDriver->SendSQL(NewConnection, Statement.bind(Fields.begin(), Fields.end()), Accounts, ErrorCode, Diagnostics);
 					_ASSERT(bResult);
 					size_t Size = Accounts.rows().size();
-					ELoginResult LoginResult = ELoginResult::None;
+					ELoginResult LoginResult = ELoginResult::None; 
 
 					if (Size == 0)
 					{
 						// 해당 계정을 찾을 수 없는 경우
 						LoginResult = ELoginResult::UsernameNotFound;
-						E_LOG(Warning, TEXT("Login failed [UsernameNotFound]: {}, {}"), ANSI_TO_TCHAR(InAccount.UserName), ANSI_TO_TCHAR(InAccount.Password));
+						E_LOG(Warning, TEXT("Login failed [UsernameNotFound]: {}, {}"), ANSI_TO_TCHAR(InAccount.ID), ANSI_TO_TCHAR(InAccount.Password));
 					}
 					else if (Size == 1)
 					{
@@ -217,13 +217,13 @@ void UDBChannel::Login(const FAccount& InAccount, function<void(ELoginResult)> R
 						{
 							// 로그인 성공
 							LoginResult = ELoginResult::Success;
-							E_LOG(Log, TEXT("Login: {}, {}"), ANSI_TO_TCHAR(InAccount.UserName), ANSI_TO_TCHAR(InAccount.Password));
+							E_LOG(Log, TEXT("Login: {}, {}"), ANSI_TO_TCHAR(InAccount.ID), ANSI_TO_TCHAR(InAccount.Password));
 						}
 						else
 						{
 							// 비밀번호가 틀림
 							LoginResult = ELoginResult::PasswordError;
-							E_LOG(Warning, TEXT("Login failed [PasswordError]: {}, {}"), ANSI_TO_TCHAR(InAccount.UserName), ANSI_TO_TCHAR(InAccount.Password));
+							E_LOG(Warning, TEXT("Login failed [PasswordError]: {}, {}"), ANSI_TO_TCHAR(InAccount.ID), ANSI_TO_TCHAR(InAccount.Password));
 						}
 					}
 

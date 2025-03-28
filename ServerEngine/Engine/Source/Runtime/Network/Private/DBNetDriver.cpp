@@ -55,8 +55,6 @@ bool UDBNetDriver::InitConnect(FNetworkNotify* InNotify, const FURL& ConnectURL,
 
 	DBConnectionPool->async_run(boost::asio::detached);
 
-	// 적당히 2개정도 확보 해둠
-	// 필요에 따라 수정해서 쓰세요
 	Channels.resize(2);
 
 	return true;

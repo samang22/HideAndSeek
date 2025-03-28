@@ -6,7 +6,7 @@ void ULoginChannel::ReceivedBunch(FBunch& Bunch)
 {
 	if (FNetLoginMessage<NMT_CTS_CreateAccount>::Receive(Bunch))
 	{
-		FARLogin& Login = (FARLogin&)(Bunch);
+		FHaLogin& Login = (FHaLogin&)(Bunch);
 		ReceivedDelegate.Broadcast(dynamic_cast<UIpConnection*>(Connection), Login);
 	}
 	else if (FNetLoginMessage<NMT_CTS_DediServerInfo>::Receive(Bunch))

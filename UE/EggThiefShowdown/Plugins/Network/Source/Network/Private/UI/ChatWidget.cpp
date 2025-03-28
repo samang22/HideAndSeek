@@ -3,6 +3,7 @@
 
 #include "UI/ChatWidget.h"
 #include "Input/Events.h"
+#include "Channel/ChatChannel.h"
 
 void UChatWidget::NativeConstruct()
 {

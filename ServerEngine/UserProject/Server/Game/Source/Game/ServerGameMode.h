@@ -17,13 +17,16 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSceonds) override;
 
+	virtual void NotifyAcceptedConnection(class UNetConnection* Connection) override;
+	virtual void NotifyConnectionClosed(class UNetConnection* Connection) override;
+
 public: // LoginNetDriver
 	void OnLogin(const struct FAccount& NewAccount, UIpConnection* Connection);
-	void OnReceivedLogin(UIpConnection* Connection, class FARLogin& LoginPacket);
+	void OnReceivedLogin(UIpConnection* Connection, class FHaLogin& LoginPacket);
 	void OnChatMessage(UIpConnection*, class FChatMessage& NewMessage);
 
 public: // ChannelNetDriver
-	void OnRequestCheckAccount(UIpConnection* Connection, class FAR_DEDI_TO_LOGIN_SERVER_CheckAccountValid& Bunch);
+	void OnRequestCheckAccount(UIpConnection* Connection, class FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValid& Bunch);
 
 protected: // DB
 	TObjectPtr<UDBNetDriver> DBNetDriver;

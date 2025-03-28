@@ -11,7 +11,7 @@ template<uint8 MessageType> class FNetLoginMessage {};
 
 #pragma pack(push, 1)
 DEFINE_LOGIN_CHANNEL_MESSAGE(CTS_CreateAccount, 0);
-class FARLogin : public FBunch
+class FHaLogin : public FBunch
 {
 public:
 	bool bCreateAccount = false;
@@ -20,7 +20,7 @@ public:
 };
 
 DEFINE_LOGIN_CHANNEL_MESSAGE(STC_CreateAccountResult, 1);
-class FARCreateAccountResult : public FBunch
+class FHaCreateAccountResult : public FBunch
 {
 public:
 	// 0: 실패, 1: 성공
@@ -28,7 +28,7 @@ public:
 };
 
 DEFINE_LOGIN_CHANNEL_MESSAGE(STC_LoginResult, 2);
-class FARLoginResult : public FBunch
+class FHaLoginResult : public FBunch
 {
 public:
 	// see ELoginResult
@@ -46,7 +46,7 @@ public:
 
 // 클라가 서버로 데디서버 정보를 요청하는 Packet
 DEFINE_LOGIN_CHANNEL_MESSAGE(CTS_DediServerInfo, 3);
-class FARRequestDediServerInfo : public FBunch
+class FHaRequestDediServerInfo : public FBunch
 { };
 
 // 서버가 클라로 데디서버 정보를 전달하는 Packet
@@ -73,7 +73,7 @@ public:
 	/** Handle an incoming bunch. */
 	virtual void ReceivedBunch(FBunch& Bunch) override;
 
-	FSafeDelegate<class UIpConnection*, FARLogin&> ReceivedDelegate;
+	FSafeDelegate<class UIpConnection*, FHaLogin&> ReceivedDelegate;
 
 	FSafeDelegate<class UIpConnection*> RequestDediServerInfo;
 };

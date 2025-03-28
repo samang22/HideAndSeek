@@ -12,7 +12,7 @@ DEFINE_LOGIN_CHANNEL_MESSAGE(CTS_CreateAccount, 0);
 DEFINE_LOGIN_CHANNEL_MESSAGE(STC_CreateAccount, 1);
 
 #pragma pack(push, 1)
-class FARLogin : public FBunch
+class FHaLogin : public FBunch
 {
 public:
     bool bCreateAccount = false;
