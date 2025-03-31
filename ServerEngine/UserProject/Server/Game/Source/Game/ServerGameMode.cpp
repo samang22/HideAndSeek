@@ -219,9 +219,7 @@ void AServerGameMode::OnChatMessage(UIpConnection* Connection, FChatMessage& Cha
 	UIpNetDriver* NetDriver = dynamic_cast<UIpNetDriver*>(Connection->GetNetDriver());
 	_ASSERT(NetDriver);
 
-	// IP와 Port로 User이름을 지정합니다
 	{
-		//FString UserName = std::format(TEXT("{}:{}"), Connection->GetRemoteIP(), Connection->GetRemotePort());
 		FString UserName = GetUsername(Connection);
 		ZeroMemory(ChatMessage.UserName, sizeof(ChatMessage.UserName));
 		std::wcsncpy(ChatMessage.UserName, UserName.c_str(), UserName.size());

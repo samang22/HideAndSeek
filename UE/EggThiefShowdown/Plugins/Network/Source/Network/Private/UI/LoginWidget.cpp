@@ -10,6 +10,10 @@ void ULoginWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	HaServerSubsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>();
+	if (!HaServerSubsystem->GetLoginChannel())
+	{
+		return;
+	}
 	HaServerSubsystem->GetLoginChannel()->OnCreateAccountResult.AddDynamic(this, &ThisClass::OnCreateAccountResult);
 	HaServerSubsystem->GetLoginChannel()->OnLoginResult.AddDynamic(this, &ThisClass::OnLoginResult);
 
@@ -130,6 +134,7 @@ void ULoginWidget::OnLoginResult(uint32 ResultCode)
 	{
 	case 1:
 		SetAckMessage(FText::FromString(TEXT("Login Successed")));
+		OnLogin.Broadcast(UserName);
 		break;
 	case 2:
 		SetAckMessage(FText::FromString(TEXT("Username not found")));

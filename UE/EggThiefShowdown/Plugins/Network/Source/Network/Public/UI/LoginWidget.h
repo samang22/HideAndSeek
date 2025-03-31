@@ -12,6 +12,7 @@
 #include "LoginWidget.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FSendButtonClicked, FString, UserName, FString, Password, bool, bCreateAccount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLogin, FString, UserName);
 
 
 /**
@@ -49,6 +50,9 @@ public:
 	UFUNCTION()
 	void OnLoginResult(uint32 ResultCode);
 
+	UPROPERTY(BlueprintAssignable)
+	FOnLogin OnLogin;
+
 protected:
 	FText RemoveDisallowedString(const FString& InString);
 
@@ -76,6 +80,7 @@ protected:
 	int32 UsernamePasswordMaxLength = 15;
 
 protected:
+	FString UserName;
 	class UHaServerSubsystem* HaServerSubsystem = nullptr;
 	EConnectionState LastConnectionState = EConnectionState::USOCK_Invalid;
 };

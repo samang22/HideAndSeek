@@ -13,6 +13,7 @@ int32 FEngineLoop::PreInit(const TCHAR* CmdLine)
 {
 	FLogger::Get();
 	FModuleManager::Get();
+	FTaskManager::Get();
 	FConfigCacheIni::Get();
 
 	// PreInitPreStartupScreen
@@ -41,6 +42,8 @@ int32 FEngineLoop::Init(HWND hViewportWnd)
 
 void FEngineLoop::Tick()
 {
+	FTaskManager::Get()->Tick();
+
 	GEngine->UpdateTimeAndHandleMaxTickRate();
 	GEngine->Tick(FApp::GetDeltaTime());
 }
@@ -48,10 +51,9 @@ void FEngineLoop::Tick()
 void FEngineLoop::Exit()
 {
 	GEngine->PreExit();
-	//RHIExit();
 
 	FConfigCacheIni::Get(true);
-	//FAssetManager::Get(true);
+	FTaskManager::Get(true);
 
 	GEngine = nullptr;
 
