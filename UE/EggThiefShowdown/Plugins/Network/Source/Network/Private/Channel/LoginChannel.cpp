@@ -21,17 +21,17 @@ void ULoginChannel::ReceivedBunch(FBunch& Bunch)
 			LoginPassword = HaLoginResult.Password;
 		}
 	}
-	//else if (FNetLoginMessage<NMT_STC_DediServerInfo>::Receive(Bunch))
-	//{
-	//	FHaDediServerInfo& HaDediServerInfo = (FHaDediServerInfo&)Bunch;
-	//	ServerCount = ARDediSHaDediServerInfoerverInfo.ServerCount;
-	//	DediServerInfos.SetNum(ServerCount);
-	//	for (int32 i = 0; i < ServerCount; ++i)
-	//	{
-	//		DediServerInfos[i].MaxPlayers = HaDediServerInfo.MaxPlayers[i];
-	//		DediServerInfos[i].CurrentPlayers = HaDediServerInfo.CurrentPlayers[i];
-	//		DediServerInfos[i].IP = FString(ANSI_TO_TCHAR(HaDediServerInfo.ServerIP[i]));
-	//		DediServerInfos[i].Port = HaDediServerInfo.Ports[i];
-	//	}
-	//}
+	else if (FNetLoginMessage<NMT_STC_DediServerInfo>::Receive(Bunch))
+	{
+		FHaDediServerInfo& HaDediServerInfo = (FHaDediServerInfo&)Bunch;
+		ServerCount = HaDediServerInfo.ServerCount;
+		DediServerInfos.SetNum(ServerCount);
+		for (int32 i = 0; i < ServerCount; ++i)
+		{
+			DediServerInfos[i].MaxPlayers = HaDediServerInfo.MaxPlayers[i];
+			DediServerInfos[i].CurrentPlayers = HaDediServerInfo.CurrentPlayers[i];
+			DediServerInfos[i].IP = FString(ANSI_TO_TCHAR(HaDediServerInfo.ServerIP[i]));
+			DediServerInfos[i].Port = HaDediServerInfo.Ports[i];
+		}
+	}
 }

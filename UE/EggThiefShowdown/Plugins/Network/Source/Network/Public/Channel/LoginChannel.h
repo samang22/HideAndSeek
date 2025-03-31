@@ -84,12 +84,15 @@ public:
     /** Handle an incoming bunch. */
     virtual void ReceivedBunch(FBunch& Bunch) override;
 
+	FString GetLoginUserName() const { return LoginUserName; }
+	FString GetLoginPassword() const { return LoginPassword; }
+
+	int32 GetServerCount() const { return ServerCount; }
+	const TArray<FDediServerInfo>& GetDediServerInfos() const { return DediServerInfos; }
+
 public:
 	FOnCreateAccountResult OnCreateAccountResult;
 	FOnLoginResult OnLoginResult;
-
-	int32 GetServerCount() const { return ServerCount; }
-	//const TArray<FDediServerInfo>& GetDediServerInfos() const { return DediServerInfos; }
 
 protected:
 	FString LoginUserName;
@@ -97,5 +100,5 @@ protected:
 
 protected:
 	int32 ServerCount = -1;
-	//TArray<FDediServerInfo> DediServerInfos;
+	TArray<FDediServerInfo> DediServerInfos;
 };

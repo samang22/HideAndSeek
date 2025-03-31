@@ -38,4 +38,8 @@ protected: // UE 클라 및 자체 클라
 protected:
 	FString GetUsername(UIpConnection* Connection);
 	map<string, UIpConnection*> LoginUsers;
+
+protected: // UE 데디 서버
+	TObjectPtr<UIpNetDriver> UEServerChannelNetDriver;
+	TArray<UIpConnection*> UEDediServers;
 };

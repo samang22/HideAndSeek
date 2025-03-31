@@ -25,7 +25,7 @@ int32 FEngineLoop::PreInit(const TCHAR* CmdLine)
 	}
 
 	// CDO 객체를 생성한다
-	for (auto It : GetClassMap()) 
+	for (auto &It : GetClassMap()) 
 	{
 		It.second->GetDefaultObject();
 	}
