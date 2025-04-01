@@ -11,19 +11,19 @@
 
 void UHaServerSubsystem::RequestDediServerInfo()
 {
-    FHaRequestDediServerInfo ARRequestDediServerInfo;
-    FNetLoginMessage<NMT_CTS_DediServerInfo>::Send(NetDriver->ServerConnection, ARRequestDediServerInfo);
+    FHaRequestDediServerInfo HaRequestDediServerInfo;
+    FNetLoginMessage<NMT_CTS_DediServerInfo>::Send(NetDriver->ServerConnection, HaRequestDediServerInfo);
 
 }
 
 FString UHaServerSubsystem::GetLoginUserName() const
 {
-    return FString();
+    return LoginChannel->GetLoginUserName();
 }
 
 FString UHaServerSubsystem::GetLoginPassword() const
 {
-    return FString();
+    return LoginChannel->GetLoginPassword();
 }
 
 void UHaServerSubsystem::SendChatMessage(FString InMessage)

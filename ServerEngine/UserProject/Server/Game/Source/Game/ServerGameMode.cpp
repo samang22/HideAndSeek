@@ -289,7 +289,7 @@ void AServerGameMode::OnRequestDediServerInfo(UIpConnection* Connection)
 		_ASSERT(DediServerChannel);
 
 		string IP = TCHAR_TO_ANSI(DediServerChannel->Connection->GetRemoteIP());
-		HaDediServerInfo.Ports[i] = DediServerChannel->Port;
+		HaDediServerInfo.Ports[i] = DediServerChannel->Port; 
 		HaDediServerInfo.CurrentPlayers[i] = DediServerChannel->CurrentPlayers;
 		HaDediServerInfo.MaxPlayers[i] = DediServerChannel->MaxPlayers;
 		memcpy_s(HaDediServerInfo.ServerIP[i], ARRAYSIZE(HaDediServerInfo.ServerIP[i]), IP.data(), IP.size());
