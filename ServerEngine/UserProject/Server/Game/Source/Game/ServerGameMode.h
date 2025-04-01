@@ -25,6 +25,9 @@ public: // LoginNetDriver
 	void OnReceivedLogin(UIpConnection* Connection, class FHaLogin& LoginPacket);
 	void OnChatMessage(UIpConnection*, class FChatMessage& NewMessage);
 
+	// 데디서버 정보를 요청하는 패킷이 수신 됨
+	void OnRequestDediServerInfo(UIpConnection* Connection);
+
 public: // ChannelNetDriver
 	void OnRequestCheckAccount(UIpConnection* Connection, class FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValid& Bunch);
 

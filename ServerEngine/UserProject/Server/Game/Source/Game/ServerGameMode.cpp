@@ -117,6 +117,7 @@ void AServerGameMode::Tick(float DeltaSceonds)
 
 	DBNetDriver->Tick(DeltaSceonds);
 	LoginNetDriver->Tick(DeltaSceonds);
+	UEServerChannelNetDriver->Tick(DeltaSceonds);
 }
 
 void AServerGameMode::NotifyAcceptedConnection(UNetConnection* Connection)
@@ -128,24 +129,20 @@ void AServerGameMode::NotifyAcceptedConnection(UNetConnection* Connection)
 		ChatChannel->OnCTS_Chat.AddUObject(this, &AServerGameMode::OnChatMessage);
 		ULoginChannel* LoginChannel = dynamic_cast<ULoginChannel*>(Connection->Channels[3].get());
 		LoginChannel->ReceivedDelegate.AddUObject(this, &AServerGameMode::OnReceivedLogin);
-		//LoginChannel->RequestDediServerInfo.AddUObject(this, &AServerGameMode::OnRequestDediServerInfo);
+		LoginChannel->RequestDediServerInfo.AddUObject(this, &AServerGameMode::OnRequestDediServerInfo);
 	}
-	else
+	else if (Connection->GetNetDriver() == UEServerChannelNetDriver.get())
 	{
-		assert(false);
+		// 신규 데디 서버 접속
+		UIpConnection* UEDediServer = dynamic_cast<UIpConnection*>(Connection);
+		_ASSERT(UEDediServer);
+		if (UEDediServer)
+		{
+			UUEDediServerChannel* DediServerChannel = dynamic_cast<UUEDediServerChannel*>(UEDediServer->Channels[4].get());
+			DediServerChannel->RequestCheckAccountDelegate.AddUObject(this, &ThisClass::OnRequestCheckAccount);
+			UEDediServers.push_back(UEDediServer);
+		}
 	}
-	//else if (Connection->GetNetDriver() == UEServerChannelNetDriver.get())
-	//{
-	//	// 신규 데디 서버 접속
-	//	UIpConnection* UEDediServer = dynamic_cast<UIpConnection*>(Connection);
-	//	_ASSERT(UEDediServer);
-	//	if (UEDediServer)
-	//	{
-	//		UUEDediServerChannel* DediServerChannel = dynamic_cast<UUEDediServerChannel*>(UEDediServer->Channels[4].get());
-	//		DediServerChannel->RequestCheckAccountDelegate.AddUObject(this, &ThisClass::OnRequestCheckAccount);
-	//		UEDediServers.push_back(UEDediServer);
-	//	}
-	//}
 }
 
 void AServerGameMode::NotifyConnectionClosed(UNetConnection* Connection)
@@ -162,22 +159,18 @@ void AServerGameMode::NotifyConnectionClosed(UNetConnection* Connection)
 			}
 		}
 	}
-	else
+	else if (Connection->GetNetDriver() == UEServerChannelNetDriver.get())
 	{
-		assert(false);
+		// 데디 서버 연결이 끊어짐 (비정상 상황)
+		for (int32 i = 0; i < UEDediServers.size(); ++i)
+		{
+			if (UEDediServers[i] == Connection)
+			{
+				UEDediServers.erase(UEDediServers.begin() + i);
+				break;
+			}
+		}
 	}
-	//else if (Connection->GetNetDriver() == UEServerChannelNetDriver.get())
-	//{
-	//	// 데디 서버 연결이 끊어짐 (비정상 상황)
-	//	for (int32 i = 0; i < UEDediServers.size(); ++i)
-	//	{
-	//		if (UEDediServers[i] == Connection)
-	//		{
-	//			UEDediServers.erase(UEDediServers.begin() + i);
-	//			break;
-	//		}
-	//	}
-	//}
 }
 
 void AServerGameMode::OnLogin(const FAccount& NewAccount, UIpConnection* Connection)
@@ -248,7 +241,14 @@ void AServerGameMode::OnReceivedLogin(UIpConnection* Connection, FHaLogin& Login
 						LoginUsers.erase(Account.ID);
 						OldConnection->Shutdown(); OldConnection = nullptr;
 
-						// @TODO : Logout from DediServer
+						for (UIpConnection* It : UEDediServers)
+						{
+							// 모든 데디 서버로 이 유저 로그아웃 처리를 하라고 요청
+							FHa_DEDI_TO_LOGIN_SERVER_KickUser KickPacket;
+							FString UserName = ANSI_TO_TCHAR(Account.ID);
+							wmemcpy_s(KickPacket.UserName, ARRAYSIZE(KickPacket.UserName), UserName.data(), UserName.size());
+							FNetDediServerChannelMessage<NMT_STUE_KickUser>::Send(It, KickPacket);
+						}
 					}
 
 					OnLogin(Account, Connection);
@@ -278,9 +278,48 @@ void AServerGameMode::OnChatMessage(UIpConnection* Connection, FChatMessage& Cha
 	}
 }
 
+void AServerGameMode::OnRequestDediServerInfo(UIpConnection* Connection)
+{
+	FHaDediServerInfo HaDediServerInfo;
+	HaDediServerInfo.ServerCount = UEDediServers.size();
+	for (int32 i = 0; i < HaDediServerInfo.ServerCount; ++i)
+	{
+		UIpConnection* DediServerConnection = UEDediServers[i];
+		UUEDediServerChannel* DediServerChannel = dynamic_cast<UUEDediServerChannel*>(DediServerConnection->Channels[4].get());
+		_ASSERT(DediServerChannel);
+
+		string IP = TCHAR_TO_ANSI(DediServerChannel->Connection->GetRemoteIP());
+		HaDediServerInfo.Ports[i] = DediServerChannel->Port;
+		HaDediServerInfo.CurrentPlayers[i] = DediServerChannel->CurrentPlayers;
+		HaDediServerInfo.MaxPlayers[i] = DediServerChannel->MaxPlayers;
+		memcpy_s(HaDediServerInfo.ServerIP[i], ARRAYSIZE(HaDediServerInfo.ServerIP[i]), IP.data(), IP.size());
+	}
+	FNetLoginMessage<NMT_STC_DediServerInfo>::Send(Connection, HaDediServerInfo);
+
+}
+
 void AServerGameMode::OnRequestCheckAccount(UIpConnection* Connection, FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValid& Bunch)
 {
-	// @TODO : Send Login packet to UE DediServer
+	FAccount Account;
+	Account.ID = TCHAR_TO_ANSI(FString(Bunch.UserName));
+	Account.Password = TCHAR_TO_ANSI(FString(Bunch.Password));
+	DBChannel->Login(Account,
+		[this, Connection, Account](ELoginResult LoginResult)
+		{
+			if (LoginResult != ELoginResult::Success)
+			{
+				E_LOG(Warning, TEXT("해커가 장난 치고 있는거 같아요"));
+			}
+
+			FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValidResult ResultPacket;
+			ResultPacket.bResult = LoginResult == ELoginResult::Success;
+			FString UserName = ANSI_TO_TCHAR(Account.ID);
+			FString Password = ANSI_TO_TCHAR(Account.Password);
+			wmemcpy_s(ResultPacket.UserName, ARRAYSIZE(ResultPacket.UserName), UserName.data(), UserName.size());
+			wmemcpy_s(ResultPacket.Password, ARRAYSIZE(ResultPacket.Password), Password.data(), Password.size());
+			FNetDediServerChannelMessage<NMT_STUE_CheckAccountValid>::Send(Connection, ResultPacket);
+		}
+	);
 }
 
 FString AServerGameMode::GetUsername(UIpConnection* Connection)
