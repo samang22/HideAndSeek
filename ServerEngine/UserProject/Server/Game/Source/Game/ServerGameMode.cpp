@@ -20,7 +20,6 @@ void AServerGameMode::BeginPlay()
 {
     Super::BeginPlay();
 
-	FURL URL;
     FString Error;
 
 	// 계정 DB 접속
@@ -44,7 +43,7 @@ void AServerGameMode::BeginPlay()
 			return;
 		}
 
-		DBNetDriver->Channels[0] = NewObject<UChannel>(this, UDBChannel::StaticClass(), TEXT("Login"));
+		DBNetDriver->Channels[0] = NewObject<UChannel>(this, UDBChannel::StaticClass(), TEXT("DB"));
 		DBNetDriver->Channels[0]->NetDriver = DBNetDriver.get();
 		DBNetDriver->Channels[0]->Init(nullptr, 0);
 		DBChannel = dynamic_cast<UDBChannel*>(DBNetDriver->Channels[0].get());
@@ -68,64 +67,48 @@ void AServerGameMode::BeginPlay()
 	//return;
 
 	// 채널 서버
-
 	{
-		UEServerChannelNetDriver = NewObject<UIpNetDriver>(this, UIpNetDriver::StaticClass(), TEXT("ChannelNetDriver"));
+		UEServerChannelNetDriver = NewObject<UIpNetDriver>(this, UIpNetDriver::StaticClass(), TEXT("UE Dedi Server ChannelNetDriver"));
 		UEServerChannelNetDriver->SetNetConnectionClass(UChannelConnection::StaticClass());
 		FURL URL;
 		ConfigFile.Get("Channel Server", "Port", URL.Port);
 
-		if (!LoginNetDriver->InitListen(this, URL, false, Error))
+		if (!UEServerChannelNetDriver->InitListen(this, URL, false, Error))
 		{
 			E_LOG(Error, TEXT("Channel Server listen failed: {}"), Error);
 			RequestEngineExit(TEXT("Channel Server listen failed"));
 			return;
 		}
+		int32 UEServerCount = 0;
+		ConfigFile.Get("Channel Server", "UEServerCount", UEServerCount);
+		int32 UEServerStartPort = 0;
+		ConfigFile.Get("Channel Server", "UEServerStartPort", UEServerStartPort);
+		FString UEServerPath;
+		ConfigFile.Get("Channel Server", "UEServerPath", UEServerPath);
+
+		for (int32 i = 0; i < UEServerCount; ++i)
+		{
+			FString Cmd = TEXT("-log -port=") + ANSI_TO_TCHAR(UEServerStartPort + i);
+			E_LOG(Log, TEXT("UE Server path: {}, Cmd: {}"), UEServerPath, Cmd);
+
+			SHELLEXECUTEINFO sei = { 0 };
+			sei.cbSize = sizeof(SHELLEXECUTEINFO);
+			sei.fMask = SEE_MASK_NOCLOSEPROCESS; // 프로세스 핸들 얻기
+			sei.lpVerb = L"open";
+			sei.lpFile = UEServerPath.c_str(); // 실행할 프로그램
+			sei.lpParameters = Cmd.c_str();
+			sei.nShow = SW_SHOW;
+			if (!ShellExecuteEx(&sei))
+			{
+				E_LOG(Error, TEXT("UE Server open failed!"));
+				RequestEngineExit(TEXT("UE Server open failed!"));
+				return;
+			}
+
+			//TerminateProcess(sei.hProcess, 0);
+			//CloseHandle(sei.hProcess);
+		}
 	}
-
-
-	//{
-	//	UEServerChannelNetDriver = NewObject<UIpNetDriver>(this, UIpNetDriver::StaticClass(), TEXT("UE Dedi Server ChannelNetDriver"));
-	//	UEServerChannelNetDriver->SetNetConnectionClass(UChannelConnection::StaticClass());
-	//	FURL URL;
-	//	ConfigFile.Get("Channel Server", "Port", URL.Port);
-
-	//	if (!UEServerChannelNetDriver->InitListen(this, URL, false, Error))
-	//	{
-	//		E_LOG(Error, TEXT("Channel Server listen failed: {}"), Error);
-	//		RequestEngineExit(TEXT("Channel Server listen failed"));
-	//		return;
-	//	}
-	//	int32 UEServerCount = 0;
-	//	ConfigFile.Get("Channel Server", "UEServerCount", UEServerCount);
-	//	int32 UEServerStartPort = 0;
-	//	ConfigFile.Get("Channel Server", "UEServerStartPort", UEServerStartPort);
-	//	FString UEServerPath;
-	//	ConfigFile.Get("Channel Server", "UEServerPath", UEServerPath);
-
-	//	for (int32 i = 0; i < UEServerCount; ++i)
-	//	{
-	//		FString Cmd = TEXT("-log -port=") + ANSI_TO_TCHAR(UEServerStartPort + i);
-	//		E_LOG(Log, TEXT("UE Server path: {}, Cmd: {}"), UEServerPath, Cmd);
-
-	//		SHELLEXECUTEINFO sei = { 0 };
-	//		sei.cbSize = sizeof(SHELLEXECUTEINFO);
-	//		sei.fMask = SEE_MASK_NOCLOSEPROCESS; // 프로세스 핸들 얻기
-	//		sei.lpVerb = L"open";
-	//		sei.lpFile = UEServerPath.c_str(); // 실행할 프로그램
-	//		sei.lpParameters = Cmd.c_str();
-	//		sei.nShow = SW_SHOW;
-	//		if (!ShellExecuteEx(&sei))
-	//		{
-	//			E_LOG(Error, TEXT("UE Server open failed!"));
-	//			RequestEngineExit(TEXT("UE Server open failed!"));
-	//			return;
-	//		}
-
-	//		//TerminateProcess(sei.hProcess, 0);
-	//		//CloseHandle(sei.hProcess);
-	//	}
-	//}
 }
 
 void AServerGameMode::Tick(float DeltaSceonds)
