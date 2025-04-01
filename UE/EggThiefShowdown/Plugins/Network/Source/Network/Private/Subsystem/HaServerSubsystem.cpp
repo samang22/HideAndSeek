@@ -84,20 +84,15 @@ void UHaServerSubsystem::ConnectToServer(FStringView InHost, int32 InPort)
         return;
     }
 
+    // UE Client only
+#if !UE_SERVER
     EchoChannel = Cast<UEchoChannel>(NetDriver->ServerConnection->Channels[1]);
     ChatChannel = Cast<UChatChannel>(NetDriver->ServerConnection->Channels[2]);
     LoginChannel = Cast<ULoginChannel>(NetDriver->ServerConnection->Channels[3]);
-
-    {
-        //// @TODO : 로그인 UI로 대체
-        //FString UserName = TEXT("user01");
-        //FString Password = TEXT("password123");
-        //FHaLogin Login;
-        //std::wcsncpy(Login.UserName, &UserName[0], UserName.Len());
-        //std::wcsncpy(Login.Password, &Password[0], Password.Len());
-        //FNetLoginMessage<NMT_CTS_CreateAccount>::Send(NetDriver->ServerConnection, Login);
-    }
-
+#else
+    // UE Server only
+    DediServerChannel = Cast<UUEDediServerChannel>(NetDriver->ServerConnection->Channels[4]);
+#endif
 }
 
 void UHaServerSubsystem::SendLoginOrCreateAccount(bool bCreateAccount, const FString& InUsername, const FString& InPassword)
