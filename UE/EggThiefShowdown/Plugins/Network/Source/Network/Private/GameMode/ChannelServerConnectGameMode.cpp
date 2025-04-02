@@ -127,15 +127,11 @@ APlayerController* AChannelServerConnectGameMode::Login(UPlayer* NewPlayer, ENet
 	const FString UserName = UGameplayStatics::ParseOption(Options, TEXT("UserName"));
 	ChangeName(PC, UserName, true);
 
-	/*const int32 NumPlayers = GetNumPlayers();
-	if (NumPlayers == 2)
-	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
-			{
-				GetWorld()->ServerTravel("/Game/Level/ServerNextMap?Listen");
-			});
+	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+		{
+			GetWorld()->ServerTravel("/Game/Level/LobbyMap?Listen");
+		});
 
-	}*/
 	return PC;
 }
 
