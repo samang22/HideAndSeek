@@ -42,8 +42,8 @@ void UChannelBtnWidget::OnChannelButtonClicked()
 	UHaServerSubsystem* Subsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>();
 	const FString URL = IP + TEXT(":") + FString::FromInt(Port);
 
-	const FString ID = Subsystem->GetLoginUserName();
+	const FString UserName = Subsystem->GetLoginUserName();
 	const FString Password = Subsystem->GetLoginPassword();
-	const FString Options = TEXT("ID=") + ID + TEXT("?Password=") + Password;
+	const FString Options = TEXT("UserName=") + UserName + TEXT("?Password=") + Password;
 	UGameplayStatics::OpenLevel(this, FName(URL), true, Options);
 }

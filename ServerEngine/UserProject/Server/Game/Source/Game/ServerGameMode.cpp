@@ -86,7 +86,7 @@ void AServerGameMode::BeginPlay()
 		FString UEServerPath;
 		ConfigFile.Get("Channel Server", "UEServerPath", UEServerPath);
 
-		for (int32 i = 0; i < UEServerCount; ++i)
+		for (int32 i = 0; i < 0; ++i)
 		{
 			FString Cmd = TEXT("-log -port=") + ANSI_TO_TCHAR(UEServerStartPort + i);
 			E_LOG(Log, TEXT("UE Server path: {}, Cmd: {}"), UEServerPath, Cmd);
@@ -175,17 +175,17 @@ void AServerGameMode::NotifyConnectionClosed(UNetConnection* Connection)
 
 void AServerGameMode::OnLogin(const FAccount& NewAccount, UIpConnection* Connection)
 {
-	LoginUsers.emplace(NewAccount.ID, Connection);
+	LoginUsers.emplace(NewAccount.UserName, Connection);
 }
 
 void AServerGameMode::OnReceivedLogin(UIpConnection* Connection, FHaLogin& LoginPacket)
 {
 	FAccount Account;
-	Account.ID = TCHAR_TO_ANSI((FString)LoginPacket.UserName);
+	Account.UserName = TCHAR_TO_ANSI((FString)LoginPacket.UserName);
 	Account.Password = TCHAR_TO_ANSI((FString)LoginPacket.Password);
 
 	bool bFailed = false;
-	if (Account.ID.size() > 15 || Account.ID.empty() ||
+	if (Account.UserName.size() > 15 || Account.UserName.empty() ||
 		Account.Password.size() > 15 || Account.Password.empty())
 	{
 		// TODO: 실패 패킷 전송
@@ -219,14 +219,14 @@ void AServerGameMode::OnReceivedLogin(UIpConnection* Connection, FHaLogin& Login
 			{
 				FHaLoginResult HaLoginResult;
 				HaLoginResult.ResultCode = LoginResult;
-				FString UserName = ANSI_TO_TCHAR(Account.ID);
+				FString UserName = ANSI_TO_TCHAR(Account.UserName);
 				FString Password = ANSI_TO_TCHAR(Account.Password);
 				wmemcpy_s(HaLoginResult.UserName, ARRAYSIZE(HaLoginResult.UserName), UserName.data(), UserName.size());
 				wmemcpy_s(HaLoginResult.Password, ARRAYSIZE(HaLoginResult.Password), Password.data(), Password.size());
 				FNetLoginMessage<NMT_STC_LoginResult>::Send(Connection, HaLoginResult);
 				if (LoginResult == ELoginResult::Success)
 				{
-					auto It = LoginUsers.find(Account.ID);
+					auto It = LoginUsers.find(Account.UserName);
 					if (It != LoginUsers.end())
 					{
 						if (It->second == Connection)
@@ -236,16 +236,16 @@ void AServerGameMode::OnReceivedLogin(UIpConnection* Connection, FHaLogin& Login
 							return;
 						}
 						// 이미 로그인 되어 있는 경우
-						E_LOG(Warning, TEXT("다른 곳에서 로그인 하여 기존 접속을 끊습니다: {}"), ANSI_TO_TCHAR(Account.ID));
+						E_LOG(Warning, TEXT("다른 곳에서 로그인 하여 기존 접속을 끊습니다: {}"), ANSI_TO_TCHAR(Account.UserName));
 						UIpConnection* OldConnection = It->second;
-						LoginUsers.erase(Account.ID);
+						LoginUsers.erase(Account.UserName);
 						OldConnection->Shutdown(); OldConnection = nullptr;
 
 						for (UIpConnection* It : UEDediServers)
 						{
 							// 모든 데디 서버로 이 유저 로그아웃 처리를 하라고 요청
 							FHa_DEDI_TO_LOGIN_SERVER_KickUser KickPacket;
-							FString UserName = ANSI_TO_TCHAR(Account.ID);
+							FString UserName = ANSI_TO_TCHAR(Account.UserName);
 							wmemcpy_s(KickPacket.UserName, ARRAYSIZE(KickPacket.UserName), UserName.data(), UserName.size());
 							FNetDediServerChannelMessage<NMT_STUE_KickUser>::Send(It, KickPacket);
 						}
@@ -301,7 +301,7 @@ void AServerGameMode::OnRequestDediServerInfo(UIpConnection* Connection)
 void AServerGameMode::OnRequestCheckAccount(UIpConnection* Connection, FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValid& Bunch)
 {
 	FAccount Account;
-	Account.ID = TCHAR_TO_ANSI(FString(Bunch.UserName));
+	Account.UserName = TCHAR_TO_ANSI(FString(Bunch.UserName));
 	Account.Password = TCHAR_TO_ANSI(FString(Bunch.Password));
 	DBChannel->Login(Account,
 		[this, Connection, Account](ELoginResult LoginResult)
@@ -313,7 +313,7 @@ void AServerGameMode::OnRequestCheckAccount(UIpConnection* Connection, FHa_DEDI_
 
 			FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValidResult ResultPacket;
 			ResultPacket.bResult = LoginResult == ELoginResult::Success;
-			FString UserName = ANSI_TO_TCHAR(Account.ID);
+			FString UserName = ANSI_TO_TCHAR(Account.UserName);
 			FString Password = ANSI_TO_TCHAR(Account.Password);
 			wmemcpy_s(ResultPacket.UserName, ARRAYSIZE(ResultPacket.UserName), UserName.data(), UserName.size());
 			wmemcpy_s(ResultPacket.Password, ARRAYSIZE(ResultPacket.Password), Password.data(), Password.size());

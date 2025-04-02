@@ -6,10 +6,10 @@
 
 struct FAccount
 {
-	string ID;
+	string UserName;
 	string Password;
 };
-BOOST_DESCRIBE_STRUCT(FAccount, (), (ID, Password))
+BOOST_DESCRIBE_STRUCT(FAccount, (), (UserName, Password))
 
 enum ELoginResult : uint32
 {
