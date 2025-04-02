@@ -86,7 +86,7 @@ void AServerGameMode::BeginPlay()
 		FString UEServerPath;
 		ConfigFile.Get("Channel Server", "UEServerPath", UEServerPath);
 
-		for (int32 i = 0; i < 0; ++i)
+		for (int32 i = 0; i < UEServerCount; ++i)
 		{
 			FString Cmd = TEXT("-log -port=") + ANSI_TO_TCHAR(UEServerStartPort + i);
 			E_LOG(Log, TEXT("UE Server path: {}, Cmd: {}"), UEServerPath, Cmd);
