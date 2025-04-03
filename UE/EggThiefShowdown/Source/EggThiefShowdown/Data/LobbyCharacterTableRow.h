@@ -26,4 +26,8 @@ public: // Animation
 	UAnimMontage* PickedMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
 	UAnimMontage* UnPickedMontage = nullptr;
+
+public:
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Widget")
+	TSubclassOf<UUserWidget> ButtonWidgetClass = nullptr;
 };

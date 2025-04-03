@@ -5,6 +5,8 @@
 #include "../../Data/LobbyCharacterTableRow.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "../../Components/StatusComponent/Lobby/LobbyCharacterStatusComponent.h"
+#include "Components/WidgetComponent.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
@@ -23,6 +25,9 @@ ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
 	SkeletalMeshComponent->SetRelativeScale3D(FVector(45.0, 45.0, 45.0));
 
 	StatusComponent = CreateDefaultSubobject<ULobbyCharacterStatusComponent>(TEXT("StatusComponent"));
+
+	//ButtonWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	//ButtonWidget->SetupAttachment(RootComponent);
 }
 
 void ALobbyCharacter::SetData(const FDataTableRowHandle& InDataTableRowHandle)

@@ -8,6 +8,8 @@
 
 class USkeletalMeshComponent;
 class ULobbyCharacterStatusComponent;
+class UWidgetComponent;
+class ULobbySelectBtnWidget;
 struct FLobbyCharacterTableRow;
 
 UCLASS()
@@ -43,6 +45,11 @@ protected:
 	TObjectPtr<ULobbyCharacterStatusComponent> StatusComponent;
 public:
 	TObjectPtr<ULobbyCharacterStatusComponent> GetStatusComponent() { return StatusComponent; }
+
+protected:
+	TObjectPtr<ULobbySelectBtnWidget> ButtonWidget;
+	LOBBY_SELECT_BUTTON_STATUS eSelectButtonStatus;
+
 
 protected:
 	UPROPERTY(EditAnywhere)
