@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../../Misc/Utils.h"
-#include "StatusComponent.h"
+#include "../../../Misc/Utils.h"
+#include "../StatusComponent.h"
 #include "LobbyCharacterStatusComponent.generated.h"
 
 UCLASS()
@@ -28,8 +28,7 @@ protected:
 	uint8 LobbyCharacterAnimationStatus;
 	LOBBY_CHARACTER_STATUS eLobbyCharacterStatus = LOBBY_CHARACTER_STATUS::IDLE;
 
-
 public:
 	void SetLobbyCharacterStatus(LOBBY_CHARACTER_STATUS eStatus);
-	LOBBY_CHARACTER_STATUS GetFishStatus() const { return eLobbyCharacterStatus; };
+	LOBBY_CHARACTER_STATUS GetLobbyCharacterStatus() const { return eLobbyCharacterStatus; };
 };

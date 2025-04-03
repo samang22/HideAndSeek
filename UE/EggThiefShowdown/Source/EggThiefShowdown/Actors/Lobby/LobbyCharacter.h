@@ -4,29 +4,35 @@
 
 #include "../../Misc/Utils.h"
 #include "GameFramework/Actor.h"
-#include "LobbyMario.generated.h"
+#include "LobbyCharacter.generated.h"
 
 class USkeletalMeshComponent;
 class ULobbyCharacterStatusComponent;
 struct FLobbyCharacterTableRow;
 
 UCLASS()
-class EGGTHIEFSHOWDOWN_API ALobbyMario : public AActor
+class EGGTHIEFSHOWDOWN_API ALobbyCharacter : public AActor
 {
 	GENERATED_BODY()
 
 	virtual void PostInitProperties() override;
-public:
+public:	
 	// Sets default values for this actor's properties
-	ALobbyMario();
+	ALobbyCharacter(const FObjectInitializer& ObjectInitializer);
+	virtual void SetData(const FDataTableRowHandle& InDataTableRowHandle);
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
+	virtual void PostLoad() override;
+	virtual void PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph) override;
+	virtual void OnConstruction(const FTransform& Transform);
+	virtual void PostInitializeComponents() override;
 
-public:
+public:	
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 protected:
 	UPROPERTY(EditAnywhere)

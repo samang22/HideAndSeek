@@ -23,11 +23,7 @@ public: // Animation
 	TSubclassOf<UAnimInstance> AnimClass;
 
 	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
-	UAnimMontage* IdleMontage = nullptr;
-	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
 	UAnimMontage* PickedMontage = nullptr;
-	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
-	UAnimMontage* PickedIdleMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
 	UAnimMontage* UnPickedMontage = nullptr;
 };

@@ -21,9 +21,7 @@
 enum class LOBBY_CHARACTER_ANIM_ENUM : uint8
 {
 	IDLE = 0,
-	PICKED,
 	PICKEDIDLE,
-	UNPICKED,
 	END,
 };
 
@@ -38,9 +36,7 @@ enum class LOBBY_CHARACTER_STATUS : uint8
 
 enum class LOBBY_CHARACTER_MONTAGE : uint8
 {
-	IDLE = 0,
-	PICKED,
-	PICKEDIDLE,
+	PICKED = 0,
 	UNPICKED,
 	END,
 };
