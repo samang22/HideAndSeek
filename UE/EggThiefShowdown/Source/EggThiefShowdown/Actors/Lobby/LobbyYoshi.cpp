@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Actors/Server/LobbyYoshiActor.h"
+#include "LobbyYoshi.h"
 
 
 // Sets default values
-ALobbyYoshiActor::ALobbyYoshiActor()
+ALobbyYoshi::ALobbyYoshi()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -20,36 +20,36 @@ ALobbyYoshiActor::ALobbyYoshiActor()
 	SkeletalMeshComponent->SetRelativeScale3D(FVector(45.0, 45.0, 45.0));
 }
 
-void ALobbyYoshiActor::PostInitProperties()
+void ALobbyYoshi::PostInitProperties()
 {
 	Super::PostInitProperties();
 	SetRemoteRoleForBackwardsCompat(ROLE_AutonomousProxy);
 }
 
 // Called when the game starts or when spawned
-void ALobbyYoshiActor::BeginPlay()
+void ALobbyYoshi::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void ALobbyYoshiActor::Tick(float DeltaTime)
+void ALobbyYoshi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void ALobbyYoshiActor::PlayMontage(LOBBY_CHARACTER_ENUM _InEnum, bool bIsLoop)
+void ALobbyYoshi::PlayMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum, bool bIsLoop)
 {
 }
 
-bool ALobbyYoshiActor::IsMontage(LOBBY_CHARACTER_ENUM _InEnum)
+bool ALobbyYoshi::IsMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum)
 {
 	return false;
 }
 
-bool ALobbyYoshiActor::IsPlayingMontage(LOBBY_CHARACTER_ENUM _InEnum)
+bool ALobbyYoshi::IsPlayingMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum)
 {
 	return false;
 }

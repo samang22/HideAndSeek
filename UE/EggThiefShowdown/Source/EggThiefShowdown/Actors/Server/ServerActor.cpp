@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Actors/Server/ServerActor.h"
+#include "ServerActor.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/Engine.h"
 #include "Engine/GameViewportClient.h"

@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Actors/Server/LobbyMarioActor.h"
+#include "LobbyMario.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
-ALobbyMarioActor::ALobbyMarioActor()
+ALobbyMario::ALobbyMario()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -20,23 +20,37 @@ ALobbyMarioActor::ALobbyMarioActor()
 	SkeletalMeshComponent->SetRelativeScale3D(FVector(45.0, 45.0, 45.0));
 }
 
-void ALobbyMarioActor::PostInitProperties()
+void ALobbyMario::PostInitProperties()
 {
 	Super::PostInitProperties();
 	SetRemoteRoleForBackwardsCompat(ROLE_AutonomousProxy);
 }
 
 // Called when the game starts or when spawned
-void ALobbyMarioActor::BeginPlay()
+void ALobbyMario::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
 // Called every frame
-void ALobbyMarioActor::Tick(float DeltaTime)
+void ALobbyMario::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ALobbyMario::PlayMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum, bool bIsLoop)
+{
+}
+
+bool ALobbyMario::IsMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum)
+{
+	return false;
+}
+
+bool ALobbyMario::IsPlayingMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum)
+{
+	return false;
 }
 

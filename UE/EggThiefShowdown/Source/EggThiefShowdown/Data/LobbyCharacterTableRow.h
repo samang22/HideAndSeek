@@ -3,49 +3,29 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Misc/Utils.h"
-#include "Animation/NPCAnimInstance.h"
-#include "AIController.h"
+#include "../Misc/Utils.h"
 
-#include "FishTableRow.generated.h"
+#include "LobbyCharacterTableRow.generated.h"
 
 USTRUCT()
-struct DREAMINGISLAND_API FFishTableRow : public FTableRowBase
+struct EGGTHIEFSHOWDOWN_API FLobbyCharacterTableRow : public FTableRowBase
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "Fish")
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter")
 	USkeletalMesh* SkeletalMesh = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "Fish")
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter")
 	FTransform MeshTransform = FTransform::Identity;
 
-	UPROPERTY(EditAnywhere, Category = "Fish|Animation")
+public: // Animation
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
 	TSubclassOf<UAnimInstance> AnimClass;
 
-public:
-	UPROPERTY(EditAnywhere, Category = "Fish|Collision")
-	float CollisionSphereRadius = 32.f;
-
-public: // To sense Lure
-	UPROPERTY(EditAnywhere, Category = "Fish|SenseLureCollision")
-	float SenseLureCollisionSphereRadius = 32.f;
-
-public: // Movement
-	UPROPERTY(EditAnywhere, Category = "Fish|Movement")
-	float MovementMaxSpeed = 100.f;
-	UPROPERTY(EditAnywhere, Category = "Fish|Movement")
-	float RushMovementMaxSpeed = 200.f;
-
-
-
-public: // Animation
-	UPROPERTY(EditAnywhere, Category = "Fish|Animation")
-	UAnimMontage* PokeMontage = nullptr;
-	UPROPERTY(EditAnywhere, Category = "Fish|Animation")
-	UAnimMontage* TurnMontage = nullptr;
-
-public: // AI
-	UPROPERTY(EditAnywhere, Category = "Fish|AI")
-	TSubclassOf<AAIController> AIControllerClass;
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
+	UAnimMontage* IdleMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
+	UAnimMontage* PickedTurnMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
+	UAnimMontage* UnPickedTurnMontage = nullptr;
 };

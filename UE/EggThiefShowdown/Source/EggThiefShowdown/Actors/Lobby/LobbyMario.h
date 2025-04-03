@@ -2,26 +2,27 @@
 
 #pragma once
 
+#include "../../Misc/Utils.h"
 #include "GameFramework/Actor.h"
-#include "Misc/Utils.h"
-#include "LobbyYoshiActor.generated.h"
+#include "LobbyMario.generated.h"
+
 class USkeletalMeshComponent;
 
 UCLASS()
-class EGGTHIEFSHOWDOWN_API ALobbyYoshiActor : public AActor
+class EGGTHIEFSHOWDOWN_API ALobbyMario : public AActor
 {
 	GENERATED_BODY()
 
 	virtual void PostInitProperties() override;
-public:	
+public:
 	// Sets default values for this actor's properties
-	ALobbyYoshiActor();
+	ALobbyMario();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -30,7 +31,7 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
 public:
-	void PlayMontage(LOBBY_CHARACTER_ENUM _InEnum, bool bIsLoop = false);
-	bool IsMontage(LOBBY_CHARACTER_ENUM _InEnum);
-	bool IsPlayingMontage(LOBBY_CHARACTER_ENUM _InEnum);
+	void PlayMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum, bool bIsLoop = false);
+	bool IsMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum);
+	bool IsPlayingMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum);
 };

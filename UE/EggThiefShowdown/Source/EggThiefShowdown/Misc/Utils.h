@@ -2,7 +2,6 @@
 
 #pragma once
 
-
 #include "CoreMinimal.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
@@ -12,14 +11,6 @@
 
 
 #define PROBE_SIZE					5.0
-
-enum class LOBBY_CHARACTER_ANIM_ENUM : uint8
-{
-	IDLE = 0,
-	FISHING,
-	PULLING,
-	END,
-};
 
 class FUtils
 {
