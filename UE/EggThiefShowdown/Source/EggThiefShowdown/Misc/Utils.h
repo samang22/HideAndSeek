@@ -12,6 +12,40 @@
 
 #define PROBE_SIZE					5.0
 
+#define LOBBY_CHARACTER_ANIM_BIT_IDLE			0x00000001
+#define LOBBY_CHARACTER_ANIM_BIT_PICKED			0x00000002
+#define LOBBY_CHARACTER_ANIM_BIT_PICKEDIDLE		0x00000004
+#define LOBBY_CHARACTER_ANIM_BIT_UNPICKED		0x00000008
+
+
+enum class LOBBY_CHARACTER_ANIM_ENUM : uint8
+{
+	IDLE = 0,
+	PICKED,
+	PICKEDIDLE,
+	UNPICKED,
+	END,
+};
+
+enum class LOBBY_CHARACTER_STATUS : uint8
+{
+	IDLE = 0,
+	PICKED,
+	PICKEDIDLE,
+	UNPICKED,
+	END,
+};
+
+enum class LOBBY_CHARACTER_MONTAGE : uint8
+{
+	IDLE = 0,
+	PICKED,
+	PICKEDIDLE,
+	UNPICKED,
+	END,
+};
+
+
 class FUtils
 {
 public:
@@ -31,12 +65,6 @@ public:
 };
 
 
-enum class LOBBY_CHARACTER_ANIM_ENUM : uint8
-{
-	IDLE = 0,
-	PICKED,
-	UNPICKED,
-};
 
 inline bool IsNearlyEqualVector_My(const FVector& A, const FVector& B, float Tolerance = KINDA_SMALL_NUMBER)
 {

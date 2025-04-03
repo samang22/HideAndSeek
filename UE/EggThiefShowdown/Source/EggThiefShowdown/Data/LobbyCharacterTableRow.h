@@ -25,7 +25,9 @@ public: // Animation
 	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
 	UAnimMontage* IdleMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
-	UAnimMontage* PickedTurnMontage = nullptr;
+	UAnimMontage* PickedMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
-	UAnimMontage* UnPickedTurnMontage = nullptr;
+	UAnimMontage* PickedIdleMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
+	UAnimMontage* UnPickedMontage = nullptr;
 };

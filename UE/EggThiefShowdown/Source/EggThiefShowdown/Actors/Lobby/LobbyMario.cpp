@@ -2,6 +2,7 @@
 
 
 #include "LobbyMario.h"
+#include "../../Data/LobbyCharacterTableRow.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
@@ -40,17 +41,79 @@ void ALobbyMario::Tick(float DeltaTime)
 
 }
 
-void ALobbyMario::PlayMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum, bool bIsLoop)
+void ALobbyMario::PlayMontage(LOBBY_CHARACTER_MONTAGE _InEnum, bool bIsLoop)
 {
+	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
+
+	UAnimMontage* tempMontage = nullptr;
+
+	switch (_InEnum)
+	{
+	case LOBBY_CHARACTER_MONTAGE::IDLE:
+		tempMontage = LobbyCharacterData->IdleMontage;
+		break;
+	case LOBBY_CHARACTER_MONTAGE::PICKED:
+		tempMontage = LobbyCharacterData->PickedMontage;
+		break;
+	case LOBBY_CHARACTER_MONTAGE::PICKEDIDLE:
+		tempMontage = LobbyCharacterData->PickedIdleMontage;
+		break;
+	case LOBBY_CHARACTER_MONTAGE::UNPICKED:
+		tempMontage = LobbyCharacterData->UnPickedMontage;
+		break;
+	default:
+		break;
+	}
+
+	if (tempMontage/* && !AnimInstance->Montage_IsPlaying(tempMontage)*/)
+	{
+		if (bIsLoop)
+		{
+			AnimInstance->Montage_Play(tempMontage, 1.0f, EMontagePlayReturnType::MontageLength, 0.0f, true);
+		}
+		else
+		{
+			AnimInstance->Montage_Play(tempMontage);
+		}
+	}
 }
 
-bool ALobbyMario::IsMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum)
+bool ALobbyMario::IsMontage(LOBBY_CHARACTER_MONTAGE _InEnum)
 {
-	return false;
+	if (!LobbyCharacterData) return false;
+
+	switch (_InEnum)
+	{
+	case LOBBY_CHARACTER_MONTAGE::IDLE:
+		return LobbyCharacterData->IdleMontage ? true : false;
+	case LOBBY_CHARACTER_MONTAGE::PICKED:
+		return LobbyCharacterData->PickedMontage ? true : false;
+	case LOBBY_CHARACTER_MONTAGE::PICKEDIDLE:
+		return LobbyCharacterData->PickedIdleMontage ? true : false;
+	case LOBBY_CHARACTER_MONTAGE::UNPICKED:
+		return LobbyCharacterData->UnPickedMontage ? true : false;
+	default:
+		return false;
+	}
 }
 
-bool ALobbyMario::IsPlayingMontage(LOBBY_CHARACTER_ANIM_ENUM _InEnum)
+bool ALobbyMario::IsPlayingMontage(LOBBY_CHARACTER_MONTAGE _InEnum)
 {
-	return false;
+	if (!LobbyCharacterData) return false;
+	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
+
+	switch (_InEnum)
+	{
+	case LOBBY_CHARACTER_MONTAGE::IDLE:
+		return AnimInstance->Montage_IsPlaying(LobbyCharacterData->IdleMontage);
+	case LOBBY_CHARACTER_MONTAGE::PICKED:
+		return AnimInstance->Montage_IsPlaying(LobbyCharacterData->PickedMontage);
+	case LOBBY_CHARACTER_MONTAGE::PICKEDIDLE:
+		return AnimInstance->Montage_IsPlaying(LobbyCharacterData->PickedIdleMontage);
+	case LOBBY_CHARACTER_MONTAGE::UNPICKED:
+		return AnimInstance->Montage_IsPlaying(LobbyCharacterData->UnPickedMontage);
+	default:
+		return false;
+	}
 }
 
