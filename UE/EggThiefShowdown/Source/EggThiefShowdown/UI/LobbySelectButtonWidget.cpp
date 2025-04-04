@@ -4,25 +4,71 @@
 #include "LobbySelectButtonWidget.h"
 #include "Subsystem/HaServerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Subsystem/HaServerSubsystem.h"
 
 void ULobbySelectButtonWidget::NativeConstruct()
 {
+    Super::NativeConstruct();
+
     if (SelectionButton)
     {
         SelectionButton->OnClicked.AddDynamic(this, &ULobbySelectButtonWidget::OnButtonClicked);
     }
+    if (StatusTextBlock)
+    {
+        StatusTextBlock->SetText(FText::FromString(TEXT("선택")));
+    }
+
+
 }
 
 void ULobbySelectButtonWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
+
+
+
+
 }
 
 void ULobbySelectButtonWidget::OnButtonClicked()
 {
+    UHaServerSubsystem* Subsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>();
+    _ASSERT(Subsystem);
+    OnButtonEvent.Broadcast(Subsystem->GetLoginUserName());
+}
+
+void ULobbySelectButtonWidget::SetButtonColor(const FLinearColor& NewColor)
+{
+    // 버튼 색상 설정 (예: 버튼이 클릭된 상태에 따라 색상 변경)
+    if (SelectionButton)
+    {
+        // 실제 버튼의 스타일을 업데이트할 수 있는 방식으로 처리
+        SelectionButton->WidgetStyle.Normal.TintColor = FSlateColor(NewColor);
+        SelectionButton->WidgetStyle.Hovered.TintColor = FSlateColor(NewColor);
+        SelectionButton->WidgetStyle.Pressed.TintColor = FSlateColor(NewColor);
+    }
+}
+
+void ULobbySelectButtonWidget::ButtonClickSuccess()
+{
     if (LOBBY_SELECT_BUTTON_STATUS::SELECTED == eButtonStatus)
     {
-        eButtonStatus = LOBBY_SELECT_BUTTON_STATUS::UNSELECTED;
+        eButtonStatus = LOBBY_SELECT_BUTTON_STATUS::DESELECTED;
+        StatusTextBlock->SetText(FText::FromString(TEXT("선택")));
+    }
+    else
+    {
+        eButtonStatus = LOBBY_SELECT_BUTTON_STATUS::SELECTED;
+        StatusTextBlock->SetText(FText::FromString(TEXT("선택됨")));
+    }
+}
+
+void ULobbySelectButtonWidget::UpdateWidgetColor()
+{
+    switch (eButtonStatus)
+    {
+    case LOBBY_SELECT_BUTTON_STATUS::DESELECTED:
         switch (eLobbyCharacterEnum)
         {
         case LOBBY_CHARACTER_ENUM::MARIO:
@@ -34,11 +80,11 @@ void ULobbySelectButtonWidget::OnButtonClicked()
         default:
             break;
         }
-        StatusTextBlock->SetText(FText::FromString(TEXT("선택")));
-    }
-    else
-    {
-        eButtonStatus = LOBBY_SELECT_BUTTON_STATUS::SELECTED;
+
+        StatusTextBlock->SetColorAndOpacity(FLinearColor::White);
+
+        break;
+    case LOBBY_SELECT_BUTTON_STATUS::SELECTED:
         SetButtonColor(FLinearColor::Gray);
 
         switch (eLobbyCharacterEnum)
@@ -53,11 +99,10 @@ void ULobbySelectButtonWidget::OnButtonClicked()
             break;
         }
 
-        StatusTextBlock->SetText(FText::FromString(TEXT("선택됨")));
-    }
-}
 
-void ULobbySelectButtonWidget::SetButtonColor(const FLinearColor& NewColor)
-{
-    SelectionButton->SetColorAndOpacity(NewColor);
+
+        break;
+    default:
+        break;
+    }
 }

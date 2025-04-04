@@ -9,11 +9,14 @@
 #include "../Misc/Utils.h"
 #include "LobbySelectButtonWidget.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnButtonEvent, const FString&, UserName);
 
 UCLASS()
 class EGGTHIEFSHOWDOWN_API ULobbySelectButtonWidget : public UUserWidget
 {
 	GENERATED_BODY()
+	friend class ALobbyCharacter;
+
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
@@ -26,7 +29,7 @@ protected:
 	UTextBlock* StatusTextBlock;
 
 protected:
-	LOBBY_SELECT_BUTTON_STATUS eButtonStatus = LOBBY_SELECT_BUTTON_STATUS::UNSELECTED;
+	LOBBY_SELECT_BUTTON_STATUS eButtonStatus = LOBBY_SELECT_BUTTON_STATUS::DESELECTED;
 public:
 	LOBBY_SELECT_BUTTON_STATUS GetButtonStatus() const { return eButtonStatus; }
 
@@ -43,4 +46,13 @@ public:
 
 	// 선택된 버튼 색상 설정
 	void SetButtonColor(const FLinearColor& NewColor);
+
+public:
+	// 버튼 누르는 것이 성공했을 때 호출
+	void ButtonClickSuccess();
+	void UpdateWidgetColor();
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnButtonEvent OnButtonEvent;  // 버튼 클릭 이벤트를 전달하는 Delegate
 };

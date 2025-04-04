@@ -68,6 +68,7 @@ protected:
 
 public:
 	// 액터 선택 함수
+	UFUNCTION()
 	void SelectActor(const FString& InUserName);
 
 	// 선택 상태가 변경되었을 때 호출되는 Replication 함수

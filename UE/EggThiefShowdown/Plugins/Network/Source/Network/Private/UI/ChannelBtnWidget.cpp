@@ -41,9 +41,12 @@ void UChannelBtnWidget::OnChannelButtonClicked()
 {
 	UHaServerSubsystem* Subsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>();
 	const FString URL = IP + TEXT(":") + FString::FromInt(Port);
-
 	const FString UserName = Subsystem->GetLoginUserName();
 	const FString Password = Subsystem->GetLoginPassword();
-	const FString Options = TEXT("UserName=") + UserName + TEXT("?Password=") + Password;
+	//const FString GameModePath = TEXT("/Script/Engine.Blueprint'/Game/Blueprint/GameMode/BPGM_LobbyMap.BPGM_LobbyMap_C");
+	const FString Options = TEXT("UserName=") + UserName + TEXT("?Password=") + Password/* + TEXT("?Game=") + GameModePath*/;
+
 	UGameplayStatics::OpenLevel(this, FName(URL), true, Options);
+
+	// _C
 }

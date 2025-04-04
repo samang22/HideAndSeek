@@ -78,4 +78,39 @@ protected:
     // 편의상 분리하지 않고 나머지 Channel을 그대로 둔다
     UUEDediServerChannel* DediServerChannel = nullptr;
 
+
+protected:
+    TMap<TWeakObjectPtr<AActor>, FString> LobbyMapCharacters;
+
+public:
+    bool TrySelectCharacter(AActor* Character, const FString& UserName)
+    {
+        // 유저가 이미 다른 캐릭터를 선택했는지 확인
+        for (const auto& Pair : LobbyMapCharacters)
+        {
+            if (Pair.Value == UserName)
+            {
+                return false;
+            }
+        }
+
+        if (LobbyMapCharacters.Contains(Character))
+        {
+            return false;
+        }
+
+        LobbyMapCharacters.Add(Character, UserName);
+        return true;
+    }
+
+    FString GetUserNameFromCharacter(AActor* Character) const
+    {
+        const FString* Result = LobbyMapCharacters.Find(Character);
+        return Result ? *Result : TEXT("");
+    }
+
+    bool selectCharacter(AActor* Character)
+    {
+        return LobbyMapCharacters.Remove(Character) > 0;
+    }
 };

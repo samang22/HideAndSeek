@@ -45,10 +45,11 @@ enum class LOBBY_CHARACTER_MONTAGE : uint8
 
 enum class LOBBY_SELECT_BUTTON_STATUS : uint8
 {
-	UNSELECTED = 0,
+	DESELECTED = 0,
 	SELECTED,
 };
 
+UENUM(BlueprintType)
 enum class LOBBY_CHARACTER_ENUM : uint8
 {
 	MARIO = 0,

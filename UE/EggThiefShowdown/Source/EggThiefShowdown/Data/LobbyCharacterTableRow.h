@@ -27,6 +27,10 @@ public: // Animation
 	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Animation")
 	UAnimMontage* UnPickedMontage = nullptr;
 
+
+public:
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|")
+	LOBBY_CHARACTER_ENUM eLobbyCharacter;
 //public:
 //	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Widget")
 //	TSubclassOf<UUserWidget> ButtonWidgetClass = nullptr;

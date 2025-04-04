@@ -10,6 +10,8 @@
 #include "../../UI/LobbySelectButtonWidget.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Subsystem/HaServerSubsystem.h"
+
 
 // Sets default values
 ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
@@ -29,6 +31,7 @@ ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
 
 	StatusComponent = CreateDefaultSubobject<ULobbyCharacterStatusComponent>(TEXT("StatusComponent"));
 
+
    	SelectButtonWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("SelectButtonWidgetComponent"));
 	SelectButtonWidgetComponent->SetupAttachment(RootComponent);
 	float RelativeScale = 1.f / 90.f;
@@ -41,7 +44,7 @@ ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
 	{
 		SelectButtonWidgetComponent->SetWidgetClass(WidgetClass);
 		//SelectButtonWidgetComponent->SetDrawSize(FVector2D(30.f, 10.f)); // 위젯 크기 설정
-		SelectButtonWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
+		SelectButtonWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 
 		//SelectButtonWidgetComponent->SetVisibility(true); // 위젯 보이기
 	}
@@ -58,7 +61,8 @@ void ALobbyCharacter::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 
 	SkeletalMeshComponent->SetSkeletalMesh(LobbyCharacterData->SkeletalMesh);
 	SkeletalMeshComponent->SetAnimClass(LobbyCharacterData->AnimClass);
-	SkeletalMeshComponent->SetRelativeTransform(LobbyCharacterData->MeshTransform);
+	SkeletalMeshComponent->SetRelativeScale3D(LobbyCharacterData->MeshTransform.GetScale3D());
+	//SkeletalMeshComponent->SetRelativeTransform(LobbyCharacterData->MeshTransform);
 }
 
 void ALobbyCharacter::PostInitProperties()
@@ -76,14 +80,13 @@ void ALobbyCharacter::BeginPlay()
 	check(WidgetClass);
 	//ButtonWidget = CreateWidget<ULobbySelectButtonWidget>(GetWorld(), WidgetClass);
 
- 	//SetData(DataTableRowHandle);
+ 	SetData(DataTableRowHandle);
 
 	if (SelectButtonWidgetComponent)
 	{
 		// 위젯을 마우스로 상호작용할 수 있도록 설정
 		SelectButtonWidgetComponent->SetVisibility(true);
 		SelectButtonWidgetComponent->Activate();
-
 		// 마우스 포인터를 표시하고 클릭 가능하게 만들기
 		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 		if (PlayerController)
@@ -91,7 +94,20 @@ void ALobbyCharacter::BeginPlay()
 			PlayerController->bShowMouseCursor = true;
 			PlayerController->SetInputMode(FInputModeUIOnly());
 		}
+
+		ULobbySelectButtonWidget* Widget = Cast<ULobbySelectButtonWidget>(SelectButtonWidgetComponent->GetWidget());
+		if (Widget && LobbyCharacterData)
+		{
+			Widget->SetLobbyCharacterEnum(LobbyCharacterData->eLobbyCharacter);
+			Widget->UpdateWidgetColor();
+		}
+
+		if (Widget)
+		{
+			Widget->OnButtonEvent.AddDynamic(this, &ALobbyCharacter::SelectActor);
+		}
 	}
+
 }
 
 void ALobbyCharacter::PostDuplicate(EDuplicateMode::Type DuplicateMode)
@@ -236,11 +252,18 @@ void ALobbyCharacter::OnRep_SelectedPlayerID()
 
 void ALobbyCharacter::ServerSelectActor_Implementation(const FString& InUserName)
 {
-	if (UserName == TEXT(""))  // 선택되지 않았다면
+	UHaServerSubsystem* Subsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>();
+
+	if (Subsystem)
 	{
-		UserName = InUserName;
-		MulticastUpdateActorSelection(UserName);  // 모든 클라이언트에게 업데이트
+		if (Subsystem->TrySelectCharacter(this, InUserName))
+		{
+			UserName = InUserName;
+			MulticastUpdateActorSelection(UserName);  // 모든 클라이언트에게 업데이트
+
+		}
 	}
+
 }
 
 bool ALobbyCharacter::ServerSelectActor_Validate(const FString& InUserName)
