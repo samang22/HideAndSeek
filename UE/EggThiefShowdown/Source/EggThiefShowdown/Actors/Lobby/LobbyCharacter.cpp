@@ -7,6 +7,7 @@
 #include "../../Components/StatusComponent/Lobby/LobbyCharacterStatusComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "../../UI/LobbySelectButtonWidget.h"
 
 // Sets default values
 ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
@@ -26,8 +27,7 @@ ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
 
 	StatusComponent = CreateDefaultSubobject<ULobbyCharacterStatusComponent>(TEXT("StatusComponent"));
 
-	//ButtonWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
-	//ButtonWidget->SetupAttachment(RootComponent);
+	ButtonWidget = CreateDefaultSubobject<ULobbySelectButtonWidget>(TEXT("LobbySelectButtonWidget"));
 }
 
 void ALobbyCharacter::SetData(const FDataTableRowHandle& InDataTableRowHandle)

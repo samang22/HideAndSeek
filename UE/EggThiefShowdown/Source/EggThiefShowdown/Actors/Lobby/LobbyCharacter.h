@@ -9,7 +9,7 @@
 class USkeletalMeshComponent;
 class ULobbyCharacterStatusComponent;
 class UWidgetComponent;
-class ULobbySelectBtnWidget;
+class ULobbySelectButtonWidget;
 struct FLobbyCharacterTableRow;
 
 UCLASS()
@@ -47,7 +47,7 @@ public:
 	TObjectPtr<ULobbyCharacterStatusComponent> GetStatusComponent() { return StatusComponent; }
 
 protected:
-	TObjectPtr<ULobbySelectBtnWidget> ButtonWidget;
+	TObjectPtr<ULobbySelectButtonWidget> ButtonWidget;
 	LOBBY_SELECT_BUTTON_STATUS eSelectButtonStatus;
 
 

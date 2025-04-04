@@ -7,13 +7,11 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "../Misc/Utils.h"
-#include "LobbySelectBtnWidget.generated.h"
+#include "LobbySelectButtonWidget.generated.h"
 
-/**
- *
- */
+
 UCLASS()
-class NETWORK_API ULobbySelectBtnWidget : public UUserWidget
+class EGGTHIEFSHOWDOWN_API ULobbySelectButtonWidget : public UUserWidget
 {
 	GENERATED_BODY()
 protected:
