@@ -8,6 +8,8 @@
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "../../UI/LobbySelectButtonWidget.h"
+#include "Net/UnrealNetwork.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
@@ -27,7 +29,23 @@ ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
 
 	StatusComponent = CreateDefaultSubobject<ULobbyCharacterStatusComponent>(TEXT("StatusComponent"));
 
-	ButtonWidget = CreateDefaultSubobject<ULobbySelectButtonWidget>(TEXT("LobbySelectButtonWidget"));
+   	SelectButtonWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("SelectButtonWidgetComponent"));
+	SelectButtonWidgetComponent->SetupAttachment(RootComponent);
+	float RelativeScale = 1.f / 90.f;
+	SelectButtonWidgetComponent->SetRelativeScale3D(FVector(RelativeScale, RelativeScale, RelativeScale));
+	SelectButtonWidgetComponent->SetRelativeLocation(FVector(1.f, RelativeScale * -0.5f, 0.f));
+	static UClass* WidgetClass = LoadClass<ULobbySelectButtonWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_YoshiSelectButton.UI_YoshiSelectButton_C'"));
+
+
+	if (WidgetClass)
+	{
+		SelectButtonWidgetComponent->SetWidgetClass(WidgetClass);
+		//SelectButtonWidgetComponent->SetDrawSize(FVector2D(30.f, 10.f)); // 위젯 크기 설정
+		SelectButtonWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
+
+		//SelectButtonWidgetComponent->SetVisibility(true); // 위젯 보이기
+	}
+
 }
 
 void ALobbyCharacter::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -53,7 +71,27 @@ void ALobbyCharacter::PostInitProperties()
 void ALobbyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	//SetData(DataTableRowHandle);
+	
+	UClass* WidgetClass = LoadClass<ULobbySelectButtonWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_YoshiSelectButton.UI_YoshiSelectButton_C'"));
+	check(WidgetClass);
+	//ButtonWidget = CreateWidget<ULobbySelectButtonWidget>(GetWorld(), WidgetClass);
+
+ 	//SetData(DataTableRowHandle);
+
+	if (SelectButtonWidgetComponent)
+	{
+		// 위젯을 마우스로 상호작용할 수 있도록 설정
+		SelectButtonWidgetComponent->SetVisibility(true);
+		SelectButtonWidgetComponent->Activate();
+
+		// 마우스 포인터를 표시하고 클릭 가능하게 만들기
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			PlayerController->bShowMouseCursor = true;
+			PlayerController->SetInputMode(FInputModeUIOnly());
+		}
+	}
 }
 
 void ALobbyCharacter::PostDuplicate(EDuplicateMode::Type DuplicateMode)
@@ -96,6 +134,20 @@ void ALobbyCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	const LOBBY_CHARACTER_STATUS eStatus = StatusComponent->GetLobbyCharacterStatus();
+
+	//if (SelectButtonWidgetComponent && GetWorld())
+	//{
+	//	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	//	if (PlayerController)
+	//	{
+	//		FVector CameraLocation = PlayerController->PlayerCameraManager->GetCameraLocation();
+	//		FVector WidgetLocation = SelectButtonWidgetComponent->GetComponentLocation();
+
+	//		// 위젯이 카메라를 바라보게 회전
+	//		FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(WidgetLocation, CameraLocation);
+	//		SelectButtonWidgetComponent->SetWorldRotation(NewRotation);
+	//	}
+	//}
 
 }
 
@@ -161,3 +213,49 @@ bool ALobbyCharacter::IsPlayingMontage(LOBBY_CHARACTER_MONTAGE _InEnum)
 	}
 }
 
+void ALobbyCharacter::SelectActor(const FString& InUserName)
+{
+	if (HasAuthority())  // 서버에서 처리
+	{
+		if (InUserName == TEXT(""))  // 아직 선택되지 않은 액터일 경우
+		{
+			UserName = InUserName;
+			MulticastUpdateActorSelection(UserName);  // 선택 상태 동기화
+		}
+	}
+	else
+	{
+		ServerSelectActor(UserName);  // 서버로 선택 요청
+	}
+}
+
+void ALobbyCharacter::OnRep_SelectedPlayerID()
+{
+	// @TODO : Update UI 
+}
+
+void ALobbyCharacter::ServerSelectActor_Implementation(const FString& InUserName)
+{
+	if (UserName == TEXT(""))  // 선택되지 않았다면
+	{
+		UserName = InUserName;
+		MulticastUpdateActorSelection(UserName);  // 모든 클라이언트에게 업데이트
+	}
+}
+
+bool ALobbyCharacter::ServerSelectActor_Validate(const FString& InUserName)
+{
+	return true;
+}
+
+void ALobbyCharacter::MulticastUpdateActorSelection_Implementation(const FString& InUserName)
+{
+	// @TODO : 모든 클라이언트에서 선택 상태 업데이트
+
+}
+
+void ALobbyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ALobbyCharacter, UserName);
+}

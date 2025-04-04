@@ -47,9 +47,8 @@ public:
 	TObjectPtr<ULobbyCharacterStatusComponent> GetStatusComponent() { return StatusComponent; }
 
 protected:
-	TObjectPtr<ULobbySelectButtonWidget> ButtonWidget;
+	TObjectPtr<UWidgetComponent> SelectButtonWidgetComponent;
 	LOBBY_SELECT_BUTTON_STATUS eSelectButtonStatus;
-
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -61,4 +60,27 @@ public:
 	void PlayMontage(LOBBY_CHARACTER_MONTAGE _InEnum, bool bIsLoop = false);
 	bool IsMontage(LOBBY_CHARACTER_MONTAGE _InEnum);
 	bool IsPlayingMontage(LOBBY_CHARACTER_MONTAGE _InEnum);
+
+
+protected:
+	UPROPERTY(Replicated)
+	FString UserName = TEXT("");
+
+public:
+	// 액터 선택 함수
+	void SelectActor(const FString& InUserName);
+
+	// 선택 상태가 변경되었을 때 호출되는 Replication 함수
+	UFUNCTION()
+	void OnRep_SelectedPlayerID();
+
+	// RPC: 서버에서 선택 상태를 업데이트하는 함수
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSelectActor(const FString& InUserName);
+
+	// Multicast: 서버에서 상태를 업데이트한 후 모든 클라이언트에게 전달
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastUpdateActorSelection(const FString& InUserName);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
