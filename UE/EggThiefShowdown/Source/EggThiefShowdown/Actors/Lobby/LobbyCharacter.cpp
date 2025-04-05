@@ -7,7 +7,7 @@
 #include "../../Components/StatusComponent/Lobby/LobbyCharacterStatusComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "../../UI/LobbySelectButtonWidget.h"
+#include "../../UI/LobbySelectCharacterButtonWidget.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Subsystem/HaServerSubsystem.h"
@@ -27,17 +27,19 @@ ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
 	//SkeletalMeshComponent->SetSkeletalMesh(Asset.Object);
 	RootComponent = SkeletalMeshComponent;
 	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SkeletalMeshComponent->SetRelativeScale3D(FVector(45.0, 45.0, 45.0));
+	SkeletalMeshComponent->SetRelativeScale3D(FVector(CHARACTER_DEFAULT_SCALE, CHARACTER_DEFAULT_SCALE, CHARACTER_DEFAULT_SCALE));
+
 
 	StatusComponent = CreateDefaultSubobject<ULobbyCharacterStatusComponent>(TEXT("StatusComponent"));
 
 
    	SelectButtonWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("SelectButtonWidgetComponent"));
 	SelectButtonWidgetComponent->SetupAttachment(RootComponent);
-	float RelativeScale = 1.f / 90.f;
+	float RelativeScale = 1.f / CHARACTER_DEFAULT_SCALE;
 	SelectButtonWidgetComponent->SetRelativeScale3D(FVector(RelativeScale, RelativeScale, RelativeScale));
-	SelectButtonWidgetComponent->SetRelativeLocation(FVector(1.f, RelativeScale * -0.5f, 0.f));
-	static UClass* WidgetClass = LoadClass<ULobbySelectButtonWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_YoshiSelectButton.UI_YoshiSelectButton_C'"));
+	// Offset
+	SelectButtonWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, -0.4f));
+	static UClass* WidgetClass = LoadClass<ULobbySelectCharacterButtonWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_LobbySelectCharacterButton.UI_LobbySelectCharacterButton_C'"));
 
 
 	if (WidgetClass)
@@ -75,10 +77,6 @@ void ALobbyCharacter::PostInitProperties()
 void ALobbyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	UClass* WidgetClass = LoadClass<ULobbySelectButtonWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_YoshiSelectButton.UI_YoshiSelectButton_C'"));
-	check(WidgetClass);
-	//ButtonWidget = CreateWidget<ULobbySelectButtonWidget>(GetWorld(), WidgetClass);
 
  	SetData(DataTableRowHandle);
 
@@ -95,7 +93,7 @@ void ALobbyCharacter::BeginPlay()
 			PlayerController->SetInputMode(FInputModeUIOnly());
 		}
 
-		ULobbySelectButtonWidget* Widget = Cast<ULobbySelectButtonWidget>(SelectButtonWidgetComponent->GetWidget());
+		ULobbySelectCharacterButtonWidget* Widget = Cast<ULobbySelectCharacterButtonWidget>(SelectButtonWidgetComponent->GetWidget());
 		if (Widget && LobbyCharacterData)
 		{
 			Widget->SetLobbyCharacterEnum(LobbyCharacterData->eLobbyCharacter);

@@ -43,8 +43,7 @@ void UChannelBtnWidget::OnChannelButtonClicked()
 	const FString URL = IP + TEXT(":") + FString::FromInt(Port);
 	const FString UserName = Subsystem->GetLoginUserName();
 	const FString Password = Subsystem->GetLoginPassword();
-	//const FString GameModePath = TEXT("/Script/Engine.Blueprint'/Game/Blueprint/GameMode/BPGM_LobbyMap.BPGM_LobbyMap_C");
-	const FString Options = TEXT("UserName=") + UserName + TEXT("?Password=") + Password/* + TEXT("?Game=") + GameModePath*/;
+	const FString Options = TEXT("UserName=") + UserName + TEXT("?Password=") + Password;
 
 	UGameplayStatics::OpenLevel(this, FName(URL), true, Options);
 

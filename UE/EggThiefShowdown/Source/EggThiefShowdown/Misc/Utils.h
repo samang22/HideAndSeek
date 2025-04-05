@@ -10,7 +10,9 @@
 #include "EnhancedInputComponent.h"
 
 
-#define PROBE_SIZE					5.0
+#define CHARACTER_DEFAULT_SCALE					45.0
+
+#define PROBE_SIZE								5.0
 
 #define LOBBY_CHARACTER_ANIM_BIT_IDLE			0x00000001
 #define LOBBY_CHARACTER_ANIM_BIT_PICKED			0x00000002
@@ -43,7 +45,7 @@ enum class LOBBY_CHARACTER_MONTAGE : uint8
 
 
 
-enum class LOBBY_SELECT_BUTTON_STATUS : uint8
+enum class LOBBY_SELECT_CHARACTER_BUTTON_STATUS : uint8
 {
 	DESELECTED = 0,
 	SELECTED,

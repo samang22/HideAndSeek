@@ -7,12 +7,12 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "../Misc/Utils.h"
-#include "LobbySelectButtonWidget.generated.h"
+#include "LobbySelectCharacterButtonWidget.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnButtonEvent, const FString&, UserName);
 
 UCLASS()
-class EGGTHIEFSHOWDOWN_API ULobbySelectButtonWidget : public UUserWidget
+class EGGTHIEFSHOWDOWN_API ULobbySelectCharacterButtonWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	friend class ALobbyCharacter;
@@ -29,9 +29,9 @@ protected:
 	UTextBlock* StatusTextBlock;
 
 protected:
-	LOBBY_SELECT_BUTTON_STATUS eButtonStatus = LOBBY_SELECT_BUTTON_STATUS::DESELECTED;
+	LOBBY_SELECT_CHARACTER_BUTTON_STATUS eButtonStatus = LOBBY_SELECT_CHARACTER_BUTTON_STATUS::DESELECTED;
 public:
-	LOBBY_SELECT_BUTTON_STATUS GetButtonStatus() const { return eButtonStatus; }
+	LOBBY_SELECT_CHARACTER_BUTTON_STATUS GetButtonStatus() const { return eButtonStatus; }
 
 protected:
 	LOBBY_CHARACTER_ENUM eLobbyCharacterEnum = LOBBY_CHARACTER_ENUM::MARIO;
