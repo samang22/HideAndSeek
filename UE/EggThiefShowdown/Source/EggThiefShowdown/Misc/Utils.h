@@ -43,12 +43,12 @@ enum class LOBBY_CHARACTER_MONTAGE : uint8
 	END,
 };
 
-
-
-enum class LOBBY_SELECT_CHARACTER_BUTTON_STATUS : uint8
+UENUM(BlueprintType)
+enum class LOBBY_CHARACTER_SELECT_BUTTON_STATE : uint8
 {
-	DESELECTED = 0,
-	SELECTED,
+	EMPTY = 0,
+	OTHER,
+	MY,
 };
 
 UENUM(BlueprintType)

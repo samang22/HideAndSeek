@@ -28,10 +28,12 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* StatusTextBlock;
 
+
 protected:
-	LOBBY_SELECT_CHARACTER_BUTTON_STATUS eButtonStatus = LOBBY_SELECT_CHARACTER_BUTTON_STATUS::DESELECTED;
+	FString UserName;
 public:
-	LOBBY_SELECT_CHARACTER_BUTTON_STATUS GetButtonStatus() const { return eButtonStatus; }
+	void SetUserName(const FString& InUserName) { UserName = InUserName; }
+
 
 protected:
 	LOBBY_CHARACTER_ENUM eLobbyCharacterEnum = LOBBY_CHARACTER_ENUM::MARIO;
@@ -48,9 +50,7 @@ public:
 	void SetButtonColor(const FLinearColor& NewColor);
 
 public:
-	// 버튼 누르는 것이 성공했을 때 호출
-	void ButtonClickSuccess();
-	void UpdateWidgetColor();
+	void UpdateWidgetState();
 
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")

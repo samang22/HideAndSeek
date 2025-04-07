@@ -5,11 +5,12 @@
 #include "Subsystem/HaServerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Subsystem/HaServerSubsystem.h"
+#include "Subsystem/HaServerSubsystem.h"
 
 void ULobbySelectCharacterButtonWidget::NativeConstruct()
 {
     Super::NativeConstruct();
-
+    
     if (SelectionButton)
     {
         SelectionButton->OnClicked.AddDynamic(this, &ULobbySelectCharacterButtonWidget::OnButtonClicked);
@@ -25,10 +26,7 @@ void ULobbySelectCharacterButtonWidget::NativeConstruct()
 void ULobbySelectCharacterButtonWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
     Super::NativeTick(MyGeometry, InDeltaTime);
-
-
-
-
+    //UpdateWidgetState();
 }
 
 void ULobbySelectCharacterButtonWidget::OnButtonClicked()
@@ -50,59 +48,73 @@ void ULobbySelectCharacterButtonWidget::SetButtonColor(const FLinearColor& NewCo
     }
 }
 
-void ULobbySelectCharacterButtonWidget::ButtonClickSuccess()
-{
-    if (LOBBY_SELECT_CHARACTER_BUTTON_STATUS::SELECTED == eButtonStatus)
-    {
-        eButtonStatus = LOBBY_SELECT_CHARACTER_BUTTON_STATUS::DESELECTED;
-        StatusTextBlock->SetText(FText::FromString(TEXT("선택")));
-    }
-    else
-    {
-        eButtonStatus = LOBBY_SELECT_CHARACTER_BUTTON_STATUS::SELECTED;
-        StatusTextBlock->SetText(FText::FromString(TEXT("선택됨")));
-    }
-}
 
-void ULobbySelectCharacterButtonWidget::UpdateWidgetColor()
+void ULobbySelectCharacterButtonWidget::UpdateWidgetState()
 {
-    switch (eButtonStatus)
+    UE_LOG(LogTemp, Warning, TEXT("UpdateWidgetState called"));
+
+    UHaServerSubsystem* Subsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>();
+
+    if (Subsystem)
     {
-    case LOBBY_SELECT_CHARACTER_BUTTON_STATUS::DESELECTED:
-        switch (eLobbyCharacterEnum)
+        const FString LoginUserName = Subsystem->GetLoginUserName();
+
+        if (LoginUserName == UserName)
         {
-        case LOBBY_CHARACTER_ENUM::MARIO:
-            SetButtonColor(FLinearColor::Red);
-            break;
-        case LOBBY_CHARACTER_ENUM::YOSHI:
-            SetButtonColor(FLinearColor::Green);
-            break;
-        default:
-            break;
+            UE_LOG(LogTemp, Warning, TEXT("LoginUserName == UserName"));
+
+            switch (eLobbyCharacterEnum)
+            {
+            case LOBBY_CHARACTER_ENUM::MARIO:
+                SetButtonColor(FLinearColor::Red);
+                break;
+            case LOBBY_CHARACTER_ENUM::YOSHI:
+                SetButtonColor(FLinearColor::Green);
+                break;
+            default:
+                break;
+            }
+
+            StatusTextBlock->SetColorAndOpacity(FLinearColor::White);
+            StatusTextBlock->SetText(FText::FromString(UserName));
+        }
+        else if (UserName.IsEmpty())
+        {
+            UE_LOG(LogTemp, Warning, TEXT("UserName.IsEmpty()"));
+
+            switch (eLobbyCharacterEnum)
+            {
+            case LOBBY_CHARACTER_ENUM::MARIO:
+                SetButtonColor(FLinearColor::Red);
+                break;
+            case LOBBY_CHARACTER_ENUM::YOSHI:
+                SetButtonColor(FLinearColor::Green);
+                break;
+            default:
+                break;
+            }
+            StatusTextBlock->SetColorAndOpacity(FLinearColor::White);
+            StatusTextBlock->SetText(FText::FromString(TEXT("선택")));
+        }
+        else // LoginUserName != UserName
+        {
+            UE_LOG(LogTemp, Warning, TEXT("LoginUserName != UserName"));
+
+            SetButtonColor(FLinearColor::Gray);
+
+            switch (eLobbyCharacterEnum)
+            {
+            case LOBBY_CHARACTER_ENUM::MARIO:
+                StatusTextBlock->SetColorAndOpacity(FLinearColor::Red);
+                break;
+            case LOBBY_CHARACTER_ENUM::YOSHI:
+                StatusTextBlock->SetColorAndOpacity(FLinearColor::Green);
+                break;
+            default:
+                break;
+            }
+            StatusTextBlock->SetText(FText::FromString(UserName));
         }
 
-        StatusTextBlock->SetColorAndOpacity(FLinearColor::White);
-
-        break;
-    case LOBBY_SELECT_CHARACTER_BUTTON_STATUS::SELECTED:
-        SetButtonColor(FLinearColor::Gray);
-
-        switch (eLobbyCharacterEnum)
-        {
-        case LOBBY_CHARACTER_ENUM::MARIO:
-            StatusTextBlock->SetColorAndOpacity(FLinearColor::Red);
-            break;
-        case LOBBY_CHARACTER_ENUM::YOSHI:
-            StatusTextBlock->SetColorAndOpacity(FLinearColor::Green);
-            break;
-        default:
-            break;
-        }
-
-
-
-        break;
-    default:
-        break;
     }
 }

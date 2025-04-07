@@ -129,7 +129,8 @@ APlayerController* AChannelServerConnectGameMode::Login(UPlayer* NewPlayer, ENet
 
 	GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 		{
-			GetWorld()->ServerTravel("/Game/Level/LobbyMap?/Script/Engine.Blueprint'/Game/Blueprint/GameMode/BPGM_LobbyMap.BPGM_LobbyMap_C'");
+			FString TravelURL = TEXT("/Game/Level/LobbyMap?game=/Game/GameMode/BPGM_LobbyMap.BPGM_LobbyMap_C");
+			GetWorld()->ServerTravel(TravelURL);
 		});
 
 	return PC;

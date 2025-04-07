@@ -11,7 +11,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Subsystem/HaServerSubsystem.h"
-
+#include "../../PlayerController/LobbyPlayerController.h"
 
 // Sets default values
 ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
@@ -19,6 +19,8 @@ ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+	bAlwaysRelevant = true;
 
 	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/Players/Yoshi/pc07_yoshi_light.pc07_yoshi_light'"));
 	//check(Asset.Object);
@@ -97,7 +99,7 @@ void ALobbyCharacter::BeginPlay()
 		if (Widget && LobbyCharacterData)
 		{
 			Widget->SetLobbyCharacterEnum(LobbyCharacterData->eLobbyCharacter);
-			Widget->UpdateWidgetColor();
+			Widget->UpdateWidgetState();
 		}
 
 		if (Widget)
@@ -165,6 +167,22 @@ void ALobbyCharacter::Tick(float DeltaTime)
 
 }
 
+LOBBY_CHARACTER_SELECT_BUTTON_STATE ALobbyCharacter::GetSelectionState(const FString& InUserName)
+{
+	if (UserName.IsEmpty())
+	{
+		return LOBBY_CHARACTER_SELECT_BUTTON_STATE::EMPTY;
+	}
+	else if (UserName == InUserName)
+	{
+		return LOBBY_CHARACTER_SELECT_BUTTON_STATE::MY;
+	}
+	else
+	{
+		return LOBBY_CHARACTER_SELECT_BUTTON_STATE::OTHER;
+	}
+}
+
 void ALobbyCharacter::PlayMontage(LOBBY_CHARACTER_MONTAGE _InEnum, bool bIsLoop)
 {
 	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
@@ -174,9 +192,11 @@ void ALobbyCharacter::PlayMontage(LOBBY_CHARACTER_MONTAGE _InEnum, bool bIsLoop)
 	switch (_InEnum)
 	{
 	case LOBBY_CHARACTER_MONTAGE::PICKED:
+		UE_LOG(LogTemp, Warning, TEXT("PlayMontage PICKED"));
 		tempMontage = LobbyCharacterData->PickedMontage;
 		break;
 	case LOBBY_CHARACTER_MONTAGE::UNPICKED:
+		UE_LOG(LogTemp, Warning, TEXT("PlayMontage UNPICKED"));
 		tempMontage = LobbyCharacterData->UnPickedMontage;
 		break;
 	default:
@@ -227,20 +247,34 @@ bool ALobbyCharacter::IsPlayingMontage(LOBBY_CHARACTER_MONTAGE _InEnum)
 	}
 }
 
+void ALobbyCharacter::SetUserName(const FString& InUserName)
+{
+	UserName = InUserName;
+
+	//MulticastUpdateActorSelection(InUserName);
+}
+
 void ALobbyCharacter::SelectActor(const FString& InUserName)
 {
 	if (HasAuthority())  // 서버에서 처리
 	{
-		if (InUserName == TEXT(""))  // 아직 선택되지 않은 액터일 경우
+		UE_LOG(LogTemp, Warning, TEXT("서버에서 SelectActor 실행"));
+	}
+	else // 클라
+	{
+		UE_LOG(LogTemp, Warning, TEXT("클라이언트에서 SelectActor 실행, 서버에 요청 중: %s"), *InUserName);
+
+		APlayerController* PC = GetWorld()->GetFirstPlayerController();
+		if (!PC) return;
+
+		ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
+		if (LobbyPC)
 		{
-			UserName = InUserName;
-			MulticastUpdateActorSelection(UserName);  // 선택 상태 동기화
+			LobbyPC->Server_SelectLobbyCharacter(this, InUserName);
+			//ServerSelectActor(InUserName); 해당 함수를 PC에서 대신 호출해준다.
 		}
 	}
-	else
-	{
-		ServerSelectActor(UserName);  // 서버로 선택 요청
-	}
+
 }
 
 void ALobbyCharacter::OnRep_SelectedPlayerID()
@@ -250,17 +284,27 @@ void ALobbyCharacter::OnRep_SelectedPlayerID()
 
 void ALobbyCharacter::ServerSelectActor_Implementation(const FString& InUserName)
 {
-	UHaServerSubsystem* Subsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>();
+	UE_LOG(LogTemp, Warning, TEXT("ServerSelectActor_Implementation called by %s"), *InUserName);
 
-	if (Subsystem)
+	FString NewUserName = TEXT("");
+	if (UserName.IsEmpty())
 	{
-		if (Subsystem->TrySelectCharacter(this, InUserName))
-		{
-			UserName = InUserName;
-			MulticastUpdateActorSelection(UserName);  // 모든 클라이언트에게 업데이트
-
-		}
+		NewUserName = InUserName;
+		MulticastUpdateActorSelection(NewUserName);
+		PlayMontage(LOBBY_CHARACTER_MONTAGE::PICKED);
 	}
+	else if (UserName == InUserName)
+	{
+		NewUserName = TEXT("");
+		MulticastUpdateActorSelection(NewUserName);
+		PlayMontage(LOBBY_CHARACTER_MONTAGE::UNPICKED);
+	}
+	else // UserName != InUserName
+	{
+		// Do Nothing
+		//MulticastUpdateActorSelection();
+	}
+
 
 }
 
@@ -271,8 +315,20 @@ bool ALobbyCharacter::ServerSelectActor_Validate(const FString& InUserName)
 
 void ALobbyCharacter::MulticastUpdateActorSelection_Implementation(const FString& InUserName)
 {
-	// @TODO : 모든 클라이언트에서 선택 상태 업데이트
+	UE_LOG(LogTemp, Warning, TEXT("MulticastUpdateActorSelection_Implementation called by %s"), *InUserName);
 
+	UserName = InUserName;
+
+	// UI 처리
+	if (SelectButtonWidgetComponent)
+	{
+		ULobbySelectCharacterButtonWidget* Widget = Cast<ULobbySelectCharacterButtonWidget>(SelectButtonWidgetComponent->GetWidget());
+		if (Widget)
+		{
+			Widget->SetUserName(InUserName);
+			Widget->UpdateWidgetState(); // 예: 색상이나 텍스트 변경
+		}
+	}
 }
 
 void ALobbyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

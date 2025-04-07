@@ -12,6 +12,10 @@ class UWidgetComponent;
 class ULobbySelectCharacterButtonWidget;
 struct FLobbyCharacterTableRow;
 
+
+
+
+
 UCLASS()
 class EGGTHIEFSHOWDOWN_API ALobbyCharacter : public AActor
 {
@@ -48,7 +52,11 @@ public:
 
 protected:
 	TObjectPtr<UWidgetComponent> SelectButtonWidgetComponent;
-	LOBBY_SELECT_CHARACTER_BUTTON_STATUS eSelectButtonStatus;
+	LOBBY_CHARACTER_SELECT_BUTTON_STATE eSelectButtonStatus;
+
+public:
+	LOBBY_CHARACTER_SELECT_BUTTON_STATE GetSelectionState(const FString& InUserName);
+
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -65,6 +73,11 @@ public:
 protected:
 	UPROPERTY(Replicated)
 	FString UserName = TEXT("");
+
+public:
+	UFUNCTION()
+	void SetUserName(const FString& InUserName);
+	
 
 public:
 	// 액터 선택 함수
