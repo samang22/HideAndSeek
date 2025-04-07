@@ -185,6 +185,7 @@ LOBBY_CHARACTER_SELECT_BUTTON_STATE ALobbyCharacter::GetSelectionState(const FSt
 
 void ALobbyCharacter::PlayMontage(LOBBY_CHARACTER_MONTAGE _InEnum, bool bIsLoop)
 {
+	UE_LOG(LogTemp, Warning, TEXT("PlayMontage"));
 	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
 
 	UAnimMontage* tempMontage = nullptr;
@@ -285,27 +286,7 @@ void ALobbyCharacter::OnRep_SelectedPlayerID()
 void ALobbyCharacter::ServerSelectActor_Implementation(const FString& InUserName)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ServerSelectActor_Implementation called by %s"), *InUserName);
-
-	FString NewUserName = TEXT("");
-	if (UserName.IsEmpty())
-	{
-		NewUserName = InUserName;
-		MulticastUpdateActorSelection(NewUserName);
-		PlayMontage(LOBBY_CHARACTER_MONTAGE::PICKED);
-	}
-	else if (UserName == InUserName)
-	{
-		NewUserName = TEXT("");
-		MulticastUpdateActorSelection(NewUserName);
-		PlayMontage(LOBBY_CHARACTER_MONTAGE::UNPICKED);
-	}
-	else // UserName != InUserName
-	{
-		// Do Nothing
-		//MulticastUpdateActorSelection();
-	}
-
-
+	MulticastUpdateActorSelection(InUserName);
 }
 
 bool ALobbyCharacter::ServerSelectActor_Validate(const FString& InUserName)
@@ -317,7 +298,42 @@ void ALobbyCharacter::MulticastUpdateActorSelection_Implementation(const FString
 {
 	UE_LOG(LogTemp, Warning, TEXT("MulticastUpdateActorSelection_Implementation called by %s"), *InUserName);
 
-	UserName = InUserName;
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (!PC) return;
+
+	ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
+	if (!LobbyPC) return;
+
+
+	if (UserName.IsEmpty())
+	{
+		// 이미 선택한 캐릭터가 있음
+		if (LobbyPC->GetSelectedLobbyCharacter())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("이미 선택한 캐릭터가 있음 by %s"), *InUserName);
+			return;
+		}
+
+
+		LobbyPC->SetSelectedLobbyCharacter(this);
+		UserName = InUserName;
+
+
+		PlayMontage(LOBBY_CHARACTER_MONTAGE::PICKED);
+	}
+	else if (UserName == InUserName)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("LobbyPC->SetSelectedLobbyCharacter by %s"), *InUserName);
+
+		LobbyPC->SetSelectedLobbyCharacter(nullptr);
+		UserName = TEXT("");
+
+		PlayMontage(LOBBY_CHARACTER_MONTAGE::UNPICKED);
+	}
+	else // UserName != InUserName
+	{
+		return;
+	}
 
 	// UI 처리
 	if (SelectButtonWidgetComponent)
@@ -325,7 +341,7 @@ void ALobbyCharacter::MulticastUpdateActorSelection_Implementation(const FString
 		ULobbySelectCharacterButtonWidget* Widget = Cast<ULobbySelectCharacterButtonWidget>(SelectButtonWidgetComponent->GetWidget());
 		if (Widget)
 		{
-			Widget->SetUserName(InUserName);
+			Widget->SetUserName(UserName);
 			Widget->UpdateWidgetState(); // 예: 색상이나 텍스트 변경
 		}
 	}

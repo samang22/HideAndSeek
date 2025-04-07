@@ -15,4 +15,10 @@ class EGGTHIEFSHOWDOWN_API ALobbyPlayerController : public APlayerController
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_SelectLobbyCharacter(ALobbyCharacter* LobbyCharacter, const FString& InUserName);
+
+protected:
+	TObjectPtr<AActor> SelectedLobbyCharacter = nullptr;
+public:
+	void SetSelectedLobbyCharacter(AActor* InCharacter) { SelectedLobbyCharacter = InCharacter; }
+	AActor* GetSelectedLobbyCharacter() const { return SelectedLobbyCharacter; }
 };
