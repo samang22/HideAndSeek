@@ -36,9 +36,9 @@ public:
 
 
 protected:
-	LOBBY_CHARACTER_ENUM eLobbyCharacterEnum = LOBBY_CHARACTER_ENUM::MARIO;
+	LOBBY_CHARACTER_KIND eLobbyCharacterEnum = LOBBY_CHARACTER_KIND::MARIO;
 public:
-	void SetLobbyCharacterEnum(LOBBY_CHARACTER_ENUM Enum) { eLobbyCharacterEnum = Enum; }
+	void SetLobbyCharacterEnum(LOBBY_CHARACTER_KIND Enum) { eLobbyCharacterEnum = Enum; }
 
 
 public:

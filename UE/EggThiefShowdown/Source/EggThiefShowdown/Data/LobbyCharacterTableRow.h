@@ -29,8 +29,8 @@ public: // Animation
 
 
 public:
-	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|")
-	LOBBY_CHARACTER_ENUM eLobbyCharacter;
+	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Kind")
+	LOBBY_CHARACTER_KIND eLobbyCharacter;
 //public:
 //	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Widget")
 //	TSubclassOf<UUserWidget> ButtonWidgetClass = nullptr;

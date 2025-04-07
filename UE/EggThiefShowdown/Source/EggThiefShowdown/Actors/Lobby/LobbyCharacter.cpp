@@ -67,6 +67,9 @@ void ALobbyCharacter::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	SkeletalMeshComponent->SetAnimClass(LobbyCharacterData->AnimClass);
 	SkeletalMeshComponent->SetRelativeScale3D(LobbyCharacterData->MeshTransform.GetScale3D());
 	//SkeletalMeshComponent->SetRelativeTransform(LobbyCharacterData->MeshTransform);
+
+	StatusComponent->SetLobbyCharacterKind(LobbyCharacterData->eLobbyCharacter);
+
 }
 
 void ALobbyCharacter::PostInitProperties()

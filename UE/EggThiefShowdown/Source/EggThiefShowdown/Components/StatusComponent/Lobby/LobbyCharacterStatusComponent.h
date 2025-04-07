@@ -27,8 +27,14 @@ protected:
 	UPROPERTY()
 	uint8 LobbyCharacterAnimationStatus;
 	LOBBY_CHARACTER_STATUS eLobbyCharacterStatus = LOBBY_CHARACTER_STATUS::IDLE;
-
 public:
 	void SetLobbyCharacterStatus(LOBBY_CHARACTER_STATUS eStatus);
 	LOBBY_CHARACTER_STATUS GetLobbyCharacterStatus() const { return eLobbyCharacterStatus; };
+
+
+protected:
+	LOBBY_CHARACTER_KIND eLobbyCharacterKind = LOBBY_CHARACTER_KIND::END;
+public:
+	void SetLobbyCharacterKind(LOBBY_CHARACTER_KIND eKind) { eLobbyCharacterKind = eKind; }
+	LOBBY_CHARACTER_KIND GetLobbyCharacterKind() const { return eLobbyCharacterKind; }
 };

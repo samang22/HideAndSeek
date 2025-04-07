@@ -49,13 +49,15 @@ enum class LOBBY_CHARACTER_SELECT_BUTTON_STATE : uint8
 	EMPTY = 0,
 	OTHER,
 	MY,
+	END,
 };
 
 UENUM(BlueprintType)
-enum class LOBBY_CHARACTER_ENUM : uint8
+enum class LOBBY_CHARACTER_KIND : uint8
 {
 	MARIO = 0,
 	YOSHI,
+	END,
 };
 
 

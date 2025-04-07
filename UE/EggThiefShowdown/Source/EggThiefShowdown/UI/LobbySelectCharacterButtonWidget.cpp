@@ -65,10 +65,10 @@ void ULobbySelectCharacterButtonWidget::UpdateWidgetState()
 
             switch (eLobbyCharacterEnum)
             {
-            case LOBBY_CHARACTER_ENUM::MARIO:
+            case LOBBY_CHARACTER_KIND::MARIO:
                 SetButtonColor(FLinearColor::Red);
                 break;
-            case LOBBY_CHARACTER_ENUM::YOSHI:
+            case LOBBY_CHARACTER_KIND::YOSHI:
                 SetButtonColor(FLinearColor::Green);
                 break;
             default:
@@ -84,10 +84,10 @@ void ULobbySelectCharacterButtonWidget::UpdateWidgetState()
 
             switch (eLobbyCharacterEnum)
             {
-            case LOBBY_CHARACTER_ENUM::MARIO:
+            case LOBBY_CHARACTER_KIND::MARIO:
                 SetButtonColor(FLinearColor::Red);
                 break;
-            case LOBBY_CHARACTER_ENUM::YOSHI:
+            case LOBBY_CHARACTER_KIND::YOSHI:
                 SetButtonColor(FLinearColor::Green);
                 break;
             default:
@@ -104,10 +104,10 @@ void ULobbySelectCharacterButtonWidget::UpdateWidgetState()
 
             switch (eLobbyCharacterEnum)
             {
-            case LOBBY_CHARACTER_ENUM::MARIO:
+            case LOBBY_CHARACTER_KIND::MARIO:
                 StatusTextBlock->SetColorAndOpacity(FLinearColor::Red);
                 break;
-            case LOBBY_CHARACTER_ENUM::YOSHI:
+            case LOBBY_CHARACTER_KIND::YOSHI:
                 StatusTextBlock->SetColorAndOpacity(FLinearColor::Green);
                 break;
             default:
