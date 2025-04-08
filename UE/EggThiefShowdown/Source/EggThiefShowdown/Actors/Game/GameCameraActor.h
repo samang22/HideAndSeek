@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "LobbyCamera.generated.h"
+#include "GameCameraActor.generated.h"
 
 class UCameraComponent;
 
 UCLASS()
-class EGGTHIEFSHOWDOWN_API ALobbyCamera : public AActor
+class EGGTHIEFSHOWDOWN_API AGameCameraActor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ALobbyCamera();
+	AGameCameraActor();
 
 protected:
 	// Called when the game starts or when spawned

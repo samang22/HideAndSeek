@@ -12,6 +12,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Subsystem/HaServerSubsystem.h"
 #include "../../PlayerController/LobbyPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ALobbyCharacter::ALobbyCharacter(const FObjectInitializer& ObjectInitializer)
@@ -271,11 +272,20 @@ void ALobbyCharacter::SelectActor(const FString& InUserName)
 		APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		if (!PC) return;
 
-		ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
-		if (LobbyPC)
+		bool bIsLocal = false;
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
-			LobbyPC->Server_SelectLobbyCharacter(this, InUserName);
-			//ServerSelectActor(InUserName); 해당 함수를 PC에서 대신 호출해준다.
+			APlayerController* TempPC = Iterator->Get();
+			if (TempPC->IsLocalController())
+			{
+				ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
+				if (LobbyPC)
+				{
+					LobbyPC->Server_SelectLobbyCharacter(this, InUserName);
+					//ServerSelectActor(InUserName); 해당 함수를 PC에서 대신 호출해준다.
+					break;
+				}
+			}
 		}
 	}
 
@@ -289,6 +299,7 @@ void ALobbyCharacter::OnRep_SelectedPlayerID()
 void ALobbyCharacter::ServerSelectActor_Implementation(const FString& InUserName)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ServerSelectActor_Implementation called by %s"), *InUserName);
+
 	MulticastUpdateActorSelection(InUserName);
 }
 
@@ -301,26 +312,9 @@ void ALobbyCharacter::MulticastUpdateActorSelection_Implementation(const FString
 {
 	UE_LOG(LogTemp, Warning, TEXT("MulticastUpdateActorSelection_Implementation called by %s"), *InUserName);
 
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	if (!PC) return;
-
-	ALobbyPlayerController* LobbyPC = Cast<ALobbyPlayerController>(PC);
-	if (!LobbyPC) return;
-
-
 	if (UserName.IsEmpty())
 	{
-		// 이미 선택한 캐릭터가 있음
-		if (LobbyPC->GetSelectedLobbyCharacter())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("이미 선택한 캐릭터가 있음 by %s"), *InUserName);
-			return;
-		}
-
-
-		LobbyPC->SetSelectedLobbyCharacter(this);
 		UserName = InUserName;
-
 
 		PlayMontage(LOBBY_CHARACTER_MONTAGE::PICKED);
 	}
@@ -328,7 +322,6 @@ void ALobbyCharacter::MulticastUpdateActorSelection_Implementation(const FString
 	{
 		UE_LOG(LogTemp, Warning, TEXT("LobbyPC->SetSelectedLobbyCharacter by %s"), *InUserName);
 
-		LobbyPC->SetSelectedLobbyCharacter(nullptr);
 		UserName = TEXT("");
 
 		PlayMontage(LOBBY_CHARACTER_MONTAGE::UNPICKED);

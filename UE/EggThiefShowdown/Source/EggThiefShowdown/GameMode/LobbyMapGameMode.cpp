@@ -8,8 +8,6 @@
 
 void ALobbyMapGameMode::CheckAndServerTravel()
 {
-	GetWorld()->GetPlayerControllerIterator();
-
 	bool bTravel = true;
 	bool bIsMario = false;
 	uint16 iYoshiNum = 0;

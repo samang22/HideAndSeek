@@ -77,7 +77,8 @@ protected:
 public:
 	UFUNCTION()
 	void SetUserName(const FString& InUserName);
-	
+	FString GetUserName() const { return UserName; }
+
 
 public:
 	// 액터 선택 함수

@@ -10,6 +10,16 @@ void ALobbyPlayerController::Server_SelectLobbyCharacter_Implementation(ALobbyCh
     if (LobbyCharacter)
     {
         LobbyCharacter->ServerSelectActor(InUserName);
+
+        // 요청한 UserName과 LobbyCharacter의 UserName의 이름이 같다면, 이름이 바뀌었다는 것
+        if (LobbyCharacter->GetUserName() == InUserName)
+        {
+            SetSelectedLobbyCharacter(LobbyCharacter);
+        }
+        else
+        {
+            SetSelectedLobbyCharacter(nullptr);
+        }
     }
 
     ALobbyMapGameMode* GameMode = Cast<ALobbyMapGameMode>(GetWorld()->GetAuthGameMode());
