@@ -171,6 +171,11 @@ void ALobbyCharacter::Tick(float DeltaTime)
 
 }
 
+LOBBY_CHARACTER_KIND ALobbyCharacter::GetLobbyCharacterKind() const
+{
+	return StatusComponent->GetLobbyCharacterKind();
+}
+
 LOBBY_CHARACTER_SELECT_BUTTON_STATE ALobbyCharacter::GetSelectionState(const FString& InUserName)
 {
 	if (UserName.IsEmpty())

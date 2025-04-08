@@ -61,6 +61,20 @@ enum class LOBBY_CHARACTER_KIND : uint8
 };
 
 
+enum class YOSHI_MONTAGE : uint8
+{
+	DAMAGED = 0,
+	PICKUP,
+	END,
+};
+
+enum class GAME_PLAYER_MONTAGE : uint8
+{
+	DAMAGED = 0,
+	PICKUP,
+	END,
+};
+
 class FUtils
 {
 public:

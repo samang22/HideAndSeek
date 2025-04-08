@@ -5,6 +5,12 @@
 #include "../PlayerController/LobbyPlayerController.h"
 #include "../Actors/Lobby/LobbyCharacter.h"
 #include "../Components/StatusComponent/Lobby/LobbyCharacterStatusComponent.h"
+#include "../PlayerState/LobbyMapPlayerState.h"
+
+ALobbyMapGameMode::ALobbyMapGameMode()
+{
+	PlayerStateClass = ALobbyMapPlayerState::StaticClass();
+}
 
 void ALobbyMapGameMode::CheckAndServerTravel()
 {
@@ -47,8 +53,8 @@ void ALobbyMapGameMode::CheckAndServerTravel()
 		{
 			GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 				{
-					FString TravelURL = TEXT("/Game/Level/GameMap?game=/Game/GameMode/BPGM_LobbyMap.BPGM_LobbyMap_C");
-					GetWorld()->ServerTravel(TravelURL);
+					FString TravelURL = TEXT("/Game/Level/GameMap?game=/Game/GameMode/BPGM_GameMap.BPGM_GameMap_C");
+					GetWorld()->ServerTravel(TravelURL, true); // Seamless Travel
 				});
 		}
 	}

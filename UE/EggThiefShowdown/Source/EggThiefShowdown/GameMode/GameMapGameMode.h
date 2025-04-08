@@ -3,15 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 #include "GameMapGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class EGGTHIEFSHOWDOWN_API AGameMapGameMode : public AGameModeBase
+class EGGTHIEFSHOWDOWN_API AGameMapGameMode : public AGameMode
 {
 	GENERATED_BODY()
 	
+
+public:
+	AGameMapGameMode();
+	virtual void PostSeamlessTravel() override;
+	//virtual void GenericPlayerInitialization(AController* NewPlayer) override;
 };

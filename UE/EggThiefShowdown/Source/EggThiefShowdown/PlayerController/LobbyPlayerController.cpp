@@ -4,6 +4,8 @@
 #include "LobbyPlayerController.h"
 #include "../Actors/Lobby/LobbyCharacter.h"
 #include "../GameMode/LobbyMapGameMode.h"
+#include "Subsystem/HaServerSubsystem.h"
+#include "../PlayerState/LobbyMapPlayerState.h"
 
 void ALobbyPlayerController::Server_SelectLobbyCharacter_Implementation(ALobbyCharacter* LobbyCharacter, const FString& InUserName)
 {
@@ -26,5 +28,23 @@ void ALobbyPlayerController::Server_SelectLobbyCharacter_Implementation(ALobbyCh
     if (GameMode)
     {
         GameMode->CheckAndServerTravel();
+    }
+}
+
+void ALobbyPlayerController::SetSelectedLobbyCharacter(AActor* InCharacter)
+{
+    SelectedLobbyCharacter = InCharacter;
+    if (SelectedLobbyCharacter)
+    {
+        // Local
+        UHaServerSubsystem* Subsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>();
+        _ASSERT(Subsystem);
+        ALobbyCharacter* LC = Cast<ALobbyCharacter>(SelectedLobbyCharacter);
+        LOBBY_CHARACTER_KIND eKind = LC->GetLobbyCharacterKind();
+        Subsystem->SetLobbyCharacterKind(static_cast<uint8>(eKind));
+
+        // Save it to next Level (Game Map)
+        ALobbyMapPlayerState* LobbyMapPlayerState = Cast<ALobbyMapPlayerState>(PlayerState);
+        LobbyMapPlayerState->SetLobbyCharacterKind(static_cast<uint8>(eKind));
     }
 }

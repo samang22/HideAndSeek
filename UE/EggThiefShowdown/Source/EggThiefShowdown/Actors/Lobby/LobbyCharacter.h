@@ -49,6 +49,8 @@ protected:
 	TObjectPtr<ULobbyCharacterStatusComponent> StatusComponent;
 public:
 	TObjectPtr<ULobbyCharacterStatusComponent> GetStatusComponent() { return StatusComponent; }
+	LOBBY_CHARACTER_KIND GetLobbyCharacterKind() const;
+	
 
 protected:
 	TObjectPtr<UWidgetComponent> SelectButtonWidgetComponent;

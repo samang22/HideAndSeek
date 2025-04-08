@@ -19,6 +19,6 @@ public:
 protected:
 	TObjectPtr<AActor> SelectedLobbyCharacter = nullptr;
 public:
-	void SetSelectedLobbyCharacter(AActor* InCharacter) { SelectedLobbyCharacter = InCharacter; }
-	AActor* GetSelectedLobbyCharacter() const { return SelectedLobbyCharacter; }
+	void SetSelectedLobbyCharacter(AActor* InCharacter);
+	AActor* GetSelectedLobbyCharacter() const { return SelectedLobbyCharacter.Get(); }
 };

@@ -15,6 +15,7 @@ class EGGTHIEFSHOWDOWN_API ALobbyMapGameMode : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
+	ALobbyMapGameMode();
 	void CheckAndServerTravel();
 
 };
