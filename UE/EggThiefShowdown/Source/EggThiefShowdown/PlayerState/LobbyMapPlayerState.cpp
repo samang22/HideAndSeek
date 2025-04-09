@@ -14,6 +14,8 @@ void ALobbyMapPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 void ALobbyMapPlayerState::CopyProperties(APlayerState* NewPlayerState)
 {
+	UE_LOG(LogTemp, Warning, TEXT("ALobbyMapPlayerState::CopyProperties"));
+
 	Super::CopyProperties(NewPlayerState);
 
 	if (AGameMapPlayerState* NewPS = Cast<AGameMapPlayerState>(NewPlayerState))

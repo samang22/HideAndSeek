@@ -14,6 +14,9 @@ class NETWORK_API AChannelServerConnectGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	AChannelServerConnectGameMode();
+	       
 protected:
 	/**
 	* PreLogin의 비동기 버전으로, 완료되었을 때 반드시 OnComplete를 호출해야 합니다. 그렇지 않으면 들어오는 클라이언트 연결이 중단되거나 시간 초과될 수 있습니다.

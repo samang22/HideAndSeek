@@ -10,6 +10,7 @@
 ALobbyMapGameMode::ALobbyMapGameMode()
 {
 	PlayerStateClass = ALobbyMapPlayerState::StaticClass();
+	bUseSeamlessTravel = true;
 }
 
 void ALobbyMapGameMode::CheckAndServerTravel()

@@ -20,17 +20,6 @@ void AGameCameraActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (PlayerController)
-	{
-		PlayerController->SetViewTarget(this);
-	}
-
-	if (Camera)
-	{
-		Camera->ProjectionMode = ECameraProjectionMode::Perspective;;
-	}
-	
 }
 
 // Called every frame

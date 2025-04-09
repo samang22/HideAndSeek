@@ -20,6 +20,15 @@ void UChannelListWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	if (!LoginChannel)
+	{
+		LoginChannel = HaServerSubsystem->GetLoginChannel();
+		if (!LoginChannel)
+		{
+			return;
+		}
+	}
+
 	if (LoginID->GetText().ToString() != LoginChannel->GetLoginUserName())
 	{
 		LoginID->SetText(FText::FromString(LoginChannel->GetLoginUserName()));

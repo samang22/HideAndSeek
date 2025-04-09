@@ -25,8 +25,4 @@ public: // Animation
 	UAnimMontage* PickupMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "GamePlayer|Animation")
 	UAnimMontage* DamagedMontage = nullptr;
-
-//public:
-//	UPROPERTY(EditAnywhere, Category = "LobbyCharacter|Widget")
-//	TSubclassOf<UUserWidget> ButtonWidgetClass = nullptr;
 };

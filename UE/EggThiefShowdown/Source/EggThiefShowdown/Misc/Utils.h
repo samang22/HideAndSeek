@@ -8,16 +8,8 @@
 #include "InputActionValue.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Defines.h"
 
-
-#define CHARACTER_DEFAULT_SCALE					45.0
-
-#define PROBE_SIZE								5.0
-
-#define LOBBY_CHARACTER_ANIM_BIT_IDLE			0x00000001
-#define LOBBY_CHARACTER_ANIM_BIT_PICKED			0x00000002
-#define LOBBY_CHARACTER_ANIM_BIT_PICKEDIDLE		0x00000004
-#define LOBBY_CHARACTER_ANIM_BIT_UNPICKED		0x00000008
 
 
 enum class LOBBY_CHARACTER_ANIM_ENUM : uint8

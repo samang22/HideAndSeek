@@ -6,6 +6,8 @@
 #include "../GameMode/LobbyMapGameMode.h"
 #include "Subsystem/HaServerSubsystem.h"
 #include "../PlayerState/LobbyMapPlayerState.h"
+#include "Kismet/GameplayStatics.h"
+#include "../Actors/Lobby/LobbyCamera.h"
 
 void ALobbyPlayerController::Server_SelectLobbyCharacter_Implementation(ALobbyCharacter* LobbyCharacter, const FString& InUserName)
 {
@@ -48,3 +50,9 @@ void ALobbyPlayerController::SetSelectedLobbyCharacter(AActor* InCharacter)
         LobbyMapPlayerState->SetLobbyCharacterKind(static_cast<uint8>(eKind));
     }
 }
+
+void ALobbyPlayerController::BeginPlay()
+{
+    Super::BeginPlay();
+}
+

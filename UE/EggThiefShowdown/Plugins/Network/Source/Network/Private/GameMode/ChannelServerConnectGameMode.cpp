@@ -8,6 +8,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerState.h"
 
+AChannelServerConnectGameMode::AChannelServerConnectGameMode()
+{
+}
+
 void AChannelServerConnectGameMode::PreLoginAsync(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, const FOnPreLoginCompleteDelegate& OnComplete)
 {
 	int32 NumPlayers = GetNumPlayers() + PendingLogins.Num();

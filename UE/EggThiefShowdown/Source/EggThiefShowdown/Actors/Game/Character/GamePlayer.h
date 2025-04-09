@@ -48,7 +48,7 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere)
 	FDataTableRowHandle DataTableRowHandle;
-	FGamePlayerTableRow* GamePlayerData;
+	FGamePlayerTableRow* GamePlayerData = nullptr;
 
 
 protected:

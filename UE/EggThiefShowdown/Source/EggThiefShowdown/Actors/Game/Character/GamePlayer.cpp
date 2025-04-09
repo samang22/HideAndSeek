@@ -2,8 +2,12 @@
 
 
 #include "GamePlayer.h"
-#include "../../../Components/StatusComponent/Game/MarioStatusComponent.h"
+#include "../../../Components/StatusComponent/Game/GamePlayerStatusComponent.h"
 #include "../../../Data/GamePlayerTableRow.h"
+#include "Kismet/GameplayStatics.h"
+#include "../../Lobby/LobbyCamera.h"
+
+
 
 // Sets default values
 AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
@@ -15,28 +19,11 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	bAlwaysRelevant = true;
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> Asset(TEXT("/Script/Engine.SkeletalMesh'/Game/Assets/Players/Mario/pc01_mario_light.pc01_mario_light'"));
-	//check(Asset.Object);
-	//SkeletalMeshComponent->SetSkeletalMesh(Asset.Object);
 	RootComponent = SkeletalMeshComponent;
 	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SkeletalMeshComponent->SetRelativeScale3D(FVector(CHARACTER_DEFAULT_SCALE, CHARACTER_DEFAULT_SCALE, CHARACTER_DEFAULT_SCALE));
 
 	StatusComponent = CreateDefaultSubobject<UGamePlayerStatusComponent>(TEXT("StatusComponent"));
-
-
-	//static ConstructorHelpers::FObjectFinder<UAnimMontage> DamagedMontageAsset(TEXT("/Script/Engine.AnimMontage'/Game/Assets/Players/Mario/Animation/MTG_MarioDamaged.MTG_MarioDamaged'"));
-	//if (DamagedMontageAsset.Succeeded())
-	//{
-	//	DamagedMontage = DamagedMontageAsset.Object;
-	//}
-
-	//static ConstructorHelpers::FObjectFinder<UAnimMontage> PickupMontageAsset(TEXT("/Script/Engine.AnimMontage'/Game/Assets/Players/Mario/Animation/MTG_MarioDamaged.MTG_MarioPickup'"));
-	//if (PickupMontageAsset.Succeeded())
-	//{
-	//	PickupMontage = PickupMontageAsset.Object;
-	//}
-
 }
 
 void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -58,6 +45,8 @@ void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 // Called when the game starts or when spawned
 void AGamePlayer::BeginPlay()
 {
+	UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::BeginPlay"));
+
 	Super::BeginPlay();
 	
 	SetData(DataTableRowHandle);

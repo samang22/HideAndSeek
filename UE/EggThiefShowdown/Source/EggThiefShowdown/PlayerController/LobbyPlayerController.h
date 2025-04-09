@@ -21,4 +21,7 @@ protected:
 public:
 	void SetSelectedLobbyCharacter(AActor* InCharacter);
 	AActor* GetSelectedLobbyCharacter() const { return SelectedLobbyCharacter.Get(); }
+
+public:
+	virtual void BeginPlay() override;
 };

@@ -30,6 +30,8 @@ void AGameMapGameMode::PostSeamlessTravel()
         
         if (NewPlayerState)
         {
+            static UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_GamePlayer.DT_GamePlayer"));
+
             switch (static_cast<LOBBY_CHARACTER_KIND>(NewPlayerState->GetCharacterKind()))
             {
             case LOBBY_CHARACTER_KIND::MARIO:
@@ -70,19 +72,69 @@ void AGameMapGameMode::PostSeamlessTravel()
                     AGamePlayer* GamePlayer = Cast<AGamePlayer>(NewPawn);
                     if (GamePlayer)
                     {
-                        //static ConstructorHelpers::FObjectFinder<UDataTable> DataTableObj(TEXT("DataTable'/Game/Data/MyDataTable.MyDataTable'"));
-                        //if (DataTableObj.Succeeded())s
-                        //{
-                        //    MyDataTable = DataTableObj.Object;
-                        //}
-                        //GamePlayer->SetData(/*FDataTableRowHandle*/);
+                        if (DataTable)
+                        {
+                            FDataTableRowHandle DataTableRowHandle;
+                            DataTableRowHandle.DataTable = DataTable;
+                            DataTableRowHandle.RowName = FName(TEXT("Mario"));
+                            GamePlayer->SetData(DataTableRowHandle);
+                        }
+ 
                     }
                 }
             }
 
                 break;
             case LOBBY_CHARACTER_KIND::YOSHI:
+            {
+                UE_LOG(LogTemp, Warning, TEXT("YOSHI"));
 
+                TArray<AActor*> SpawnPoints;
+                UGameplayStatics::GetAllActorsOfClass(GetWorld(), AYoshiSpawnPoint::StaticClass(), SpawnPoints);
+
+                if (SpawnPoints.Num() > 0)
+                {
+                    // 2. 랜덤 스폰 포인트 선택
+                    FVector SpawnLocation = {};
+                    FRotator SpawnRotation = {};
+
+                    while (true)
+                    {
+                        int32 RandomIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
+                        AYoshiSpawnPoint* YoshiSP = Cast<AYoshiSpawnPoint>(SpawnPoints[RandomIndex]);
+                        if (YoshiSP->GetIsSpawned()) continue;
+
+                        YoshiSP->SetIsSpawned(true);
+                        SpawnLocation = YoshiSP->GetActorLocation();
+                        SpawnRotation = YoshiSP->GetActorRotation();
+                        break;
+                    }
+
+                    // 3. Pawn 스폰 및 소유권 설정
+                    FActorSpawnParameters SpawnParams;
+                    SpawnParams.Owner = PC;
+                    APawn* NewPawn = GetWorld()->SpawnActor<APawn>(AGamePlayer::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
+
+                    if (NewPawn)
+                    {
+                        PC->Possess(NewPawn);
+                    }
+
+                    AGamePlayer* GamePlayer = Cast<AGamePlayer>(NewPawn);
+                    if (GamePlayer)
+                    {
+
+                        if (DataTable)
+                        {
+                            FDataTableRowHandle DataTableRowHandle;
+                            DataTableRowHandle.DataTable = DataTable;
+                            DataTableRowHandle.RowName = FName(TEXT("Yoshi"));
+                            GamePlayer->SetData(DataTableRowHandle);
+                        }
+
+                    }
+                }
+            }
                 break;
             default:
                 break;
