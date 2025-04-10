@@ -14,13 +14,13 @@ class EGGTHIEFSHOWDOWN_API AGameMapPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 
-protected:
-    UPROPERTY(Replicated)
-    uint8 eCharacterKind = 0;
-public:
-    void SetCharacterKind(uint8 eKind) { eCharacterKind = eKind; }
-    uint8 GetCharacterKind() const { return eCharacterKind; }
-
-public:
-    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+//protected:
+//    UPROPERTY(Replicated)
+//    uint8 eCharacterKind = 0;
+//public:
+//    void SetCharacterKind(uint8 eKind) { eCharacterKind = eKind; }
+//    uint8 GetCharacterKind() const { return eCharacterKind; }
+//
+//public:
+//    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

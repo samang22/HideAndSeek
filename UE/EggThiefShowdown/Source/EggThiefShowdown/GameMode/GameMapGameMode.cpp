@@ -10,136 +10,136 @@
 #include "../Actors/Game/SpawnPoint/YoshiSpawnPoint.h"
 #include "../PlayerController/LobbyPlayerController.h"
 #include "../PlayerState/GameMapPlayerState.h"
+#include "../PlayerState/LobbyMapPlayerState.h"
 
 AGameMapGameMode::AGameMapGameMode()
 {
     PlayerStateClass = AGameMapPlayerState::StaticClass();
 }
 
-void AGameMapGameMode::PostSeamlessTravel()
+void AGameMapGameMode::SetPlayerData(AController* NewPlayer)
 {
-    Super::PostSeamlessTravel();
+	UE_LOG(LogGameMode, Warning, TEXT("AGameMapGameMode::SetPlayerData"));
 
-    UE_LOG(LogTemp, Warning, TEXT("AGameMapGameMode::PostSeamlessTravel"));
 
-    // PlayerState의 정보를 토대로 초기화
-    for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-    {
-        APlayerController* PC = Iterator->Get();
-        AGameMapPlayerState* NewPlayerState = PC->GetPlayerState<AGameMapPlayerState>();
-        
-        if (NewPlayerState)
-        {
-            static UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_GamePlayer.DT_GamePlayer"));
+	//if (NewPlayer == nullptr || NewPlayer->IsPendingKillPending())
+	//{
+	//	UE_LOG(LogGameMode, Warning, TEXT("NewPlayer == nullptr || NewPlayer->IsPendingKillPending()"));
+ //
+	//	return;
+	//}
+	//if (NewPlayer)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::PC"));
 
-            switch (static_cast<LOBBY_CHARACTER_KIND>(NewPlayerState->GetCharacterKind()))
-            {
-            case LOBBY_CHARACTER_KIND::MARIO:
-            {
-                UE_LOG(LogTemp, Warning, TEXT("MARIO"));
+	//	if (ALobbyPlayerController* LPC = Cast< ALobbyPlayerController>(NewPlayer))
+	//	{
+	//		if (ALobbyMapPlayerState* NewPlayerState = LPC->GetPlayerState<ALobbyMapPlayerState>())
+	//		{
+	//			UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::ALobbyMapPlayerState"));
 
-                TArray<AActor*> SpawnPoints;
-                UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMarioSpawnPoint::StaticClass(), SpawnPoints);
+	//			static UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_GamePlayer.DT_GamePlayer"));
 
-                if (SpawnPoints.Num() > 0)
-                {
-                    // 2. 랜덤 스폰 포인트 선택
-                    FVector SpawnLocation = {};
-                    FRotator SpawnRotation = {};
+	//			switch (static_cast<LOBBY_CHARACTER_KIND>(NewPlayerState->GetLobbyCharacterKind()))
+	//			{
+	//			case LOBBY_CHARACTER_KIND::MARIO:
+	//			{
+	//				UE_LOG(LogTemp, Warning, TEXT("MARIO"));
 
-                    while (true)
-                    {
-                        int32 RandomIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
-                        AMarioSpawnPoint* MarioSP = Cast<AMarioSpawnPoint>(SpawnPoints[RandomIndex]);
-                        if (MarioSP->GetIsSpawned()) continue;
+	//				TArray<AActor*> SpawnPoints;
+	//				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMarioSpawnPoint::StaticClass(), SpawnPoints);
 
-                        MarioSP->SetIsSpawned(true);
-                        SpawnLocation = MarioSP->GetActorLocation();
-                        SpawnRotation = MarioSP->GetActorRotation();
-                        break;
-                    }
+	//				if (SpawnPoints.Num() > 0)
+	//				{
+	//					// 2. 랜덤 스폰 포인트 선택
+	//					FVector SpawnLocation = {};
+	//					FRotator SpawnRotation = {};
 
-                    // 3. Pawn 스폰 및 소유권 설정
-                    FActorSpawnParameters SpawnParams;
-                    SpawnParams.Owner = PC;
-                    APawn* NewPawn = GetWorld()->SpawnActor<APawn>(AGamePlayer::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
+	//					while (true)
+	//					{
+	//						int32 RandomIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
+	//						AMarioSpawnPoint* MarioSP = Cast<AMarioSpawnPoint>(SpawnPoints[RandomIndex]);
+	//						if (MarioSP->GetIsSpawned()) continue;
 
-                    if (NewPawn)
-                    {
-                        PC->Possess(NewPawn);
-                    }
+	//						MarioSP->SetIsSpawned(true);
+	//						break;
+	//					}
 
-                    AGamePlayer* GamePlayer = Cast<AGamePlayer>(NewPawn);
-                    if (GamePlayer)
-                    {
-                        if (DataTable)
-                        {
-                            FDataTableRowHandle DataTableRowHandle;
-                            DataTableRowHandle.DataTable = DataTable;
-                            DataTableRowHandle.RowName = FName(TEXT("Mario"));
-                            GamePlayer->SetData(DataTableRowHandle);
-                        }
- 
-                    }
-                }
-            }
+	//					if (DataTable)
+	//					{
+	//						FDataTableRowHandle tempDataTableRowHandle;
+	//						tempDataTableRowHandle.DataTable = DataTable;
+	//						tempDataTableRowHandle.RowName = FName(TEXT("Mario"));
+	//						NewPlayerState->SetDataTableRowHandle(tempDataTableRowHandle);
+	//					}
+	//				}
+	//			}
 
-                break;
-            case LOBBY_CHARACTER_KIND::YOSHI:
-            {
-                UE_LOG(LogTemp, Warning, TEXT("YOSHI"));
+	//			break;
+	//			case LOBBY_CHARACTER_KIND::YOSHI:
+	//			{
+	//				UE_LOG(LogTemp, Warning, TEXT("YOSHI"));
 
-                TArray<AActor*> SpawnPoints;
-                UGameplayStatics::GetAllActorsOfClass(GetWorld(), AYoshiSpawnPoint::StaticClass(), SpawnPoints);
+	//				TArray<AActor*> SpawnPoints;
+	//				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AYoshiSpawnPoint::StaticClass(), SpawnPoints);
 
-                if (SpawnPoints.Num() > 0)
-                {
-                    // 2. 랜덤 스폰 포인트 선택
-                    FVector SpawnLocation = {};
-                    FRotator SpawnRotation = {};
+	//				if (SpawnPoints.Num() > 0)
+	//				{
+	//					// 2. 랜덤 스폰 포인트 선택
+	//					FVector SpawnLocation = {};
+	//					FRotator SpawnRotation = {};
 
-                    while (true)
-                    {
-                        int32 RandomIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
-                        AYoshiSpawnPoint* YoshiSP = Cast<AYoshiSpawnPoint>(SpawnPoints[RandomIndex]);
-                        if (YoshiSP->GetIsSpawned()) continue;
+	//					while (true)
+	//					{
+	//						int32 RandomIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
+	//						AYoshiSpawnPoint* YoshiSP = Cast<AYoshiSpawnPoint>(SpawnPoints[RandomIndex]);
+	//						if (YoshiSP->GetIsSpawned()) continue;
 
-                        YoshiSP->SetIsSpawned(true);
-                        SpawnLocation = YoshiSP->GetActorLocation();
-                        SpawnRotation = YoshiSP->GetActorRotation();
-                        break;
-                    }
+	//						YoshiSP->SetIsSpawned(true);
+	//						StartSpot = YoshiSP;
+	//						break;
+	//					}
 
-                    // 3. Pawn 스폰 및 소유권 설정
-                    FActorSpawnParameters SpawnParams;
-                    SpawnParams.Owner = PC;
-                    APawn* NewPawn = GetWorld()->SpawnActor<APawn>(AGamePlayer::StaticClass(), SpawnLocation, SpawnRotation, SpawnParams);
 
-                    if (NewPawn)
-                    {
-                        PC->Possess(NewPawn);
-                    }
-
-                    AGamePlayer* GamePlayer = Cast<AGamePlayer>(NewPawn);
-                    if (GamePlayer)
-                    {
-
-                        if (DataTable)
-                        {
-                            FDataTableRowHandle DataTableRowHandle;
-                            DataTableRowHandle.DataTable = DataTable;
-                            DataTableRowHandle.RowName = FName(TEXT("Yoshi"));
-                            GamePlayer->SetData(DataTableRowHandle);
-                        }
-
-                    }
-                }
-            }
-                break;
-            default:
-                break;
-            }
-        }
-    }
-
+	//					if (DataTable)
+	//					{
+	//						FDataTableRowHandle tempDataTableRowHandle;
+	//						tempDataTableRowHandle.DataTable = DataTable;
+	//						tempDataTableRowHandle.RowName = FName(TEXT("Yoshi"));
+	//						NewPlayerState->SetDataTableRowHandle(tempDataTableRowHandle);
+	//					}
+	//				}
+	//			}
+	//			break;
+	//			default:
+	//				UE_LOG(LogTemp, Warning, TEXT("no MARIO no YOSHI"));
+	//				return;
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
 }
+
+void AGameMapGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 현재 월드에서 모든 플레이어 컨트롤러를 순회
+	//for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	//{
+	//	APlayerController* PlayerController = Iterator->Get();
+	//	if (PlayerController && PlayerController->GetPawn() == nullptr)
+	//	{
+	//		SetPlayerData(PlayerController);
+	//	}
+	//}
+}
+
+//void AGameMapGameMode::PostSeamlessTravel()
+//{
+//    Super::PostSeamlessTravel();
+//
+//    UE_LOG(LogTemp, Warning, TEXT("AGameMapGameMode::PostSeamlessTravel"));
+//
+//}

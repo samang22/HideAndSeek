@@ -36,15 +36,11 @@ void ALobbyCamera::Tick(float DeltaTime)
 		Camera->OrthoWidth = LOBBY_CAMERA_ORTHO_WIDTH;  // 원하는 직교 투영의 크기로 설정
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("ALobbyCamera::BeginPlay"));
-
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		APlayerController* PC = Iterator->Get();
 		if (PC)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("ALobbyCamera::BeginPlay : SetViewTarget"));
-
 			PC->SetViewTarget(this);
 		}
 	}

@@ -18,8 +18,8 @@ void ALobbyMapPlayerState::CopyProperties(APlayerState* NewPlayerState)
 
 	Super::CopyProperties(NewPlayerState);
 
-	if (AGameMapPlayerState* NewPS = Cast<AGameMapPlayerState>(NewPlayerState))
+	if (ALobbyMapPlayerState* NewPS = Cast<ALobbyMapPlayerState>(NewPlayerState))
 	{
-		NewPS->SetCharacterKind(this->GetLobbyCharacterKind());
+		NewPS->SetLobbyCharacterKind(this->GetLobbyCharacterKind());
 	}
 }

@@ -9,6 +9,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "../Actors/Lobby/LobbyCamera.h"
 
+ALobbyPlayerController::ALobbyPlayerController()
+{
+
+}
+
 void ALobbyPlayerController::Server_SelectLobbyCharacter_Implementation(ALobbyCharacter* LobbyCharacter, const FString& InUserName)
 {
     if (LobbyCharacter)

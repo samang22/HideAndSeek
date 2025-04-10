@@ -23,6 +23,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;
 	virtual void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
 	virtual void PostLoad() override;
 	virtual void PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph) override;
@@ -46,7 +47,21 @@ protected:
 //	UAnimMontage* PickupMontage = nullptr;
 
 protected:
-	UPROPERTY(EditAnywhere)
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+protected:
+	UFUNCTION()
+	void OnRep_UpdateDataTableRowHandle();
+
+	UFUNCTION()
+	void OnRep_RowName();
+
+protected:
+	UPROPERTY(ReplicatedUsing = OnRep_RowName, EditAnywhere)
+	FName RowName;
+
+protected:
+	UPROPERTY(/*ReplicatedUsing = OnRep_UpdateDataTableRowHandle, */EditAnywhere,  meta = (RowType = "GamePlayerData"))
 	FDataTableRowHandle DataTableRowHandle;
 	FGamePlayerTableRow* GamePlayerData = nullptr;
 
@@ -61,4 +76,7 @@ public:
 	void PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop = false);
 	bool IsMontage(GAME_PLAYER_MONTAGE _InEnum);
 	bool IsPlayingMontage(GAME_PLAYER_MONTAGE _InEnum);
+
+
+
 };

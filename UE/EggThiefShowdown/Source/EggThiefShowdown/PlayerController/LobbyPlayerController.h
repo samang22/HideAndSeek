@@ -13,6 +13,7 @@ class EGGTHIEFSHOWDOWN_API ALobbyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:
+	ALobbyPlayerController();
 	UFUNCTION(Server, Reliable)
 	void Server_SelectLobbyCharacter(ALobbyCharacter* LobbyCharacter, const FString& InUserName);
 
@@ -21,6 +22,7 @@ protected:
 public:
 	void SetSelectedLobbyCharacter(AActor* InCharacter);
 	AActor* GetSelectedLobbyCharacter() const { return SelectedLobbyCharacter.Get(); }
+
 
 public:
 	virtual void BeginPlay() override;

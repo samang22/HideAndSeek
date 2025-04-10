@@ -55,7 +55,7 @@ void ALobbyMapGameMode::CheckAndServerTravel()
 			GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 				{
 					FString TravelURL = TEXT("/Game/Level/GameMap?game=/Game/GameMode/BPGM_GameMap.BPGM_GameMap_C");
-					GetWorld()->ServerTravel(TravelURL, true); // Seamless Travel
+					GetWorld()->ServerTravel(TravelURL/*, true*/);
 				});
 		}
 	}
