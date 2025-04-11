@@ -59,7 +59,11 @@ void AGamePlayer::BeginPlay()
 
 	Super::BeginPlay();
 	
-
+	if (HasAuthority())
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::InitDataTableByPlayerState);
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::OnRep_UpdateDataTableRowHandle);
+	}
 }
 
 void AGamePlayer::PossessedBy(AController* NewController)
@@ -68,14 +72,55 @@ void AGamePlayer::PossessedBy(AController* NewController)
 
 	Super::PossessedBy(NewController);
 
+	//InitByDataTable();
+
+	SetData(DataTableRowHandle);
+}
+
+void AGamePlayer::PostDuplicate(EDuplicateMode::Type DuplicateMode)
+{
+	Super::PostDuplicate(DuplicateMode);
+
+	if (DuplicateMode == EDuplicateMode::Normal)
+	{
+		FTransform Backup = GetActorTransform();
+		SetData(DataTableRowHandle);
+		SetActorTransform(Backup);
+	}
+}
+
+void AGamePlayer::PostLoad()
+{
+	Super::PostLoad();
+}
+
+void AGamePlayer::PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph)
+{
+	Super::PostLoadSubobjects(OuterInstanceGraph);
+}
+
+void AGamePlayer::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	SetData(DataTableRowHandle);
+	SetActorTransform(Transform);
+}
+
+void AGamePlayer::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
+void AGamePlayer::InitDataTableByPlayerState()
+{
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::PossessedBy // ALobbyPlayerController"));
+		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::InitByDataTable // ALobbyPlayerController"));
 
 		if (ALobbyMapPlayerState* NewPlayerState = LPC->GetPlayerState<ALobbyMapPlayerState>())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::PossessedBy // ALobbyMapPlayerState"));
+			UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::InitByDataTable // ALobbyMapPlayerState"));
 
 
 			switch (static_cast<LOBBY_CHARACTER_KIND>(NewPlayerState->GetLobbyCharacterKind()))
@@ -133,7 +178,7 @@ void AGamePlayer::PossessedBy(AController* NewController)
 						SetActorLocationAndRotation(YoshiSP->GetActorLocation(), YoshiSP->GetActorRotation().Quaternion());
 						break;
 					}
-					
+
 					static UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_GamePlayer.DT_GamePlayer"));
 
 					if (DataTable)
@@ -153,42 +198,6 @@ void AGamePlayer::PossessedBy(AController* NewController)
 			}
 		}
 	}
-
-	SetData(DataTableRowHandle);
-}
-
-void AGamePlayer::PostDuplicate(EDuplicateMode::Type DuplicateMode)
-{
-	Super::PostDuplicate(DuplicateMode);
-
-	if (DuplicateMode == EDuplicateMode::Normal)
-	{
-		FTransform Backup = GetActorTransform();
-		SetData(DataTableRowHandle);
-		SetActorTransform(Backup);
-	}
-}
-
-void AGamePlayer::PostLoad()
-{
-	Super::PostLoad();
-}
-
-void AGamePlayer::PostLoadSubobjects(FObjectInstancingGraph* OuterInstanceGraph)
-{
-	Super::PostLoadSubobjects(OuterInstanceGraph);
-}
-
-void AGamePlayer::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-	SetData(DataTableRowHandle);
-	SetActorTransform(Transform);
-}
-
-void AGamePlayer::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
 }
 
 // Called every frame
@@ -196,10 +205,10 @@ void AGamePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (HasAuthority())
-	{
-		OnRep_UpdateDataTableRowHandle();
-	}
+	//if (HasAuthority())
+	//{
+	//	OnRep_UpdateDataTableRowHandle();
+	//}
 
 }
 
@@ -277,8 +286,7 @@ void AGamePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	//DOREPLIFETIME(ThisClass, DataTableRowHandle);
-	DOREPLIFETIME(ThisClass, RowName);
+	DOREPLIFETIME(ThisClass, DataTableRowHandle);
 }
 
 void AGamePlayer::OnRep_UpdateDataTableRowHandle()
@@ -290,8 +298,6 @@ void AGamePlayer::OnRep_UpdateDataTableRowHandle()
 		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::OnRep_UpdateDataTableRowHandle // DataTableRowHandle.IsNull()"));
 		return; 
 	}
-
-
 
 	FGamePlayerTableRow* Data = DataTableRowHandle.GetRow<FGamePlayerTableRow>(DataTableRowHandle.RowName.ToString());
 	if (!Data) { return; }
@@ -308,7 +314,6 @@ void AGamePlayer::OnRep_UpdateDataTableRowHandle()
 	}
 
 	{
-		SkeletalMeshComponent = GetMesh();
 		SkeletalMeshComponent->SetSkeletalMesh(GamePlayerData->SkeletalMesh);
 		SkeletalMeshComponent->SetRelativeTransform(GamePlayerData->MeshTransform);
 		SkeletalMeshComponent->SetAnimClass(GamePlayerData->AnimClass);
@@ -322,18 +327,3 @@ void AGamePlayer::OnRep_UpdateDataTableRowHandle()
 		CacheInitialMeshOffset(GamePlayerData->MeshTransform.GetTranslation(), GamePlayerData->MeshTransform.GetRotation().Rotator());
 	}
 }
-
-void AGamePlayer::OnRep_RowName()
-{
-	UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::OnRep_RowName"));
-
-	// RowName을 기반으로 DataTableRowHandle 구성
-	static UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_GamePlayer.DT_GamePlayer"));
-
-	DataTableRowHandle.DataTable = DataTable;
-	DataTableRowHandle.RowName = RowName;
-
-	// 기존 OnRep_UpdateDataTableRowHandle 내용 호출
-	OnRep_UpdateDataTableRowHandle();
-}
-

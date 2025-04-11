@@ -30,6 +30,10 @@ protected:
 	virtual void OnConstruction(const FTransform& Transform);
 	virtual void PostInitializeComponents() override;
 
+protected:
+	void InitDataTableByPlayerState();
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -53,15 +57,7 @@ protected:
 	UFUNCTION()
 	void OnRep_UpdateDataTableRowHandle();
 
-	UFUNCTION()
-	void OnRep_RowName();
-
-protected:
-	UPROPERTY(ReplicatedUsing = OnRep_RowName, EditAnywhere)
-	FName RowName;
-
-protected:
-	UPROPERTY(/*ReplicatedUsing = OnRep_UpdateDataTableRowHandle, */EditAnywhere,  meta = (RowType = "GamePlayerData"))
+	UPROPERTY(ReplicatedUsing = OnRep_UpdateDataTableRowHandle, EditAnywhere,  meta = (RowType = "GamePlayerData"))
 	FDataTableRowHandle DataTableRowHandle;
 	FGamePlayerTableRow* GamePlayerData = nullptr;
 
