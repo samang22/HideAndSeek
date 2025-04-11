@@ -67,6 +67,16 @@ enum class GAME_PLAYER_MONTAGE : uint8
 	END,
 };
 
+
+namespace CollisionProfileName
+{
+	static inline FName Yoshi = TEXT("Yoshi");
+	static inline FName Egg = TEXT("Egg");
+	static inline FName Mario = TEXT("Mario");
+	static inline FName MapMesh = TEXT("MapMesh");
+}
+
+
 class FUtils
 {
 public:

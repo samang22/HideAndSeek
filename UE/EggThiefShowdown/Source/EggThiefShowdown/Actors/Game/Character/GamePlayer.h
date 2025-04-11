@@ -8,6 +8,8 @@
 
 class USkeletalMeshComponent;
 class UGamePlayerStatusComponent;
+class UCameraComponent;
+class USoftWheelSpringArmComponent;
 struct FGamePlayerTableRow;
 
 UCLASS()
@@ -32,7 +34,7 @@ protected:
 
 protected:
 	void InitDataTableByPlayerState();
-
+	void SetInputModeGameOnly();
 
 public:	
 	// Called every frame
@@ -43,12 +45,14 @@ public:
 
 
 protected:
-	UPROPERTY()
-	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
-//	UPROPERTY()
-//	UAnimMontage* DamagedMontage = nullptr;
-//	UPROPERTY()
-//	UAnimMontage* PickupMontage = nullptr;
+	//UPROPERTY()
+	//TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	TObjectPtr<USoftWheelSpringArmComponent> SpringArm;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	TObjectPtr<UCameraComponent> Camera;
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

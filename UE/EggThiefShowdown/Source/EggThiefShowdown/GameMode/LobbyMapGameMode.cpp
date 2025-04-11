@@ -48,9 +48,9 @@ void ALobbyMapGameMode::CheckAndServerTravel()
 	}
 
 
-	if (bTravel && bIsMario)
+	if (/*bTravel && */bIsMario)
 	{
-		if (iYoshiNum > 0)
+		//if (iYoshiNum > 0)
 		{
 			GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 				{
@@ -59,6 +59,4 @@ void ALobbyMapGameMode::CheckAndServerTravel()
 				});
 		}
 	}
-
-
 }

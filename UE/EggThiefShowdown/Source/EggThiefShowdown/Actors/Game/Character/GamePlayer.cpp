@@ -14,6 +14,10 @@
 #include "../../../PlayerController/LobbyPlayerController.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Camera/CameraComponent.h"
+#include "../../../Components/SoftWheelSpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
@@ -24,12 +28,45 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	bReplicates = true;
 	bAlwaysRelevant = true;
 
+	UCapsuleComponent* tempCapsuleComponent = GetCapsuleComponent();
+	tempCapsuleComponent->SetCanEverAffectNavigation(false);
+	RootComponent = tempCapsuleComponent;
+	tempCapsuleComponent->SetCollisionProfileName(CollisionProfileName::Yoshi);
+	tempCapsuleComponent->SetCapsuleHalfHeight(CHARACTER_CAPSULE_HALF_HEIGHT);
+
+
+	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
 	RootComponent = SkeletalMeshComponent;
 	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SkeletalMeshComponent->SetRelativeScale3D(FVector(CHARACTER_DEFAULT_SCALE, CHARACTER_DEFAULT_SCALE, CHARACTER_DEFAULT_SCALE));
 
 	StatusComponent = CreateDefaultSubobject<UGamePlayerStatusComponent>(TEXT("StatusComponent"));
+
+	SpringArm = CreateDefaultSubobject<USoftWheelSpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(SkeletalMeshComponent);
+	SpringArm->TargetArmLength = 1000.f;
+
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(SpringArm);
+
+	{
+		SpringArm->ProbeSize = 5.0;
+		SpringArm->bUsePawnControlRotation = true;
+		SpringArm->bInheritRoll = false;
+
+		const FRotator Rotation = FRotator(0., 90.0, 0.);
+		const FVector Translation = FVector(0., 0., 90.0);
+		FTransform SpringArmTransform = FTransform(Rotation, Translation, FVector::OneVector);
+		SpringArm->SetRelativeTransform(SpringArmTransform);
+
+		// TPS
+		{
+			SpringArm->SetRelativeLocation(FVector(0., 0., 160.));
+			Camera->SetRelativeLocation(FVector(0., 140., 0.));
+		}
+	}
+
 }
 
 void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -43,6 +80,7 @@ void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
 	}
 	GamePlayerData = Data;
 
+	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
 	SkeletalMeshComponent->SetSkeletalMesh(GamePlayerData->SkeletalMesh);
 	SkeletalMeshComponent->SetAnimClass(GamePlayerData->AnimClass);
 	SkeletalMeshComponent->SetRelativeScale3D(GamePlayerData->MeshTransform.GetScale3D());
@@ -60,6 +98,11 @@ void AGamePlayer::BeginPlay()
 	Super::BeginPlay();
 	
 	if (HasAuthority())
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::InitDataTableByPlayerState);
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::OnRep_UpdateDataTableRowHandle);
+	}
+	else if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::InitDataTableByPlayerState);
 		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::OnRep_UpdateDataTableRowHandle);
@@ -156,6 +199,8 @@ void AGamePlayer::InitDataTableByPlayerState()
 						DataTableRowHandle = MarioDataTableRowHandle;
 					}
 				}
+
+				SetInputModeGameOnly();
 			}
 
 			break;
@@ -189,6 +234,8 @@ void AGamePlayer::InitDataTableByPlayerState()
 						DataTableRowHandle = YoshiDataTableRowHandle;
 					}
 				}
+
+				SetInputModeGameOnly();
 			}
 			break;
 			default:
@@ -197,6 +244,16 @@ void AGamePlayer::InitDataTableByPlayerState()
 				break;
 			}
 		}
+	}
+}
+
+void AGamePlayer::SetInputModeGameOnly()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
+	{
+		LPC->SetInputModeGameOnly();
+		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::SetInputModeGameOnly Successed"));
 	}
 }
 
@@ -221,6 +278,7 @@ void AGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AGamePlayer::PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop)
 {
+	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
 	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
 
 	UAnimMontage* tempMontage = nullptr;
@@ -269,6 +327,8 @@ bool AGamePlayer::IsMontage(GAME_PLAYER_MONTAGE _InEnum)
 
 bool AGamePlayer::IsPlayingMontage(GAME_PLAYER_MONTAGE _InEnum)
 {
+	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
+
 	UAnimInstance* AnimInstance = SkeletalMeshComponent->GetAnimInstance();
 
 	switch (_InEnum)
@@ -314,6 +374,7 @@ void AGamePlayer::OnRep_UpdateDataTableRowHandle()
 	}
 
 	{
+		USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
 		SkeletalMeshComponent->SetSkeletalMesh(GamePlayerData->SkeletalMesh);
 		SkeletalMeshComponent->SetRelativeTransform(GamePlayerData->MeshTransform);
 		SkeletalMeshComponent->SetAnimClass(GamePlayerData->AnimClass);
