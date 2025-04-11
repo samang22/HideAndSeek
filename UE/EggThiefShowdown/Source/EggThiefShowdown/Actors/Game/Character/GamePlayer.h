@@ -10,6 +10,7 @@ class USkeletalMeshComponent;
 class UGamePlayerStatusComponent;
 class UCameraComponent;
 class USoftWheelSpringArmComponent;
+class USpringArmComponent;
 struct FGamePlayerTableRow;
 
 UCLASS()
@@ -50,6 +51,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TObjectPtr<USoftWheelSpringArmComponent> SpringArm;
+	//TObjectPtr<USpringArmComponent> SpringArm;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TObjectPtr<UCameraComponent> Camera;

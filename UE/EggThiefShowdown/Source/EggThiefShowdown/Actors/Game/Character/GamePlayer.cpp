@@ -17,6 +17,7 @@
 #include "Camera/CameraComponent.h"
 #include "../../../Components/SoftWheelSpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -44,27 +45,23 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	StatusComponent = CreateDefaultSubobject<UGamePlayerStatusComponent>(TEXT("StatusComponent"));
 
 	SpringArm = CreateDefaultSubobject<USoftWheelSpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(SkeletalMeshComponent);
-	SpringArm->TargetArmLength = 1000.f;
+	//SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(GetMesh());
+	//SpringArm->TargetArmLength = 100.f;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 
 	{
-		SpringArm->ProbeSize = 5.0;
+		SpringArm->TargetArmLength = 30.f;
 		SpringArm->bUsePawnControlRotation = true;
+		SpringArm->bInheritPitch = true;
+		SpringArm->bInheritYaw = true;
 		SpringArm->bInheritRoll = false;
+		//SpringArm->SetRelativeLocation(FVector(0.f, 0.f, 80.f));
+		SpringArm->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f)); // 약간 아래로 바라보게
 
-		const FRotator Rotation = FRotator(0., 90.0, 0.);
-		const FVector Translation = FVector(0., 0., 90.0);
-		FTransform SpringArmTransform = FTransform(Rotation, Translation, FVector::OneVector);
-		SpringArm->SetRelativeTransform(SpringArmTransform);
-
-		// TPS
-		{
-			SpringArm->SetRelativeLocation(FVector(0., 0., 160.));
-			Camera->SetRelativeLocation(FVector(0., 140., 0.));
-		}
+		//Camera->SetRelativeLocation(FVector::ZeroVector); // SpringArm 끝에 붙음
 	}
 
 }
@@ -184,7 +181,10 @@ void AGamePlayer::InitDataTableByPlayerState()
 						if (MarioSP->GetIsSpawned()) continue;
 
 						MarioSP->SetIsSpawned(true);
+						FVector Location = MarioSP->GetActorLocation();
 						SetActorLocationAndRotation(MarioSP->GetActorLocation(), MarioSP->GetActorRotation().Quaternion());
+						UE_LOG(LogTemp, Warning, TEXT("MarioSP %f %f %f"), Location.X, Location.Y, Location.Z);
+
 						break;
 
 					}
@@ -201,6 +201,7 @@ void AGamePlayer::InitDataTableByPlayerState()
 				}
 
 				SetInputModeGameOnly();
+				PC->SetViewTarget(this);
 			}
 
 			break;
@@ -220,7 +221,10 @@ void AGamePlayer::InitDataTableByPlayerState()
 						if (YoshiSP->GetIsSpawned()) continue;
 
 						YoshiSP->SetIsSpawned(true);
-						SetActorLocationAndRotation(YoshiSP->GetActorLocation(), YoshiSP->GetActorRotation().Quaternion());
+						FVector Location = YoshiSP->GetActorLocation();
+						SetActorLocationAndRotation(Location, YoshiSP->GetActorRotation().Quaternion());
+						UE_LOG(LogTemp, Warning, TEXT("YoshiSP %f %f %f"), Location.X, Location.Y, Location.Z);
+
 						break;
 					}
 
@@ -236,6 +240,7 @@ void AGamePlayer::InitDataTableByPlayerState()
 				}
 
 				SetInputModeGameOnly();
+				PC->SetViewTarget(this);
 			}
 			break;
 			default:
@@ -266,7 +271,6 @@ void AGamePlayer::Tick(float DeltaTime)
 	//{
 	//	OnRep_UpdateDataTableRowHandle();
 	//}
-
 }
 
 // Called to bind functionality to input
@@ -368,7 +372,7 @@ void AGamePlayer::OnRep_UpdateDataTableRowHandle()
 		Movement->bOrientRotationToMovement = true;
 		Movement->GetNavAgentPropertiesRef().bCanCrouch = true;
 		// @TODO change it to data
-		Movement->MaxWalkSpeed = 10.f;
+		Movement->MaxWalkSpeed = 100.f;
 		const float NewCapsuleHalfHeight = 45.f;
 		//Movement->SetCrouchedHalfHeight(NewCapsuleHalfHeight);
 	}

@@ -138,9 +138,6 @@ void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
         return; 
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::OnMove Success"));
-
-
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
     const FRotator Rotation = K2_GetActorRotation();
     const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
@@ -156,7 +153,6 @@ void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
 void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
 {
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
-    UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::OnLook"));
 
     AddYawInput(-1 * ActionValue.X);
     AddPitchInput(ActionValue.Y);
