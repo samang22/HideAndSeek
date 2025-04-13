@@ -16,9 +16,9 @@
 #define GP_ANIM_BIT_WALK						0x00000002
 #define GP_ANIM_BIT_RUN							0x00000004
 
-#define CHARACTER_CAPSULE_HALF_HEIGHT			300.f
+#define CHARACTER_CAPSULE_HALF_HEIGHT			45.f
 
-#define MARIO_WALK_SPEED						400.f
-#define MARIO_RUN_SPEED							800.f
-#define YOSHI_WALK_SPEED						400.f
-#define YOSHI_RUN_SPEED							800.f
+#define MARIO_WALK_SPEED						200.f
+#define MARIO_RUN_SPEED							400.f
+#define YOSHI_WALK_SPEED						200.f
+#define YOSHI_RUN_SPEED							400.f

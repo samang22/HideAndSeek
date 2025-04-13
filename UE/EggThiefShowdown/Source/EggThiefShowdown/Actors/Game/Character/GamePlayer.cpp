@@ -24,7 +24,7 @@
 AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
 	bAlwaysRelevant = true;
@@ -37,33 +37,29 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 
 
 	USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
-	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-	RootComponent = SkeletalMeshComponent;
 	SkeletalMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SkeletalMeshComponent->SetRelativeScale3D(FVector(CHARACTER_DEFAULT_SCALE, CHARACTER_DEFAULT_SCALE, CHARACTER_DEFAULT_SCALE));
+	SkeletalMeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -1.f * CHARACTER_CAPSULE_HALF_HEIGHT));
+	SkeletalMeshComponent->SetupAttachment(RootComponent);
+
 
 	StatusComponent = CreateDefaultSubobject<UGamePlayerStatusComponent>(TEXT("StatusComponent"));
 
+
+
 	SpringArm = CreateDefaultSubobject<USoftWheelSpringArmComponent>(TEXT("SpringArm"));
-	//SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(GetMesh());
-	//SpringArm->TargetArmLength = 100.f;
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->TargetArmLength = 300.f;
+	SpringArm->bUsePawnControlRotation = true;
+	SpringArm->bInheritPitch = true;
+	SpringArm->bInheritYaw = true;
+	SpringArm->bInheritRoll = false;
+
+	SpringArm->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f)); // 약간 아래로 바라보게
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
-
-	{
-		SpringArm->TargetArmLength = 30.f;
-		SpringArm->bUsePawnControlRotation = true;
-		SpringArm->bInheritPitch = true;
-		SpringArm->bInheritYaw = true;
-		SpringArm->bInheritRoll = false;
-		//SpringArm->SetRelativeLocation(FVector(0.f, 0.f, 80.f));
-		SpringArm->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f)); // 약간 아래로 바라보게
-
-		//Camera->SetRelativeLocation(FVector::ZeroVector); // SpringArm 끝에 붙음
-	}
-
+	Camera->SetRelativeLocation(FVector::ZeroVector);
 }
 
 void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -202,6 +198,8 @@ void AGamePlayer::InitDataTableByPlayerState()
 
 				SetInputModeGameOnly();
 				PC->SetViewTarget(this);
+
+				StatusComponent->SetCharacterKind(LOBBY_CHARACTER_KIND::MARIO);
 			}
 
 			break;
@@ -241,6 +239,8 @@ void AGamePlayer::InitDataTableByPlayerState()
 
 				SetInputModeGameOnly();
 				PC->SetViewTarget(this);
+
+				StatusComponent->SetCharacterKind(LOBBY_CHARACTER_KIND::YOSHI);
 			}
 			break;
 			default:
@@ -358,22 +358,20 @@ void AGamePlayer::SetSpeedWalk()
 {
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
 
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
+	float TargetSpeed = 0.f;
+	switch (StatusComponent->GetCharacterKind())
 	{
-		if (ALobbyMapPlayerState* NewPlayerState = LPC->GetPlayerState<ALobbyMapPlayerState>())
-		{
-			switch (static_cast<LOBBY_CHARACTER_KIND>(NewPlayerState->GetLobbyCharacterKind()))
-			{
-			case LOBBY_CHARACTER_KIND::MARIO:
-				Movement->MaxWalkSpeed = MARIO_WALK_SPEED;
-				break;
+	case LOBBY_CHARACTER_KIND::MARIO:
+		TargetSpeed = MARIO_WALK_SPEED;
+		break;
+	case LOBBY_CHARACTER_KIND::YOSHI:
+		TargetSpeed = YOSHI_WALK_SPEED;
+		break;
+	}
 
-			case LOBBY_CHARACTER_KIND::YOSHI:
-				Movement->MaxWalkSpeed = YOSHI_WALK_SPEED;
-				break;
-			}
-		}
+	if (!FMath::IsNearlyEqual(Movement->MaxWalkSpeed, TargetSpeed))
+	{
+		Movement->MaxWalkSpeed = TargetSpeed;
 	}
 }
 
@@ -381,22 +379,20 @@ void AGamePlayer::SetSpeedRun()
 {
 	UCharacterMovementComponent* Movement = GetCharacterMovement();
 
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
+	float TargetSpeed = 0.f;
+	switch (StatusComponent->GetCharacterKind())
 	{
-		if (ALobbyMapPlayerState* NewPlayerState = LPC->GetPlayerState<ALobbyMapPlayerState>())
-		{
-			switch (static_cast<LOBBY_CHARACTER_KIND>(NewPlayerState->GetLobbyCharacterKind()))
-			{
-			case LOBBY_CHARACTER_KIND::MARIO:
-				Movement->MaxWalkSpeed = MARIO_RUN_SPEED;
-				break;
+	case LOBBY_CHARACTER_KIND::MARIO:
+		TargetSpeed = MARIO_RUN_SPEED;
+		break;
+	case LOBBY_CHARACTER_KIND::YOSHI:
+		TargetSpeed = YOSHI_RUN_SPEED;
+		break;
+	}
 
-			case LOBBY_CHARACTER_KIND::YOSHI:
-				Movement->MaxWalkSpeed = YOSHI_RUN_SPEED;
-				break;
-			}
-		}
+	if (!FMath::IsNearlyEqual(Movement->MaxWalkSpeed, TargetSpeed))
+	{
+		Movement->MaxWalkSpeed = TargetSpeed;
 	}
 }
 
@@ -424,22 +420,44 @@ void AGamePlayer::OnRep_UpdateDataTableRowHandle()
 	{
 		UCharacterMovementComponent* Movement = GetCharacterMovement();
 		Movement->bOrientRotationToMovement = true;
-		Movement->GetNavAgentPropertiesRef().bCanCrouch = true;
-		// @TODO change it to data
-		Movement->MaxWalkSpeed = 100.f;
-		const float NewCapsuleHalfHeight = 45.f;
+		//Movement->GetNavAgentPropertiesRef().bCanCrouch = true;
+		switch (StatusComponent->GetCharacterKind())
+		{
+		case LOBBY_CHARACTER_KIND::MARIO:
+			if (StatusComponent->GetAnimStatus(GP_ANIM_BIT_RUN))
+			{
+				Movement->MaxWalkSpeed = MARIO_RUN_SPEED;
+			}
+			else
+			{
+				Movement->MaxWalkSpeed = MARIO_WALK_SPEED;
+			}
+			break;
+
+		case LOBBY_CHARACTER_KIND::YOSHI:
+			if (StatusComponent->GetAnimStatus(GP_ANIM_BIT_RUN))
+			{
+				Movement->MaxWalkSpeed = YOSHI_RUN_SPEED;
+			}
+			else
+			{
+				Movement->MaxWalkSpeed = YOSHI_WALK_SPEED;
+			}
+			break;
+		}
+		//const float NewCapsuleHalfHeight = CHARACTER_CAPSULE_HALF_HEIGHT;
 		//Movement->SetCrouchedHalfHeight(NewCapsuleHalfHeight);
 	}
 
 	{
 		USkeletalMeshComponent* SkeletalMeshComponent = GetMesh();
 		SkeletalMeshComponent->SetSkeletalMesh(GamePlayerData->SkeletalMesh);
-		SkeletalMeshComponent->SetRelativeTransform(GamePlayerData->MeshTransform);
+		//SkeletalMeshComponent->SetRelativeTransform(GamePlayerData->MeshTransform);
 		SkeletalMeshComponent->SetAnimClass(GamePlayerData->AnimClass);
 
 		// ACharacter::PostInitializeComponents() 시점에 초기에 설정된 Mesh의 RelativeLocation, RelativeRotation을 받아와서
 		// CharacterMovementComponent에서 사용하고 있음.
-		// 우리는 데이터를 받아와서 적용하고 있기 때문에 한번 더 설정 필요
+		// 데이터를 받아와서 적용하고 있기 때문에 한번 더 설정 필요
 		// * 이부분을 뺴면 내 Character는 정상적으로 보이지만, 다른 플레이어의 Character는 이동되기전 위치 정보로 처리됨
 		// 이 데이터를 통해서 클라 UCharacterMovementComponent::SmoothClientPosition_UpdateVisuals() 에서 Mesh의 위치를 바꾸고 있음.
 		// (Mesh->SetRelativeLocationAndRotation(NewRelTranslation, NewRelRotation, false, nullptr, GetTeleportType());)

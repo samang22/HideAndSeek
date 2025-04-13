@@ -51,7 +51,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TObjectPtr<USoftWheelSpringArmComponent> SpringArm;
-	//TObjectPtr<USpringArmComponent> SpringArm;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TObjectPtr<UCameraComponent> Camera;

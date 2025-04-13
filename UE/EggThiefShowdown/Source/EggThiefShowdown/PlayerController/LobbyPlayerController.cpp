@@ -189,11 +189,21 @@ void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
 void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
 {
     StatusComponent->SetOnAnimationStatus(GP_ANIM_BIT_RUN);
+    APawn* ControlledPawn = GetPawn();
+    if (AGamePlayer* GP = Cast<AGamePlayer>(ControlledPawn))
+    {
+        GP->SetSpeedRun();
+    }
 }
 
 void ALobbyPlayerController::OnRunOff(const FInputActionValue& InputActionValue)
 {
     StatusComponent->SetOffAnimationStatus(GP_ANIM_BIT_RUN);
+    APawn* ControlledPawn = GetPawn();
+    if (AGamePlayer* GP = Cast<AGamePlayer>(ControlledPawn))
+    {
+        GP->SetSpeedWalk();
+    }
 }
 
 void ALobbyPlayerController::OnAttack(const FInputActionValue& InputActionValue)

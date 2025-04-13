@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "../StatusComponent.h"
+#include "../../../Misc/Utils.h"
 #include "GamePlayerStatusComponent.generated.h"
 
 /**
@@ -28,4 +29,11 @@ public:
 public:
 	UFUNCTION()
 	bool GetAnimStatus(uint8 InBit) const;
+
+protected:
+	LOBBY_CHARACTER_KIND eCharacterKind = LOBBY_CHARACTER_KIND::END;
+public:
+	void SetCharacterKind(LOBBY_CHARACTER_KIND eKind) { eCharacterKind = eKind; }
+	LOBBY_CHARACTER_KIND GetCharacterKind() const { return eCharacterKind; }
+
 };

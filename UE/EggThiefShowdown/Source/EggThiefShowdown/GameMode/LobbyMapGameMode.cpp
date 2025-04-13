@@ -48,7 +48,7 @@ void ALobbyMapGameMode::CheckAndServerTravel()
 	}
 
 
-	if (/*bTravel && */bIsMario)
+	if (iYoshiNum || /*bTravel && */bIsMario)
 	{
 		//if (iYoshiNum > 0)
 		{
