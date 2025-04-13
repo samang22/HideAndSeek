@@ -79,6 +79,8 @@ public:
 	bool IsMontage(GAME_PLAYER_MONTAGE _InEnum);
 	bool IsPlayingMontage(GAME_PLAYER_MONTAGE _InEnum);
 
-
+public:
+	void SetSpeedWalk();
+	void SetSpeedRun();
 
 };

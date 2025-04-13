@@ -11,6 +11,8 @@
 #include "../Actors/GameMapPlayerCameraManager.h"
 #include "../Components/StatusComponent/StatusComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "../Components/StatusComponent/Game/GamePlayerStatusComponent.h"
+#include "../Actors/Game/Character/GamePlayer.h"
 
 
 ALobbyPlayerController::ALobbyPlayerController()
@@ -86,10 +88,30 @@ void ALobbyPlayerController::SetupInputComponent()
     if (const UInputAction* InputAction = FUtils::GetInputActionFromName(IMC_Default, TEXT("IA_Move")))
     {
         EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &ThisClass::OnMove);
+        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &ThisClass::OnMoveOff);
     }
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("IA_Move is disabled"));
+    }
+
+    if (const UInputAction* InputAction = FUtils::GetInputActionFromName(IMC_Default, TEXT("IA_Run")))
+    {
+        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &ThisClass::OnRun);
+        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &ThisClass::OnRunOff);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("IA_Run is disabled"));
+    }
+
+    if (const UInputAction* InputAction = FUtils::GetInputActionFromName(IMC_Default, TEXT("IA_Attack")))
+    {
+        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &ThisClass::OnAttack);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("IA_Attack is disabled"));
     }
 
     if (const UInputAction* InputAction = FUtils::GetInputActionFromName(IMC_Default, TEXT("IA_LookMouse")))
@@ -107,7 +129,7 @@ void ALobbyPlayerController::OnPossess(APawn* InPawn)
     Super::OnPossess(InPawn);
 
     // OnPossess 서버에서만 실행
-    StatusComponent = InPawn->GetComponentByClass<UStatusComponent>();
+    StatusComponent = InPawn->GetComponentByClass<UGamePlayerStatusComponent>();
     UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::OnPossess"));
 
     //check(StatusComponent);
@@ -120,7 +142,7 @@ void ALobbyPlayerController::OnRep_Pawn()
 
     if (GetPawn())
     {
-        StatusComponent = GetPawn()->GetComponentByClass<UStatusComponent>();
+        StatusComponent = GetPawn()->GetComponentByClass<UGamePlayerStatusComponent>();
         //check(StatusComponent);
     }
     else
@@ -131,11 +153,11 @@ void ALobbyPlayerController::OnRep_Pawn()
 
 void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
 {
-    if (StatusComponent && !StatusComponent->CanMove()) 
+    if (StatusComponent && !StatusComponent->CanMove())
     {
         UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::OnMove Failed"));
 
-        return; 
+        return;
     }
 
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
@@ -148,6 +170,12 @@ void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
     ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
     ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
 
+    StatusComponent->SetOnAnimationStatus(GP_ANIM_BIT_WALK);
+}
+
+void ALobbyPlayerController::OnMoveOff(const FInputActionValue& InputActionValue)
+{
+    StatusComponent->SetOffAnimationStatus(GP_ANIM_BIT_WALK);
 }
 
 void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
@@ -156,6 +184,24 @@ void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
 
     AddYawInput(-1 * ActionValue.X);
     AddPitchInput(ActionValue.Y);
+}
+
+void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
+{
+    StatusComponent->SetOnAnimationStatus(GP_ANIM_BIT_RUN);
+}
+
+void ALobbyPlayerController::OnRunOff(const FInputActionValue& InputActionValue)
+{
+    StatusComponent->SetOffAnimationStatus(GP_ANIM_BIT_RUN);
+}
+
+void ALobbyPlayerController::OnAttack(const FInputActionValue& InputActionValue)
+{
+    if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
+    {
+        GP->PlayMontage(GAME_PLAYER_MONTAGE::PICKUP);
+    }
 }
 
 void ALobbyPlayerController::SetInputModeGameOnly()

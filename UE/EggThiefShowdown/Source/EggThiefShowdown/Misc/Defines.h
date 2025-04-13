@@ -18,3 +18,7 @@
 
 #define CHARACTER_CAPSULE_HALF_HEIGHT			300.f
 
+#define MARIO_WALK_SPEED						400.f
+#define MARIO_RUN_SPEED							800.f
+#define YOSHI_WALK_SPEED						400.f
+#define YOSHI_RUN_SPEED							800.f

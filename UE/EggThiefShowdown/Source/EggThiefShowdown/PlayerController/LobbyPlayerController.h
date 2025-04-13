@@ -7,7 +7,7 @@
 #include "LobbyPlayerController.generated.h"
 
 class ALobbyCharacter;
-
+class UGamePlayerStatusComponent;
 UCLASS()
 class EGGTHIEFSHOWDOWN_API ALobbyPlayerController : public APlayerController
 {
@@ -33,7 +33,7 @@ public:
 protected:
 	UInputMappingContext* IMC_Default = nullptr;
 	UPROPERTY()
-	class UStatusComponent* StatusComponent;
+	UGamePlayerStatusComponent* StatusComponent;
 
 protected:
 	virtual void SetupInputComponent() override;
@@ -44,8 +44,11 @@ protected:
 
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
+	void OnMoveOff(const FInputActionValue& InputActionValue);
 	void OnLook(const FInputActionValue& InputActionValue);
-
+	void OnRun(const FInputActionValue& InputActionValue);
+	void OnRunOff(const FInputActionValue& InputActionValue);
+	void OnAttack(const FInputActionValue& InputActionValue);
 public:
 	void SetInputModeGameOnly();
 

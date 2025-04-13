@@ -297,6 +297,10 @@ void AGamePlayer::PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop)
 		UE_LOG(LogTemp, Warning, TEXT("PlayMontage DAMAGED"));
 		tempMontage = GamePlayerData->DamagedMontage;
 		break;
+	//case GAME_PLAYER_MONTAGE::ATTACK:
+	//	UE_LOG(LogTemp, Warning, TEXT("PlayMontage ATTACK"));
+	//	tempMontage = GamePlayerData->AttackMontage;
+	//	break;
 	default:
 		break;
 	}
@@ -324,6 +328,8 @@ bool AGamePlayer::IsMontage(GAME_PLAYER_MONTAGE _InEnum)
 		return GamePlayerData->PickupMontage ? true : false;
 	case GAME_PLAYER_MONTAGE::PICKUP:
 		return GamePlayerData->DamagedMontage ? true : false;
+	//case GAME_PLAYER_MONTAGE::ATTACK:
+	//	return GamePlayerData->AttackMontage ? true : false;
 	default:
 		return false;
 	}
@@ -341,8 +347,56 @@ bool AGamePlayer::IsPlayingMontage(GAME_PLAYER_MONTAGE _InEnum)
 		return AnimInstance->Montage_IsPlaying(GamePlayerData->PickupMontage);
 	case GAME_PLAYER_MONTAGE::PICKUP:
 		return AnimInstance->Montage_IsPlaying(GamePlayerData->DamagedMontage);
+	//case GAME_PLAYER_MONTAGE::ATTACK:
+	//	return AnimInstance->Montage_IsPlaying(GamePlayerData->AttackMontage);
 	default:
 		return false;
+	}
+}
+
+void AGamePlayer::SetSpeedWalk()
+{
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
+	{
+		if (ALobbyMapPlayerState* NewPlayerState = LPC->GetPlayerState<ALobbyMapPlayerState>())
+		{
+			switch (static_cast<LOBBY_CHARACTER_KIND>(NewPlayerState->GetLobbyCharacterKind()))
+			{
+			case LOBBY_CHARACTER_KIND::MARIO:
+				Movement->MaxWalkSpeed = MARIO_WALK_SPEED;
+				break;
+
+			case LOBBY_CHARACTER_KIND::YOSHI:
+				Movement->MaxWalkSpeed = YOSHI_WALK_SPEED;
+				break;
+			}
+		}
+	}
+}
+
+void AGamePlayer::SetSpeedRun()
+{
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(PC))
+	{
+		if (ALobbyMapPlayerState* NewPlayerState = LPC->GetPlayerState<ALobbyMapPlayerState>())
+		{
+			switch (static_cast<LOBBY_CHARACTER_KIND>(NewPlayerState->GetLobbyCharacterKind()))
+			{
+			case LOBBY_CHARACTER_KIND::MARIO:
+				Movement->MaxWalkSpeed = MARIO_RUN_SPEED;
+				break;
+
+			case LOBBY_CHARACTER_KIND::YOSHI:
+				Movement->MaxWalkSpeed = YOSHI_RUN_SPEED;
+				break;
+			}
+		}
 	}
 }
 

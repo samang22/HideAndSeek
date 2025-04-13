@@ -21,5 +21,5 @@ void UGamePlayerStatusComponent::SetOffAnimationStatus(uint8 InBit)
 
 bool UGamePlayerStatusComponent::GetAnimStatus(uint8 InBit) const
 {
-	return false;
+	return AnimationStatus & InBit;
 }

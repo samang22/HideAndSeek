@@ -25,4 +25,6 @@ public: // Animation
 	UAnimMontage* PickupMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "GamePlayer|Animation")
 	UAnimMontage* DamagedMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "GamePlayer|Animation")
+	UAnimMontage* AttackMontage = nullptr;
 };

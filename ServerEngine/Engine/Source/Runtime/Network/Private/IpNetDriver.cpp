@@ -186,7 +186,7 @@ void UIpNetDriver::AsyncRead(UIpConnection* IpConnection)
 			// PacketSize가 우리가 정한 최대 사이즈보다 크다
 			if (IpConnection->GetRecvBufferSize() < PacketHeader->PacketSize)
 			{
-				E_LOG(Error, TEXT("{} IpConnection->GetRecvBufferSize({}) < PacketHeader->PacketSize: {}:{}"), GetName(), IpConnection->GetRecvBufferSize(), IpConnection->GetRemoteIP(), IpConnection->GetRemotePort());
+				E_LOG(Warning, TEXT("{} IpConnection->GetRecvBufferSize({}) < PacketHeader->PacketSize: {}:{}"), GetName(), IpConnection->GetRecvBufferSize(), IpConnection->GetRemoteIP(), IpConnection->GetRemotePort());
 				// TODO Shutdown()
 				return;
 			}

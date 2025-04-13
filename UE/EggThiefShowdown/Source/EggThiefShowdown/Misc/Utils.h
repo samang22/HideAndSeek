@@ -67,6 +67,14 @@ enum class GAME_PLAYER_MONTAGE : uint8
 	END,
 };
 
+enum class GAME_PLAYER_ANIM_STATE : uint8
+{
+	IDLE = 0,
+	WALK,
+	RUN,
+};
+
+
 
 namespace CollisionProfileName
 {

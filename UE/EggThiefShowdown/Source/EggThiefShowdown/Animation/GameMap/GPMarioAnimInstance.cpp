@@ -29,6 +29,7 @@ void UGPMarioAnimInstance::NativeInitializeAnimation()
 void UGPMarioAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
+	if (!StatusComponent) return;
 
 	bIsIdle = StatusComponent->GetAnimStatus(GP_ANIM_BIT_IDLE);
 	bIsWalk = StatusComponent->GetAnimStatus(GP_ANIM_BIT_WALK);
