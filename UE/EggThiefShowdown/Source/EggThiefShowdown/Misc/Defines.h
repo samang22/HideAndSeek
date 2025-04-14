@@ -22,3 +22,5 @@
 #define MARIO_RUN_SPEED							400.f
 #define YOSHI_WALK_SPEED						200.f
 #define YOSHI_RUN_SPEED							400.f
+
+#define CHARACTER_TARGETARMLENGTH				300.f

@@ -49,7 +49,7 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 
 	SpringArm = CreateDefaultSubobject<USoftWheelSpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->TargetArmLength = 300.f;
+	SpringArm->TargetArmLength = CHARACTER_TARGETARMLENGTH;
 	SpringArm->bUsePawnControlRotation = true;
 	SpringArm->bInheritPitch = true;
 	SpringArm->bInheritYaw = true;
@@ -536,6 +536,6 @@ void AGamePlayer::OnRep_UpdateDataTableRowHandle()
 		// * 이부분을 뺴면 내 Character는 정상적으로 보이지만, 다른 플레이어의 Character는 이동되기전 위치 정보로 처리됨
 		// 이 데이터를 통해서 클라 UCharacterMovementComponent::SmoothClientPosition_UpdateVisuals() 에서 Mesh의 위치를 바꾸고 있음.
 		// (Mesh->SetRelativeLocationAndRotation(NewRelTranslation, NewRelRotation, false, nullptr, GetTeleportType());)
-		CacheInitialMeshOffset(GamePlayerData->MeshTransform.GetTranslation(), GamePlayerData->MeshTransform.GetRotation().Rotator());
+		//CacheInitialMeshOffset(GamePlayerData->MeshTransform.GetTranslation(), GamePlayerData->MeshTransform.GetRotation().Rotator());
 	}
 }
