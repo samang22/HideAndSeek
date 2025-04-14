@@ -51,5 +51,4 @@ protected:
 	void OnAttack(const FInputActionValue& InputActionValue);
 public:
 	void SetInputModeGameOnly();
-
 };

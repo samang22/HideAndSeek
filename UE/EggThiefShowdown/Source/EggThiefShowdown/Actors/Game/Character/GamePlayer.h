@@ -33,9 +33,17 @@ protected:
 	virtual void OnConstruction(const FTransform& Transform);
 	virtual void PostInitializeComponents() override;
 
+public:
+	/** Called when Controller is replicated */
+	virtual void OnRep_Controller() override;
+
 protected:
 	void InitDataTableByPlayerState();
-	void SetInputModeGameOnly();
+	void SetInputModeGameOnly();           
+
+protected:
+	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 
 public:	
 	// Called every frame
@@ -46,9 +54,6 @@ public:
 
 
 protected:
-	//UPROPERTY()
-	//TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TObjectPtr<USoftWheelSpringArmComponent> SpringArm;
 
@@ -78,8 +83,18 @@ public:
 	bool IsMontage(GAME_PLAYER_MONTAGE _InEnum);
 	bool IsPlayingMontage(GAME_PLAYER_MONTAGE _InEnum);
 
-public:
+protected:
 	void SetSpeedWalk();
 	void SetSpeedRun();
+protected:
+	bool bIsRun = false;
+public:
+	bool GetIsRun() const { return bIsRun; }
+
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_SetSpeedWalk();
+	UFUNCTION(Server, Reliable)
+	void Server_SetSpeedRun();
 
 };

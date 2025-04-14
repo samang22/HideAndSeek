@@ -97,7 +97,7 @@ void ALobbyPlayerController::SetupInputComponent()
 
     if (const UInputAction* InputAction = FUtils::GetInputActionFromName(IMC_Default, TEXT("IA_Run")))
     {
-        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &ThisClass::OnRun);
+        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Started, this, &ThisClass::OnRun);
         EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &ThisClass::OnRunOff);
     }
     else
@@ -192,7 +192,10 @@ void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
     APawn* ControlledPawn = GetPawn();
     if (AGamePlayer* GP = Cast<AGamePlayer>(ControlledPawn))
     {
-        GP->SetSpeedRun();
+        if (!GP->GetIsRun())
+        {
+            GP->Server_SetSpeedRun();
+        }
     }
 }
 
@@ -202,7 +205,7 @@ void ALobbyPlayerController::OnRunOff(const FInputActionValue& InputActionValue)
     APawn* ControlledPawn = GetPawn();
     if (AGamePlayer* GP = Cast<AGamePlayer>(ControlledPawn))
     {
-        GP->SetSpeedWalk();
+        GP->Server_SetSpeedWalk();
     }
 }
 
@@ -210,7 +213,10 @@ void ALobbyPlayerController::OnAttack(const FInputActionValue& InputActionValue)
 {
     if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
     {
-        GP->PlayMontage(GAME_PLAYER_MONTAGE::PICKUP);
+        if (GP->IsMontage(GAME_PLAYER_MONTAGE::PICKUP))
+        {
+            GP->PlayMontage(GAME_PLAYER_MONTAGE::PICKUP);
+        }
     }
 }
 

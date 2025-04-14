@@ -89,17 +89,6 @@ void AGamePlayer::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::BeginPlay"));
 
 	Super::BeginPlay();
-	
-	if (HasAuthority())
-	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::InitDataTableByPlayerState);
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::OnRep_UpdateDataTableRowHandle);
-	}
-	else if (GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::InitDataTableByPlayerState);
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &AGamePlayer::OnRep_UpdateDataTableRowHandle);
-	}
 }
 
 void AGamePlayer::PossessedBy(AController* NewController)
@@ -108,7 +97,12 @@ void AGamePlayer::PossessedBy(AController* NewController)
 
 	Super::PossessedBy(NewController);
 
-	//InitByDataTable();
+	if (HasAuthority())
+	{
+		InitDataTableByPlayerState();
+		OnRep_UpdateDataTableRowHandle();         
+	}
+
 
 	SetData(DataTableRowHandle);
 }
@@ -145,6 +139,35 @@ void AGamePlayer::OnConstruction(const FTransform& Transform)
 void AGamePlayer::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+}
+
+void AGamePlayer::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+
+	if (IsLocallyControlled())
+	{
+		ULevel* Level = GetLevel();
+		if (Level)
+		{
+			FString LevelName = Level->GetOuter()->GetName();
+			if (LevelName == TEXT("GameMap"))
+			{
+				ALobbyPlayerController* LPC = Cast<ALobbyPlayerController>(GetController());
+				if (LPC)
+				{
+					FInputModeGameOnly InputMode;
+					LPC->SetInputMode(InputMode);
+					LPC->bShowMouseCursor = false;
+				}
+			}
+			else
+			{
+
+			}
+		}
+
+	}
 }
 
 void AGamePlayer::InitDataTableByPlayerState()
@@ -196,8 +219,8 @@ void AGamePlayer::InitDataTableByPlayerState()
 					}
 				}
 
-				SetInputModeGameOnly();
-				PC->SetViewTarget(this);
+				//SetInputModeGameOnly();
+				//PC->SetViewTarget(this);
 
 				StatusComponent->SetCharacterKind(LOBBY_CHARACTER_KIND::MARIO);
 			}
@@ -237,8 +260,8 @@ void AGamePlayer::InitDataTableByPlayerState()
 					}
 				}
 
-				SetInputModeGameOnly();
-				PC->SetViewTarget(this);
+				//SetInputModeGameOnly();
+				//PC->SetViewTarget(this);
 
 				StatusComponent->SetCharacterKind(LOBBY_CHARACTER_KIND::YOSHI);
 			}
@@ -260,6 +283,37 @@ void AGamePlayer::SetInputModeGameOnly()
 		LPC->SetInputModeGameOnly();
 		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::SetInputModeGameOnly Successed"));
 	}
+}
+
+void AGamePlayer::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	if (!GamePlayerData)
+	{
+		Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+		return;
+	}
+	RecalculateBaseEyeHeight();
+	FVector& MeshRelativeLocation = GetMesh()->GetRelativeLocation_DirectMutable();
+	MeshRelativeLocation.Z = GamePlayerData->MeshTransform.GetLocation().Z + HalfHeightAdjust;
+	BaseTranslationOffset.Z = MeshRelativeLocation.Z;
+
+	K2_OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+}
+
+void AGamePlayer::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	if (!GamePlayerData)
+	{
+		Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+		return;
+	}
+	RecalculateBaseEyeHeight();
+
+	FVector& MeshRelativeLocation = GetMesh()->GetRelativeLocation_DirectMutable();
+	MeshRelativeLocation.Z = GamePlayerData->MeshTransform.GetLocation().Z;
+	BaseTranslationOffset.Z = MeshRelativeLocation.Z;
+
+	K2_OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 }
 
 // Called every frame
@@ -373,6 +427,8 @@ void AGamePlayer::SetSpeedWalk()
 	{
 		Movement->MaxWalkSpeed = TargetSpeed;
 	}
+
+	bIsRun = false;
 }
 
 void AGamePlayer::SetSpeedRun()
@@ -394,6 +450,18 @@ void AGamePlayer::SetSpeedRun()
 	{
 		Movement->MaxWalkSpeed = TargetSpeed;
 	}
+
+	bIsRun = true;
+}
+
+void AGamePlayer::Server_SetSpeedWalk_Implementation()
+{
+	SetSpeedWalk();
+}
+
+void AGamePlayer::Server_SetSpeedRun_Implementation()
+{
+	SetSpeedRun();
 }
 
 void AGamePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
