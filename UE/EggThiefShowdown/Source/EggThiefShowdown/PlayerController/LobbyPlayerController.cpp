@@ -170,12 +170,13 @@ void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
     ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
     ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
 
-    StatusComponent->SetOnAnimationStatus(GP_ANIM_BIT_WALK);
+
+    StatusComponent->Server_SetOnAnimationStatus(GP_ANIM_BIT_WALK);
 }
 
 void ALobbyPlayerController::OnMoveOff(const FInputActionValue& InputActionValue)
 {
-    StatusComponent->SetOffAnimationStatus(GP_ANIM_BIT_WALK);
+    StatusComponent->Server_SetOffAnimationStatus(GP_ANIM_BIT_WALK);
 }
 
 void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
@@ -188,7 +189,8 @@ void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
 
 void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
 {
-    StatusComponent->SetOnAnimationStatus(GP_ANIM_BIT_RUN);
+    StatusComponent->Server_SetOnAnimationStatus(GP_ANIM_BIT_RUN);
+    
     APawn* ControlledPawn = GetPawn();
     if (AGamePlayer* GP = Cast<AGamePlayer>(ControlledPawn))
     {
@@ -201,7 +203,8 @@ void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
 
 void ALobbyPlayerController::OnRunOff(const FInputActionValue& InputActionValue)
 {
-    StatusComponent->SetOffAnimationStatus(GP_ANIM_BIT_RUN);
+    StatusComponent->Server_SetOffAnimationStatus(GP_ANIM_BIT_RUN);
+
     APawn* ControlledPawn = GetPawn();
     if (AGamePlayer* GP = Cast<AGamePlayer>(ControlledPawn))
     {
@@ -215,7 +218,7 @@ void ALobbyPlayerController::OnAttack(const FInputActionValue& InputActionValue)
     {
         if (GP->IsMontage(GAME_PLAYER_MONTAGE::PICKUP))
         {
-            GP->PlayMontage(GAME_PLAYER_MONTAGE::PICKUP);
+            GP->Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::PICKUP);
         }
     }
 }

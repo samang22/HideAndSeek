@@ -19,12 +19,16 @@ public:
 	UGamePlayerStatusComponent();
 
 protected:
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_AnimationStatus)
 	uint8 AnimationStatus;
 
 public:
 	void SetOnAnimationStatus(uint8 InBit);
 	void SetOffAnimationStatus(uint8 InBit);
+	UFUNCTION(Server, Reliable)
+	void Server_SetOnAnimationStatus(uint8 InBit);
+	UFUNCTION(Server, Reliable)
+	void Server_SetOffAnimationStatus(uint8 InBit);
 
 public:
 	UFUNCTION()
@@ -36,4 +40,10 @@ public:
 	void SetCharacterKind(LOBBY_CHARACTER_KIND eKind) { eCharacterKind = eKind; }
 	LOBBY_CHARACTER_KIND GetCharacterKind() const { return eCharacterKind; }
 
+public:
+	UFUNCTION()
+	void OnRep_AnimationStatus();
+
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

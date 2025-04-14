@@ -80,6 +80,12 @@ public:
 
 public:
 	void PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop = false);
+	UFUNCTION(Server, Reliable)
+	void Server_PlayMontage(uint8 _InEnum, bool bIsLoop = false);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayMontage(uint8 _InEnum, bool bIsLoop = false);
+
+
 	bool IsMontage(GAME_PLAYER_MONTAGE _InEnum);
 	bool IsPlayingMontage(GAME_PLAYER_MONTAGE _InEnum);
 

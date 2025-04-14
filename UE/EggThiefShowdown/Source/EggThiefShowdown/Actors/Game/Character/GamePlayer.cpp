@@ -44,7 +44,7 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 
 
 	StatusComponent = CreateDefaultSubobject<UGamePlayerStatusComponent>(TEXT("StatusComponent"));
-
+	StatusComponent->SetIsReplicated(true);
 
 
 	SpringArm = CreateDefaultSubobject<USoftWheelSpringArmComponent>(TEXT("SpringArm"));
@@ -320,11 +320,6 @@ void AGamePlayer::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdju
 void AGamePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//if (HasAuthority())
-	//{
-	//	OnRep_UpdateDataTableRowHandle();
-	//}
 }
 
 // Called to bind functionality to input
@@ -371,6 +366,18 @@ void AGamePlayer::PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop)
 		}
 	}
 }
+
+void AGamePlayer::Server_PlayMontage_Implementation(uint8 _InEnum, bool bIsLoop)
+{
+	Multicast_PlayMontage(_InEnum, bIsLoop);
+}
+
+
+void AGamePlayer::Multicast_PlayMontage_Implementation(uint8 _InEnum, bool bIsLoop)
+{
+	PlayMontage((GAME_PLAYER_MONTAGE)_InEnum, bIsLoop);
+}
+
 
 bool AGamePlayer::IsMontage(GAME_PLAYER_MONTAGE _InEnum)
 {
