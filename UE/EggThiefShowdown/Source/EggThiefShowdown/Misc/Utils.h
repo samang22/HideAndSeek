@@ -82,6 +82,8 @@ namespace CollisionProfileName
 	static inline FName Egg = TEXT("Egg");
 	static inline FName Mario = TEXT("Mario");
 	static inline FName MapMesh = TEXT("MapMesh");
+	static inline FName MarioAttack = TEXT("MarioAttack");
+	static inline FName YoshiPickup = TEXT("YoshiPickup");
 }
 
 

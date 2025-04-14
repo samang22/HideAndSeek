@@ -24,3 +24,5 @@
 #define YOSHI_RUN_SPEED							400.f
 
 #define CHARACTER_TARGETARMLENGTH				300.f
+
+#define COLLISION_HIDDEN_IN_GAME				false

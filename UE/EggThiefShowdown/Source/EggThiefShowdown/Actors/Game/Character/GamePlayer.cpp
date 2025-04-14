@@ -461,6 +461,11 @@ void AGamePlayer::SetSpeedRun()
 	bIsRun = true;
 }
 
+LOBBY_CHARACTER_KIND AGamePlayer::GetCharacterKind()
+{
+	return StatusComponent->GetCharacterKind();
+}
+
 void AGamePlayer::Server_SetSpeedWalk_Implementation()
 {
 	SetSpeedWalk();

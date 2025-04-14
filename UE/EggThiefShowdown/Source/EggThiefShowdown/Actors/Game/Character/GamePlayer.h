@@ -103,4 +103,6 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_SetSpeedRun();
 
+public:
+	LOBBY_CHARACTER_KIND GetCharacterKind();
 };
