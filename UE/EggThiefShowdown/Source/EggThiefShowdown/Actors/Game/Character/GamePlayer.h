@@ -105,4 +105,13 @@ public:
 
 public:
 	LOBBY_CHARACTER_KIND GetCharacterKind();
+
+protected:
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+protected:
+	bool bCanMove = true;
+public:
+	void SetMovement(bool bFlag) { bCanMove = bFlag; };
+
 };

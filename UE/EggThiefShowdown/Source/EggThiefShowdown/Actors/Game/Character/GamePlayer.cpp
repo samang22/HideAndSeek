@@ -466,6 +466,36 @@ LOBBY_CHARACTER_KIND AGamePlayer::GetCharacterKind()
 	return StatusComponent->GetCharacterKind();
 }
 
+float AGamePlayer::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (StatusComponent->IsDie()) { return 0.f; }
+
+	float DamageResult = StatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	
+	// 데미지가 거의 들어오지 않음
+	if (FMath::IsNearlyZero(DamageResult)) { return 0.f; }
+
+	// 만약 죽지 않았다면, DamagedMontage가 풀릴 때 다시 움직이게 만들기 
+	SetMovement(false);
+
+	// 계산 결과 사망
+	if (StatusComponent->IsDie())
+	{
+		// @TODO : 사망처리
+		SetActorEnableCollision(false);
+		//PlayMontage(GAME_PLAYER_MONTAGE::DEAD);
+
+	}
+	// 데미지만 입음
+	else if (!StatusComponent->IsDie() && GamePlayerData->DamagedMontage)
+	{
+		PlayMontage(GAME_PLAYER_MONTAGE::DAMAGED);
+	}
+
+	return DamageResult;
+}
+
+
 void AGamePlayer::Server_SetSpeedWalk_Implementation()
 {
 	SetSpeedWalk();

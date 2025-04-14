@@ -39,8 +39,8 @@ public:
 protected:
 	bool bAttack = false;
 	bool bDie = false;
-	float MaxHP = 4.f;
-	float HP = 4.f;
+	float MaxHP = 100.f;
+	float HP = 100.f;
 
 public:
 	AController* LastInstigator = nullptr;

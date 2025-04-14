@@ -86,6 +86,12 @@ namespace CollisionProfileName
 	static inline FName YoshiPickup = TEXT("YoshiPickup");
 }
 
+namespace ProjectileName
+{
+	static inline FName YoshiPickup = TEXT("YoshiPickup");
+	static inline FName MarioAttack = TEXT("MarioAttack");
+}
+
 
 class FUtils
 {

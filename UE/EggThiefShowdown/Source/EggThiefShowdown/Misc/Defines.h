@@ -26,3 +26,5 @@
 #define CHARACTER_TARGETARMLENGTH				300.f
 
 #define COLLISION_HIDDEN_IN_GAME				false
+
+#define MARIOATTACK_LENGTH						50.f
