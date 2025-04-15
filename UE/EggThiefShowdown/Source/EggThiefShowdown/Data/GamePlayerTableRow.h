@@ -27,4 +27,8 @@ public: // Animation
 	UAnimMontage* DamagedMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "GamePlayer|Animation")
 	UAnimMontage* AttackMontage = nullptr;
+
+public: // AI 
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float CollisionSphereRadius = 32.f;
 };
