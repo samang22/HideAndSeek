@@ -112,6 +112,6 @@ protected:
 protected:
 	bool bCanMove = true;
 public:
-	void SetMovement(bool bFlag) { bCanMove = bFlag; };
+	void SetCanMove(bool bFlag) { bCanMove = bFlag; };
 
 };

@@ -15,7 +15,6 @@
 #include "Misc/Utils.h"
 #include "Net/UnrealNetwork.h"
 
-
 // Sets default values
 ARealYoshi::ARealYoshi(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -44,6 +43,8 @@ ARealYoshi::ARealYoshi(const FObjectInitializer& ObjectInitializer)
 	AISenseConfig_Sight->LoseSightRadius = AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
 	AISenseConfig_Sight->PeripheralVisionAngleDegrees = AISENSECONFIG_SIGHT_LOSESIGHTRADIUS_PERIPHERALVISIONANGLEDEGREES;
 	AIPerceptionComponent->ConfigureSense(*AISenseConfig_Sight);
+
+	AIControllerClass = ARealYoshiAIController::StaticClass();
 
 	StatusComponent = CreateDefaultSubobject<URealYoshiStatusComponent>(TEXT("StatusComponent"));
 
@@ -97,17 +98,7 @@ void ARealYoshi::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	if (PatrolPathRef)
-	{
-		if (ARealYoshiAIController* RealYoshiAIController = Cast<ARealYoshiAIController>(Controller))
-		{
-			RealYoshiAIController->SetPatrolPath(PatrolPathRef->GetPath());
-		}
-		else
-		{
-			check(false);
-		}
-	}
+
 }
 
 void ARealYoshi::OnConstruction(const FTransform& Transform)
@@ -126,16 +117,44 @@ void ARealYoshi::BeginPlay()
 
 }
 
+void ARealYoshi::PossessedBy(AController* NewController)
+{
+	if (PatrolPathRef)
+	{
+		if (ARealYoshiAIController* RealYoshiAIController = Cast<ARealYoshiAIController>(NewController))
+		{
+			RealYoshiAIController->SetPatrolPath(PatrolPathRef->GetPath());
+		}
+		else
+		{
+			check(false);
+		}
+	}
+}
+
+
 // Called every frame
 void ARealYoshi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsMoveToEgg)
+	{
+		MovementComponent->RequestDirectMove(MoveToEggDirection * MovementComponent->GetMaxSpeed(), true);
+	}
+	TickMovement(DeltaTime);
 }
 
 float ARealYoshi::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	return 0.0f;
+	float DamageResult = StatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	
+	// 만약 죽지 않았다면, DamagedMontage가 풀릴 때 다시 움직이게 만들기 
+	StopMovement();
+
+	Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::DAMAGED);
+
+	return DamageResult;
 }
 
 void ARealYoshi::OnRep_UpdateDataTableRowHandle()
@@ -244,4 +263,20 @@ void ARealYoshi::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, DataTableRowHandle);
+}
+
+void ARealYoshi::SetMoveToEggWithDirection(FVector _Direction)
+{
+	bIsMoveToEgg = true;
+	MoveToEggDirection = _Direction;
+}
+
+void ARealYoshi::StopMovement()
+{
+	MovementComponent->MaxSpeed = 0.f;
+}
+
+void ARealYoshi::ResumeMovement()
+{
+	MovementComponent->MaxSpeed = YOSHI_WALK_SPEED;
 }

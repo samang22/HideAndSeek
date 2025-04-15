@@ -3,6 +3,11 @@
 
 #include "SoftWheelSpringArmComponent.h"
 
+USoftWheelSpringArmComponent::USoftWheelSpringArmComponent()
+{
+	PrimaryComponentTick.bCanEverTick = true;
+}
+
 void USoftWheelSpringArmComponent::SetDesiredZoom(const float InValue)
 {
 	DesiredTargetArmLength = FMath::Clamp(InValue, MinTargetArmLength, MaxTargetArmLength);

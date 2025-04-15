@@ -2,6 +2,7 @@
 
 
 #include "Actors/Game/NPC/Egg.h"
+#include "Components/StatusComponent/Game/EggStatusComponent.h"
 
 // Sets default values
 AEgg::AEgg()
@@ -23,5 +24,15 @@ void AEgg::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+bool AEgg::IsCoolTime()
+{
+	return StatusComponent->IsCoolTime();
+}
+
+void AEgg::SetCoolTimeZero()
+{
+	StatusComponent->SetCoolTimeZero();
 }
 

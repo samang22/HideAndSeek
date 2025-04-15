@@ -33,6 +33,28 @@ void ARealYoshiAIController::Tick(float DeltaTime)
 	FindEggByPerception();
 }
 
+void ARealYoshiAIController::SetPatrolPath(TObjectPtr<USplineComponent> NewPatrolPath)
+{
+	PatrolPath = NewPatrolPath;
+
+	if (!IsValid(PatrolPath))
+	{
+		//checkf(false, TEXT("PatrolPath not valid"));
+		return;
+	}
+
+	UBehaviorTree* BehaviorTree = nullptr;
+	if (!IsValid(BrainComponent))
+	{
+		BehaviorTree = LoadObject<UBehaviorTree>(nullptr, TEXT("/Script/AIModule.BehaviorTree'/Game/Blueprint/NPC/BT_RealYoshi.BT_RealYoshi'"));
+		check(BehaviorTree);
+		RunBehaviorTree(BehaviorTree);
+	}
+
+	Blackboard->SetValueAsObject(TEXT("SplineComponent"), PatrolPath);
+
+}
+
 void ARealYoshiAIController::FindEggByPerception()
 {
 	APawn* OwningPawn = GetPawn();
@@ -46,8 +68,11 @@ void ARealYoshiAIController::FindEggByPerception()
 		{
 			if (AEgg* DetectedEgg = Cast<AEgg>(It))
 			{
-				bFound = true;
-				Blackboard->SetValueAsObject(TEXT("DetectedEgg"), Cast<UObject>(DetectedEgg));
+				if (!DetectedEgg->IsCoolTime())
+				{
+					bFound = true;
+					Blackboard->SetValueAsObject(TEXT("DetectedEgg"), Cast<UObject>(DetectedEgg));
+				}
 				break;
 			}
 		}

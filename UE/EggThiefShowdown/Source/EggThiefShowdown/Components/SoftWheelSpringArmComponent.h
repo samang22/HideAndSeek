@@ -15,6 +15,8 @@ class EGGTHIEFSHOWDOWN_API USoftWheelSpringArmComponent : public USpringArmCompo
 	GENERATED_BODY()
 	
 public:
+	USoftWheelSpringArmComponent();
+public:
 	UFUNCTION(BlueprintCallable)
 	void SetDesiredZoom(const float InValue);
 

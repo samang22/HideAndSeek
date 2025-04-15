@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Egg.generated.h"
 
+class UEggStatusComponent;
+
 UCLASS()
 class EGGTHIEFSHOWDOWN_API AEgg : public AActor
 {
@@ -23,4 +25,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UEggStatusComponent* StatusComponent;
+
+
+public:
+	bool IsCoolTime();
+	void SetCoolTimeZero();
 };

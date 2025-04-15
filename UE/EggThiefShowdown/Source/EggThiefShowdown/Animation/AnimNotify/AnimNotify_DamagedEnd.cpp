@@ -3,7 +3,7 @@
 
 #include "Animation/AnimNotify/AnimNotify_DamagedEnd.h"
 #include "Actors/Game/Character/GamePlayer.h"
-
+#include "Actors/Game/NPC/RealYoshi.h"
 
 UAnimNotify_DamagedEnd::UAnimNotify_DamagedEnd()
 {
@@ -13,6 +13,10 @@ void UAnimNotify_DamagedEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSeque
 {
 	if (AGamePlayer* GP = Cast<AGamePlayer>(MeshComp->GetOwner()))
 	{
-		GP->SetMovement(true);
+		GP->SetCanMove(true);
+	}
+	else if (ARealYoshi* RealYoshi = Cast<ARealYoshi>(MeshComp->GetOwner()))
+	{
+		RealYoshi->ResumeMovement();
 	}
 }

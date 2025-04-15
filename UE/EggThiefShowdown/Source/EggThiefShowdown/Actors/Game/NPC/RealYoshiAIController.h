@@ -18,6 +18,8 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	virtual void SetPatrolPath(TObjectPtr<USplineComponent> NewPatrolPath);
 protected:
 	void FindEggByPerception();
 

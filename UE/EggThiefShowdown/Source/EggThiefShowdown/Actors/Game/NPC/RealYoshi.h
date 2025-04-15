@@ -29,6 +29,8 @@ protected:
 	virtual void PostInitializeComponents() override;
 	virtual void OnConstruction(const FTransform& Transform);
 	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;
+
 
 public:	
 	// Called every frame
@@ -96,4 +98,11 @@ protected:
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+protected:
+	bool bIsMoveToEgg = false;
+	FVector MoveToEggDirection = FVector::Zero();
+public:
+	void SetMoveToEggWithDirection(FVector _Direction);
+	void StopMovement();
+	void ResumeMovement();
 };

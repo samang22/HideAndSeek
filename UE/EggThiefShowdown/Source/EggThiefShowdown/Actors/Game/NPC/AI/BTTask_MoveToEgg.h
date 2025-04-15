@@ -1,0 +1,26 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Actors/Game/NPC/AI/BTTask_Base.h"
+#include "BTTask_MoveToEgg.generated.h"
+
+class UBehaviorTreeComponent;
+class UBlackboardComponent;
+
+UCLASS()
+class EGGTHIEFSHOWDOWN_API UBTTask_MoveToEgg : public UBTTask_Base
+{
+	GENERATED_BODY()
+	
+public:
+	UBTTask_MoveToEgg();
+
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+
+protected:
+	UBehaviorTreeComponent* BehaviorTreeComponent = nullptr;
+	UBlackboardComponent* BlackboardComponent = nullptr;
+};

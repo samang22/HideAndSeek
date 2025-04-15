@@ -478,7 +478,7 @@ float AGamePlayer::TakeDamage(float Damage, FDamageEvent const& DamageEvent, ACo
 	if (FMath::IsNearlyZero(DamageResult)) { return 0.f; }
 
 	// 만약 죽지 않았다면, DamagedMontage가 풀릴 때 다시 움직이게 만들기 
-	SetMovement(false);
+	SetCanMove(false);
 
 	// 계산 결과 사망
 	if (StatusComponent->IsDie())

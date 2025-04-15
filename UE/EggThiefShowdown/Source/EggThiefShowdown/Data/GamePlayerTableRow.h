@@ -28,7 +28,7 @@ public: // Animation
 	UPROPERTY(EditAnywhere, Category = "GamePlayer|Animation")
 	UAnimMontage* AttackMontage = nullptr;
 
-public: // AI 
+public: // For RealYoshi
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float CollisionSphereRadius = 32.f;
 };
