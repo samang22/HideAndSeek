@@ -159,7 +159,11 @@ void AGamePlayer::OnRep_Controller()
 					FInputModeGameOnly InputMode;
 					LPC->SetInputMode(InputMode);
 					LPC->bShowMouseCursor = false;
+
 				}
+
+				InitDataTableByPlayerState();
+
 			}
 			else
 			{
@@ -219,10 +223,9 @@ void AGamePlayer::InitDataTableByPlayerState()
 					}
 				}
 
-				//SetInputModeGameOnly();
-				//PC->SetViewTarget(this);
-
 				StatusComponent->SetCharacterKind(LOBBY_CHARACTER_KIND::MARIO);
+				UCapsuleComponent* tempCapsuleComponent = GetCapsuleComponent();
+				tempCapsuleComponent->SetCollisionProfileName(CollisionProfileName::Mario);
 			}
 
 			break;
@@ -260,10 +263,9 @@ void AGamePlayer::InitDataTableByPlayerState()
 					}
 				}
 
-				//SetInputModeGameOnly();
-				//PC->SetViewTarget(this);
-
 				StatusComponent->SetCharacterKind(LOBBY_CHARACTER_KIND::YOSHI);
+				UCapsuleComponent* tempCapsuleComponent = GetCapsuleComponent();
+				tempCapsuleComponent->SetCollisionProfileName(CollisionProfileName::Yoshi);
 			}
 			break;
 			default:
@@ -489,7 +491,7 @@ float AGamePlayer::TakeDamage(float Damage, FDamageEvent const& DamageEvent, ACo
 	// 데미지만 입음
 	else if (!StatusComponent->IsDie() && GamePlayerData->DamagedMontage)
 	{
-		PlayMontage(GAME_PLAYER_MONTAGE::DAMAGED);
+		Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::DAMAGED);
 	}
 
 	return DamageResult;
