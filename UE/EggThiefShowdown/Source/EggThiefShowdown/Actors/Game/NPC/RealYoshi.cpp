@@ -119,6 +119,7 @@ void ARealYoshi::BeginPlay()
 
 void ARealYoshi::PossessedBy(AController* NewController)
 {
+	Super::PossessedBy(NewController);
 	if (PatrolPathRef)
 	{
 		if (ARealYoshiAIController* RealYoshiAIController = Cast<ARealYoshiAIController>(NewController))
@@ -138,11 +139,14 @@ void ARealYoshi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bIsMoveToEgg)
+	if (HasAuthority())
 	{
-		MovementComponent->RequestDirectMove(MoveToEggDirection * MovementComponent->GetMaxSpeed(), true);
+		if (bIsMoveToEgg)
+		{
+			MovementComponent->RequestDirectMove(MoveToEggDirection * MovementComponent->GetMaxSpeed(), true);
+		}
+		TickMovement(DeltaTime);
 	}
-	TickMovement(DeltaTime);
 }
 
 float ARealYoshi::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -152,6 +156,10 @@ float ARealYoshi::TakeDamage(float Damage, FDamageEvent const& DamageEvent, ACon
 	// 만약 죽지 않았다면, DamagedMontage가 풀릴 때 다시 움직이게 만들기 
 	StopMovement();
 
+	//if (HasAuthority())
+	//{
+	//	PlayMontage(GAME_PLAYER_MONTAGE::DAMAGED);
+	//}
 	Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::DAMAGED);
 
 	return DamageResult;

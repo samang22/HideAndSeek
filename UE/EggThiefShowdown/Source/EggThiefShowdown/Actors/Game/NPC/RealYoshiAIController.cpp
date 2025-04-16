@@ -37,48 +37,56 @@ void ARealYoshiAIController::SetPatrolPath(TObjectPtr<USplineComponent> NewPatro
 {
 	PatrolPath = NewPatrolPath;
 
-	if (!IsValid(PatrolPath))
+	APawn* OwningPawn = GetPawn();
+	// 서버에서만 순찰 경로 설정 및 Blackboard 업데이트
+	if (IsValid(OwningPawn) && OwningPawn->HasAuthority())
 	{
-		//checkf(false, TEXT("PatrolPath not valid"));
-		return;
+		if (!IsValid(PatrolPath))
+		{
+			//checkf(false, TEXT("PatrolPath not valid"));
+			return;
+		}
+
+		UBehaviorTree* BehaviorTree = nullptr;
+		if (!IsValid(BrainComponent))
+		{
+			BehaviorTree = LoadObject<UBehaviorTree>(nullptr, TEXT("/Script/AIModule.BehaviorTree'/Game/Blueprint/NPC/BT_RealYoshi.BT_RealYoshi'"));
+			check(BehaviorTree);
+			RunBehaviorTree(BehaviorTree);
+		}
+
+		Blackboard->SetValueAsObject(TEXT("SplineComponent"), PatrolPath);
 	}
-
-	UBehaviorTree* BehaviorTree = nullptr;
-	if (!IsValid(BrainComponent))
-	{
-		BehaviorTree = LoadObject<UBehaviorTree>(nullptr, TEXT("/Script/AIModule.BehaviorTree'/Game/Blueprint/NPC/BT_RealYoshi.BT_RealYoshi'"));
-		check(BehaviorTree);
-		RunBehaviorTree(BehaviorTree);
-	}
-
-	Blackboard->SetValueAsObject(TEXT("SplineComponent"), PatrolPath);
-
 }
 
 void ARealYoshiAIController::FindEggByPerception()
 {
 	APawn* OwningPawn = GetPawn();
-	if (UAIPerceptionComponent* AIPerceptionComponent = OwningPawn->GetComponentByClass<UAIPerceptionComponent>())
-	{
-		TArray<AActor*> OutActors;
-		AIPerceptionComponent->GetCurrentlyPerceivedActors(UAISenseConfig_Sight::StaticClass(), OutActors);
 
-		bool bFound = false;
-		for (AActor* It : OutActors)
+	if (IsValid(OwningPawn) && OwningPawn->HasAuthority() && Blackboard)
+	{
+		if (UAIPerceptionComponent* AIPerceptionComponent = OwningPawn->GetComponentByClass<UAIPerceptionComponent>())
 		{
-			if (AEgg* DetectedEgg = Cast<AEgg>(It))
+			TArray<AActor*> OutActors;
+			AIPerceptionComponent->GetCurrentlyPerceivedActors(UAISenseConfig_Sight::StaticClass(), OutActors);
+
+			bool bFound = false;
+			for (AActor* It : OutActors)
 			{
-				if (!DetectedEgg->IsCoolTime())
+				if (AEgg* DetectedEgg = Cast<AEgg>(It))
 				{
-					bFound = true;
-					Blackboard->SetValueAsObject(TEXT("DetectedEgg"), Cast<UObject>(DetectedEgg));
+					if (!DetectedEgg->IsCoolTime())
+					{
+						bFound = true;
+						Blackboard->SetValueAsObject(TEXT("DetectedEgg"), Cast<UObject>(DetectedEgg));
+					}
+					break;
 				}
-				break;
 			}
-		}
-		if (!bFound)
-		{
-			Blackboard->ClearValue(TEXT("DetectedEgg"));
+			if (!bFound)
+			{
+				Blackboard->ClearValue(TEXT("DetectedEgg"));
+			}
 		}
 	}
 }
