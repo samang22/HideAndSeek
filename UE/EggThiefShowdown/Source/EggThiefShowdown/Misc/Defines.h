@@ -35,3 +35,5 @@
 
 
 #define EGG_MAX_COOLTIME						10.f
+
+#define EGG_SCALE								60.0

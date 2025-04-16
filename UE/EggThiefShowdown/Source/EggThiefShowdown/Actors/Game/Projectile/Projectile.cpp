@@ -14,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Actors/Game/Character/GamePlayer.h"
+#include "Actors/Game/NPC/RealYoshi.h"
 
 // Sets default values
 AProjectile::AProjectile()
@@ -94,6 +95,11 @@ void AProjectile::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 			UGameplayStatics::ApplyDamage(OtherActor, ProjectileTableRow->Damage, OtherActor->GetInstigator()->GetController(), this, nullptr);
 		}
 	}
+	else if (ARealYoshi* RY = Cast<ARealYoshi>(OtherActor))
+	{
+		UGameplayStatics::ApplyDamage(OtherActor, ProjectileTableRow->Damage, OtherActor->GetInstigator()->GetController(), this, nullptr);
+	}
+
 
 
 	Destroy();
