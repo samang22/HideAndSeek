@@ -27,6 +27,7 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
+	SetReplicatingMovement(true);
 	bAlwaysRelevant = true;
 
 	UCapsuleComponent* tempCapsuleComponent = GetCapsuleComponent();
@@ -54,12 +55,18 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	SpringArm->bInheritPitch = true;
 	SpringArm->bInheritYaw = true;
 	SpringArm->bInheritRoll = false;
+	SpringArm->ProbeSize = PROBE_SIZE;
 
 	SpringArm->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f)); // 약간 아래로 바라보게
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 	Camera->SetRelativeLocation(FVector::ZeroVector);
+
+	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
+	MovementComponent->SetIsReplicated(true);
+
+	MovementComponent->NetworkSmoothingMode = ENetworkSmoothingMode::Linear;
 }
 
 void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -432,9 +439,10 @@ void AGamePlayer::SetSpeedWalk()
 		break;
 	}
 
-	if (!FMath::IsNearlyEqual(Movement->MaxWalkSpeed, TargetSpeed))
+	if (!FMath::IsNearlyEqual(ReplicatedMaxWalkSpeed, TargetSpeed))
 	{
-		Movement->MaxWalkSpeed = TargetSpeed;
+		ReplicatedMaxWalkSpeed = TargetSpeed;
+		OnRep_MaxWalkSpeed(); // 서버에서도 직접 적용
 	}
 
 	bIsRun = false;
@@ -455,12 +463,22 @@ void AGamePlayer::SetSpeedRun()
 		break;
 	}
 
-	if (!FMath::IsNearlyEqual(Movement->MaxWalkSpeed, TargetSpeed))
+	if (!FMath::IsNearlyEqual(ReplicatedMaxWalkSpeed, TargetSpeed))
 	{
-		Movement->MaxWalkSpeed = TargetSpeed;
+		ReplicatedMaxWalkSpeed = TargetSpeed;
+		OnRep_MaxWalkSpeed(); // 서버에서도 직접 적용
 	}
 
 	bIsRun = true;
+}
+
+void AGamePlayer::OnRep_MaxWalkSpeed()
+{
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = ReplicatedMaxWalkSpeed;
+		UE_LOG(LogTemp, Log, TEXT("MaxWalkSpeed updated on client: %f"), ReplicatedMaxWalkSpeed);
+	}
 }
 
 LOBBY_CHARACTER_KIND AGamePlayer::GetCharacterKind()
@@ -513,6 +531,7 @@ void AGamePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, DataTableRowHandle);
+	DOREPLIFETIME(ThisClass, ReplicatedMaxWalkSpeed);
 }
 
 void AGamePlayer::OnRep_UpdateDataTableRowHandle()
@@ -533,30 +552,31 @@ void AGamePlayer::OnRep_UpdateDataTableRowHandle()
 		UCharacterMovementComponent* Movement = GetCharacterMovement();
 		Movement->bOrientRotationToMovement = true;
 		//Movement->GetNavAgentPropertiesRef().bCanCrouch = true;
-		switch (StatusComponent->GetCharacterKind())
-		{
-		case LOBBY_CHARACTER_KIND::MARIO:
-			if (StatusComponent->GetAnimStatus(GP_ANIM_BIT_RUN))
-			{
-				Movement->MaxWalkSpeed = MARIO_RUN_SPEED;
-			}
-			else
-			{
-				Movement->MaxWalkSpeed = MARIO_WALK_SPEED;
-			}
-			break;
+		//switch (StatusComponent->GetCharacterKind())
+		//{
+		//case LOBBY_CHARACTER_KIND::MARIO:
+		//	if (StatusComponent->GetAnimStatus(GP_ANIM_BIT_RUN))
+		//	{
+		//		Movement->MaxWalkSpeed = MARIO_RUN_SPEED;
+		//	}
+		//	else
+		//	{
+		//		Movement->MaxWalkSpeed = MARIO_WALK_SPEED;
+		//	}
+		//	break;
 
-		case LOBBY_CHARACTER_KIND::YOSHI:
-			if (StatusComponent->GetAnimStatus(GP_ANIM_BIT_RUN))
-			{
-				Movement->MaxWalkSpeed = YOSHI_RUN_SPEED;
-			}
-			else
-			{
-				Movement->MaxWalkSpeed = YOSHI_WALK_SPEED;
-			}
-			break;
-		}
+		//case LOBBY_CHARACTER_KIND::YOSHI:
+		//	if (StatusComponent->GetAnimStatus(GP_ANIM_BIT_RUN))
+		//	{
+		//		Movement->MaxWalkSpeed = YOSHI_RUN_SPEED;
+		//	}
+		//	else
+		//	{
+		//		Movement->MaxWalkSpeed = YOSHI_WALK_SPEED;
+		//	}
+		//	break;
+		//}
+
 		//const float NewCapsuleHalfHeight = CHARACTER_CAPSULE_HALF_HEIGHT;
 		//Movement->SetCrouchedHalfHeight(NewCapsuleHalfHeight);
 	}

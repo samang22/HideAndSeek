@@ -97,11 +97,19 @@ protected:
 public:
 	bool GetIsRun() const { return bIsRun; }
 
+
+protected:
+	UPROPERTY(ReplicatedUsing = OnRep_MaxWalkSpeed)
+	float ReplicatedMaxWalkSpeed;
+
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_SetSpeedWalk();
 	UFUNCTION(Server, Reliable)
 	void Server_SetSpeedRun();
+
+	UFUNCTION()
+	void OnRep_MaxWalkSpeed();
 
 public:
 	LOBBY_CHARACTER_KIND GetCharacterKind();

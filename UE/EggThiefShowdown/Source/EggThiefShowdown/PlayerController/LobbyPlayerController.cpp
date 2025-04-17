@@ -34,6 +34,7 @@ ALobbyPlayerController::ALobbyPlayerController()
 
     PlayerCameraManagerClass = AGameMapPlayerCameraManager::StaticClass();
 
+    SetReplicates(true);
 }
 
 void ALobbyPlayerController::Server_SelectLobbyCharacter_Implementation(ALobbyCharacter* LobbyCharacter, const FString& InUserName)
@@ -138,7 +139,7 @@ void ALobbyPlayerController::OnPossess(APawn* InPawn)
 void ALobbyPlayerController::OnRep_Pawn()
 {
     Super::OnRep_Pawn();
-    UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::OnRep_Pawn()"));
+    UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::OnRep_Pawn()"));         
 
     if (GetPawn())
     {
@@ -156,7 +157,6 @@ void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
     if (StatusComponent && !StatusComponent->CanMove())
     {
         UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::OnMove Failed"));
-
         return;
     }
 
@@ -167,11 +167,41 @@ void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
     const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
 
     APawn* ControlledPawn = GetPawn();
-    ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
-    ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
 
-
+    // 서버/클라 둘다 계산
+    if (ControlledPawn)
+    {
+        ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
+        ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+    }
+    if (!HasAuthority()) // 클라이언트에서 로컬 움직임 시뮬레이션
+    {
+        Server_OnMove(InputActionValue); // 입력 정보를 서버로 전송
+    }
     StatusComponent->Server_SetOnAnimationStatus(GP_ANIM_BIT_WALK);
+}
+
+void ALobbyPlayerController::Server_OnMove_Implementation(const FInputActionValue& InputActionValue)
+{
+    if (StatusComponent && !StatusComponent->CanMove())
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Server_OnMove Failed - Can't Move"));
+        return;
+    }
+
+    const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
+    const FRotator Rotation = K2_GetActorRotation();
+    const FRotator RotationYaw = FRotator(0.0, Rotation.Yaw, 0.0);
+    const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
+    const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
+
+    APawn* ControlledPawn = GetPawn();
+    if (ControlledPawn)
+    {
+        ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
+        ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
+        StatusComponent->Server_SetOnAnimationStatus(GP_ANIM_BIT_WALK);
+    }
 }
 
 void ALobbyPlayerController::OnMoveOff(const FInputActionValue& InputActionValue)
@@ -231,6 +261,8 @@ void ALobbyPlayerController::SetInputModeGameOnly()
     SetInputMode(InputMode);
     bShowMouseCursor = false; // UI도 같이 쓸 거면 true
 }
+
+
 
 void ALobbyPlayerController::BeginPlay()
 {

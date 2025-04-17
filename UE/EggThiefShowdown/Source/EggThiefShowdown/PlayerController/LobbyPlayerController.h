@@ -44,6 +44,8 @@ protected:
 
 protected:
 	void OnMove(const FInputActionValue& InputActionValue);
+	UFUNCTION(Server, Reliable)
+	void Server_OnMove(const FInputActionValue& InputActionValue);
 	void OnMoveOff(const FInputActionValue& InputActionValue);
 	void OnLook(const FInputActionValue& InputActionValue);
 	void OnRun(const FInputActionValue& InputActionValue);
