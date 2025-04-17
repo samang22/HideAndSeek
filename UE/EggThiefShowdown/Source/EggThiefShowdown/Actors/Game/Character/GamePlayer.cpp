@@ -528,7 +528,7 @@ void AGamePlayer::Server_SetSpeedRun_Implementation()
 
 void AGamePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);      
 
 	DOREPLIFETIME(ThisClass, DataTableRowHandle);
 	DOREPLIFETIME(ThisClass, ReplicatedMaxWalkSpeed);
@@ -550,7 +550,7 @@ void AGamePlayer::OnRep_UpdateDataTableRowHandle()
 	GamePlayerData = Data;
 	{
 		UCharacterMovementComponent* Movement = GetCharacterMovement();
-		Movement->bOrientRotationToMovement = true;
+		//Movement->bOrientRotationToMovement = true;
 		//Movement->GetNavAgentPropertiesRef().bCanCrouch = true;
 		//switch (StatusComponent->GetCharacterKind())
 		//{

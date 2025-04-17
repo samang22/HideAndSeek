@@ -17,6 +17,8 @@ UBTTask_PathTrace::UBTTask_PathTrace()
 
 EBTNodeResult::Type UBTTask_PathTrace::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	AIOwner = OwnerComp.GetAIOwner();
+
 	APawn* Pawn = AIOwner->GetPawn();
 
 	if (Pawn && Pawn->HasAuthority())
@@ -35,7 +37,7 @@ EBTNodeResult::Type UBTTask_PathTrace::ExecuteTask(UBehaviorTreeComponent& Owner
 
 		const FVector TargetLocation = SplineComponent->GetLocationAtSplinePoint(CurrentPatrolIndex, ESplineCoordinateSpace::World);
 
-		Proxy = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(OwnerComp.GetOwner(), Pawn, TargetLocation);
+		Proxy = UAIBlueprintHelperLibrary::CreateMoveToProxyObject(AIOwner, Pawn, TargetLocation);
 		if (Proxy)
 		{
 			Proxy->OnSuccess.AddDynamic(this, &ThisClass::OnResult);

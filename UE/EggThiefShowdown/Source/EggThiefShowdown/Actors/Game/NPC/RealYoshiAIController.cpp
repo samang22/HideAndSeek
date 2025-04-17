@@ -33,29 +33,23 @@ void ARealYoshiAIController::Tick(float DeltaTime)
 	FindEggByPerception();
 }
 
-void ARealYoshiAIController::SetPatrolPath(TObjectPtr<USplineComponent> NewPatrolPath)
+void ARealYoshiAIController::SetPatrolPath(TObjectPtr<USplineComponent> NewPatrolPath, APawn* OwningPawn)
 {
-	PatrolPath = NewPatrolPath;
-
-	APawn* OwningPawn = GetPawn();
-	// 서버에서만 순찰 경로 설정 및 Blackboard 업데이트
+	Super::SetPatrolPath(NewPatrolPath);
 	if (IsValid(OwningPawn) && OwningPawn->HasAuthority())
 	{
-		if (!IsValid(PatrolPath))
+		if (!IsValid(NewPatrolPath))
 		{
-			//checkf(false, TEXT("PatrolPath not valid"));
 			return;
 		}
 
-		UBehaviorTree* BehaviorTree = nullptr;
-		if (!IsValid(BrainComponent))
-		{
-			BehaviorTree = LoadObject<UBehaviorTree>(nullptr, TEXT("/Script/AIModule.BehaviorTree'/Game/Blueprint/NPC/BT_RealYoshi.BT_RealYoshi'"));
-			check(BehaviorTree);
-			RunBehaviorTree(BehaviorTree);
-		}
+		UBehaviorTree* BehaviorTree = LoadObject<UBehaviorTree>(nullptr, TEXT("/Game/Blueprint/NPC/BT_RealYoshi.BT_RealYoshi"));
+		check(BehaviorTree);
+		RunBehaviorTree(BehaviorTree);
 
-		Blackboard->SetValueAsObject(TEXT("SplineComponent"), PatrolPath);
+		Blackboard->SetValueAsObject(TEXT("SplineComponent"), NewPatrolPath);
+
+		UE_LOG(LogTemp, Warning, TEXT("RunBehaviorTree(BehaviorTree)"));
 	}
 }
 

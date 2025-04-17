@@ -4,7 +4,7 @@
 #include "Actors/Game/NPC/RealYoshi.h"
 #include "Actors/Game/NPC/RealYoshiAIController.h"
 #include "Actors/Game/NPC/PatrolPath.h"
-#include "GameFramework/FloatingPawnMovement.h"
+#include "Components/AdvancedFloatingPawnMovement.h"
 #include "Components/StatusComponent/Game/RealYoshiStatusComponent.h"
 #include "Data/GamePlayerTableRow.h"
 #include "Perception/AIPerceptionComponent.h"
@@ -30,7 +30,8 @@ ARealYoshi::ARealYoshi(const FObjectInitializer& ObjectInitializer)
 	CollisionComponent->SetCollisionProfileName(CollisionProfileName::Yoshi);
 	CollisionComponent->SetCanEverAffectNavigation(false);
 
-	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+	MovementComponent = CreateDefaultSubobject<UAdvancedFloatingPawnMovement>(TEXT("MovementComponent"));
+	MovementComponent->MaxSpeed = YOSHI_WALK_SPEED;
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
@@ -117,6 +118,7 @@ void ARealYoshi::BeginPlay()
 
 }
 
+// 이 시점에서 Controller에 OwningPawn이 Set 되어있지 않다.
 void ARealYoshi::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -124,7 +126,7 @@ void ARealYoshi::PossessedBy(AController* NewController)
 	{
 		if (ARealYoshiAIController* RealYoshiAIController = Cast<ARealYoshiAIController>(NewController))
 		{
-			RealYoshiAIController->SetPatrolPath(PatrolPathRef->GetPath());
+			RealYoshiAIController->SetPatrolPath(PatrolPathRef->GetPath(), this);
 		}
 		else
 		{

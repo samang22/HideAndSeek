@@ -8,6 +8,7 @@
 
 class USplineComponent;
 class UStatusComponent;
+class APawn;
 
 UCLASS()
 class EGGTHIEFSHOWDOWN_API ARealYoshiAIController : public ABaseAIController
@@ -19,7 +20,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	virtual void SetPatrolPath(TObjectPtr<USplineComponent> NewPatrolPath);
+	virtual void SetPatrolPath(TObjectPtr<USplineComponent> NewPatrolPath, APawn* OwningPawn);
 protected:
 	void FindEggByPerception();
 

@@ -8,7 +8,7 @@
 #include "RealYoshi.generated.h"
 
 class APatrolPath;
-class UFloatingPawnMovement;
+class UAdvancedFloatingPawnMovement;
 class URealYoshiStatusComponent;
 struct FGamePlayerTableRow;
 
@@ -48,7 +48,7 @@ protected: // 옵션에 따라 생성되고 Root로 지정 됩니다.
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	UFloatingPawnMovement* MovementComponent;
+	UAdvancedFloatingPawnMovement* MovementComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	URealYoshiStatusComponent* StatusComponent;
