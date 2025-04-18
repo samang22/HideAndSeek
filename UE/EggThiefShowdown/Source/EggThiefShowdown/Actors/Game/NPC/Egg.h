@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Pawn.h"
 #include "Egg.generated.h"
 
 class UEggStatusComponent;
+class UAIPerceptionStimuliSourceComponent;
 
 UCLASS()
-class EGGTHIEFSHOWDOWN_API AEgg : public AActor
+class EGGTHIEFSHOWDOWN_API AEgg : public APawn
 {
 	GENERATED_BODY()
 	
@@ -36,4 +37,8 @@ protected:
 public:
 	bool IsCoolTime();
 	void SetCoolTimeZero();
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	UAIPerceptionStimuliSourceComponent* StimuliSource;
 };

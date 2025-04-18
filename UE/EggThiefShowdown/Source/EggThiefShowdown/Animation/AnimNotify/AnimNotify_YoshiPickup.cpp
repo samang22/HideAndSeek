@@ -4,6 +4,7 @@
 #include "AnimNotify_YoshiPickup.h"
 #include "Actors/Game/Character/GamePlayer.h"
 #include "Actors/Game/Projectile/Projectile.h"
+#include "Actors/Game/NPC/RealYoshi.h"
 #include "Misc/Utils.h"
 
 UAnimNotify_YoshiPickup::UAnimNotify_YoshiPickup()
@@ -34,4 +35,9 @@ void UAnimNotify_YoshiPickup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 		NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
 		Projectile->FinishSpawning(NewTransform);
 	}
+	else if (ARealYoshi* RY = Cast<ARealYoshi>(MeshComp->GetOwner()))
+	{
+		RY->ResumeMovement();
+	}
+
 }

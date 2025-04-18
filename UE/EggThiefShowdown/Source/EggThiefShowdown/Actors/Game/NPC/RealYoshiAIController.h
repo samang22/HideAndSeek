@@ -14,14 +14,17 @@ UCLASS()
 class EGGTHIEFSHOWDOWN_API ARealYoshiAIController : public ABaseAIController
 {
 	GENERATED_BODY()
+
+public:
+	ARealYoshiAIController();
 public:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
-	virtual void Tick(float DeltaTime) override;
 
 public:
 	virtual void SetPatrolPath(TObjectPtr<USplineComponent> NewPatrolPath, APawn* OwningPawn);
 protected:
-	void FindEggByPerception();
 
+	UFUNCTION()
+	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
 };

@@ -477,7 +477,6 @@ void AGamePlayer::OnRep_MaxWalkSpeed()
 	if (GetCharacterMovement())
 	{
 		GetCharacterMovement()->MaxWalkSpeed = ReplicatedMaxWalkSpeed;
-		UE_LOG(LogTemp, Log, TEXT("MaxWalkSpeed updated on client: %f"), ReplicatedMaxWalkSpeed);
 	}
 }
 
