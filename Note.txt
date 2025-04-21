@@ -32,6 +32,23 @@ MaxWalkSpeed 값을 Replicated 변수로 서버-클라이언트 간 동기화해
 
 Pawn이 아닌 액터는 AISenseConfig에 잡히지 않는다.
 UAIPerceptionComponent::ProcessStimuli
+기본적으로 TArray<FStimulusToProcess> StimuliToProcess; 에 있는 구조체에 대하여 검사 실시
+FStimulusToProcess는? 
+		TObjectKey<AActor> Source;
+		FAIStimulus Stimulus;
+        이렇게 구성
+        FAIStimulus는? AI Perception 시스템을 통해 감지된 정보(Stimulus)를 담는 구조체
+
+그럼 일단 StimuliToProcess에 직접 액터를 기입? 
+이건 내부적으로 작동하는 코드이고, 외부에서 수정해서 쓰라고 만든 API가 아님
+기본적으로 이 프로젝트는 언리얼 엔진 내부 코드를 수정해서 만드는 프로젝트가 아니므로, 수정할 경우 발생할 버그에 대해 무지함. 지양해야됨
+
+AEgg에 UAIPerceptionStimuliSourceComponent를 추가?
+일단 안됨
+
+
+ProcessStimuli 함수내에서 PerceptualData
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
