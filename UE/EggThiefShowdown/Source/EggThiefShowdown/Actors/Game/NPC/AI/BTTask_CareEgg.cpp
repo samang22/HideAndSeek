@@ -38,6 +38,6 @@ EBTNodeResult::Type UBTTask_CareEgg::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 		
 	}
 
-	return EBTNodeResult::Failed;
+	return EBTNodeResult::Succeeded;
 }
 

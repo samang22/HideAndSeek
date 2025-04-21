@@ -23,10 +23,10 @@ ARealYoshiAIController::ARealYoshiAIController()
 
 	// 시야 설정
 	UAISenseConfig_Sight* SightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
-	SightConfig->SightRadius = 1500.0f;
-	SightConfig->LoseSightRadius = 1600.0f;
-	SightConfig->PeripheralVisionAngleDegrees = 90.0f;
-	SightConfig->SetMaxAge(5.0f);
+	SightConfig->SightRadius = 800.0f;
+	SightConfig->LoseSightRadius = 900.0f;
+	SightConfig->PeripheralVisionAngleDegrees = 120.0f;
+	SightConfig->SetMaxAge(1.0f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = true;

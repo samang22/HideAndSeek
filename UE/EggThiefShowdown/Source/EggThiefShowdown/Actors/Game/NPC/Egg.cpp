@@ -22,10 +22,10 @@ AEgg::AEgg()
 	RootComponent = StaticMeshComponent;
 	StaticMeshComponent->SetCollisionProfileName(CollisionProfileName::Egg);
 
-	// Stimuli Source 컴포넌트 생성
-	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
-	// 시야 센스로 등록
-	StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
+	//// Stimuli Source 컴포넌트 생성
+	//StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
+	//// 시야 센스로 등록
+	//StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
 
 	StatusComponent = CreateDefaultSubobject<UEggStatusComponent>(TEXT("StatusComponent"));
 
@@ -37,12 +37,12 @@ void AEgg::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// 퍼셉션 시스템에 등록
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Server: AEgg %s BeginPlay. Registering with Perception System."), *GetName());
-		StimuliSource->RegisterWithPerceptionSystem();
-	}
+	//// 퍼셉션 시스템에 등록
+	//if (HasAuthority())
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Server: AEgg %s BeginPlay. Registering with Perception System."), *GetName());
+	//	StimuliSource->RegisterWithPerceptionSystem();
+	//}
 }
 
 // Called every frame

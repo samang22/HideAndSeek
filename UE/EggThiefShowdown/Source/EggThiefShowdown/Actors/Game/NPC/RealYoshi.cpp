@@ -37,15 +37,6 @@ ARealYoshi::ARealYoshi(const FObjectInitializer& ObjectInitializer)
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
 	SkeletalMeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -1.f * CHARACTER_CAPSULE_HALF_HEIGHT));
 
-	//AIPerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
-	//AISenseConfig_Sight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AISenseConfig_Sight"));
-	//AISenseConfig_Sight->DetectionByAffiliation.bDetectNeutrals = true;
-	//AISenseConfig_Sight->SightRadius = AISENSECONFIG_SIGHT_SIGHTRADIUS;
-	//AISenseConfig_Sight->LoseSightRadius = AISENSECONFIG_SIGHT_LOSESIGHTRADIUS;
-	//AISenseConfig_Sight->PeripheralVisionAngleDegrees = AISENSECONFIG_SIGHT_LOSESIGHTRADIUS_PERIPHERALVISIONANGLEDEGREES;
-	//AIPerceptionComponent->ConfigureSense(*AISenseConfig_Sight);
-
-
 	AIControllerClass = ARealYoshiAIController::StaticClass();
 
 	StatusComponent = CreateDefaultSubobject<URealYoshiStatusComponent>(TEXT("StatusComponent"));
