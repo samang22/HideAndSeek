@@ -308,7 +308,7 @@ void AServerGameMode::OnRequestCheckAccount(UIpConnection* Connection, FHa_DEDI_
 		{
 			if (LoginResult != ELoginResult::Success)
 			{
-				E_LOG(Warning, TEXT("해커가 장난 치고 있는거 같아요"));
+				E_LOG(Warning, TEXT("Login Failed"));
 			}
 
 			FHa_DEDI_TO_LOGIN_SERVER_CheckAccountValidResult ResultPacket;
