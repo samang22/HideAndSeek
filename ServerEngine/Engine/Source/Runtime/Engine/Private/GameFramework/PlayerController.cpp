@@ -111,7 +111,7 @@ void APlayerController::InitPlayerState()
             TSubclassOf<APlayerState> PlayerStateClassToSpawn = GameMode->PlayerStateClass;
             if (PlayerStateClassToSpawn.Get() == nullptr)
             {
-                E_LOG(Log, TEXT("AController::InitPlayerState: 게임 모드 {}의 PlayerStateClass가 null입니다. APlayerState로 대체합니다."),
+                E_LOG(Log, TEXT("AController::InitPlayerState: GameMode {}'s PlayerStateClass is null. Alternate with APlayerState."),
                     GameMode->GetName());
                 PlayerStateClassToSpawn = APlayerState::StaticClass();
             }

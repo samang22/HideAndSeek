@@ -10,7 +10,7 @@ class UEggStatusComponent;
 class UAIPerceptionStimuliSourceComponent;
 
 UCLASS()
-class EGGTHIEFSHOWDOWN_API AEgg : public APawn
+class EGGTHIEFSHOWDOWN_API AEgg : public AActor
 {
 	GENERATED_BODY()
 	

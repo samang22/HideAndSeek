@@ -148,7 +148,7 @@ void AGameModeBase::RestartPlayer(AController* NewPlayer)
     // 시작 위치를 찾지 못한 경우,
     if (StartSpot == nullptr)
     {
-        E_LOG(Warning, TEXT("아직 StartSpot이 없습니다"));
+        E_LOG(Warning, TEXT("No StartSpot"));
         // 이전에 할당된 위치가 있는지 확인합니다.
         /*if (NewPlayer->StartSpot != nullptr)
         {
