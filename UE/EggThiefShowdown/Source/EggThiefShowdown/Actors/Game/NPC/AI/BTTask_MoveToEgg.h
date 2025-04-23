@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Actors/Game/NPC/AI/BTTask_Base.h"
+#include "AIController.h"
 #include "BTTask_MoveToEgg.generated.h"
 
 class UBehaviorTreeComponent;

@@ -6,7 +6,7 @@
 #include "IpNetDriver.h"
 #include "HaNetDriver.generated.h"
 
-class UHaConneciton;
+class UHaConnection;
 UCLASS(config = Network)
 class NETWORK_API UHaNetDriver : public UIpNetDriver
 {

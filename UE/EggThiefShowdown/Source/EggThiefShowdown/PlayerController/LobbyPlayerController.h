@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -8,6 +8,8 @@
 
 class ALobbyCharacter;
 class UGamePlayerStatusComponent;
+class UInputMappingContext;
+
 UCLASS()
 class EGGTHIEFSHOWDOWN_API ALobbyPlayerController : public APlayerController
 {
@@ -31,6 +33,7 @@ public:
 
 // ------------------------------------------------------------------------
 protected:
+	UPROPERTY()
 	UInputMappingContext* IMC_Default = nullptr;
 	UPROPERTY()
 	UGamePlayerStatusComponent* StatusComponent;
