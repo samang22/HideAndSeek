@@ -112,7 +112,7 @@ void ARealYoshiAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedA
 		{
 			if (AEgg* DetectedEgg = Cast<AEgg>(SeenActor))
 			{
-				if (!DetectedEgg->IsCoolTime())
+				if (!DetectedEgg->IsCoolTime() && !DetectedEgg->GetIsHold())
 				{
 					MostRecentEgg = DetectedEgg;
 					break; // 일단 하나만 감지하면 멈춤 (필요에 따라 로직 변경 가능)

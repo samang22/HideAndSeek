@@ -19,25 +19,45 @@ void UAnimNotify_YoshiPickup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 #endif
 
 
-	if (AGamePlayer* GP = Cast<AGamePlayer>(MeshComp->GetOwner()))
+	if (ARealYoshi* RY = Cast<ARealYoshi>(MeshComp->GetOwner()))
 	{
-		FVector Location = GP->GetActorLocation();
+		RY->StopMovement();
 
-		const FVector ForwardVector = GP->GetActorForwardVector();
-		UWorld* World = GP->GetWorld();
-
-		AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
-			FTransform::Identity, GP, GP, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
-		FTransform NewTransform;
-		Projectile->SetData(ProjectileName::YoshiPickup, CollisionProfileName::YoshiPickup);
-		NewTransform.SetLocation(GP->GetActorLocation() + MARIOATTACK_LENGTH * ForwardVector);
-		NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
-		Projectile->FinishSpawning(NewTransform);
 	}
-	else if (ARealYoshi* RY = Cast<ARealYoshi>(MeshComp->GetOwner()))
+	else if (AGamePlayer* GP = Cast<AGamePlayer>(MeshComp->GetOwner()))
 	{
-		RY->ResumeMovement();
+		if (GP->GetCharacterKind() == LOBBY_CHARACTER_KIND::YOSHI)
+		{
+			GP->SetCanMove(false);
+
+			if (GP->GetIsEgg())
+			{
+				if (GP->HasAuthority())
+				{
+					GP->DropEgg();
+				}
+				else
+				{
+					GP->Server_DropEgg();
+				}
+			}
+			else
+			{
+				const FVector GPLocation = GP->GetActorLocation();
+
+				const FVector ForwardVector = GP->GetActorForwardVector();
+				UWorld* World = GP->GetWorld();
+
+				AProjectile* Projectile = World->SpawnActorDeferred<AProjectile>(AProjectile::StaticClass(),
+					FTransform::Identity, GP, GP, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+				FTransform NewTransform;
+				Projectile->SetData(ProjectileName::YoshiPickup, CollisionProfileName::YoshiPickup);
+				NewTransform.SetLocation(GPLocation + MARIOATTACK_LENGTH * ForwardVector);
+				NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+				Projectile->FinishSpawning(NewTransform);
+			}
+		}
 	}
 
 }

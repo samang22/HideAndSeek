@@ -10,7 +10,6 @@
 #include "../SpawnPoint/YoshiSpawnPoint.h"
 #include "../../../PlayerState/GameMapPlayerState.h"
 #include "../../../PlayerState/LobbyMapPlayerState.h"
-#include "../../../PlayerController/GameMapPlayerController.h"
 #include "../../../PlayerController/LobbyPlayerController.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -19,6 +18,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/CapsuleComponent.h"
+
+#include "Actors/Game/NPC/Egg.h"
 
 // Sets default values
 AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
@@ -329,6 +330,10 @@ void AGamePlayer::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdju
 void AGamePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (HasAuthority())
+	{
+		SetEggRelativePosition(DeltaTime); // 그냥 바로 실행
+	}
 }
 
 // Called to bind functionality to input
@@ -494,8 +499,8 @@ float AGamePlayer::TakeDamage(float Damage, FDamageEvent const& DamageEvent, ACo
 	// 데미지가 거의 들어오지 않음
 	if (FMath::IsNearlyZero(DamageResult)) { return 0.f; }
 
-	// 만약 죽지 않았다면, DamagedMontage가 풀릴 때 다시 움직이게 만들기 
-	SetCanMove(false);
+	//// 만약 죽지 않았다면, DamagedMontage가 풀릴 때 다시 움직이게 만들기 
+	//SetCanMove(false);
 
 	// 계산 결과 사망
 	if (StatusComponent->IsDie())
@@ -511,7 +516,53 @@ float AGamePlayer::TakeDamage(float Damage, FDamageEvent const& DamageEvent, ACo
 		Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::DAMAGED);
 	}
 
+	// 알 처리 
+	Server_DropEgg();
+
+
+
 	return DamageResult;
+}
+
+
+void AGamePlayer::SetEggRelativePosition(float DeltaTime)
+{
+	if (Egg)
+	{
+		FVector GPLocation = GetActorLocation();
+		FVector GPForward = GetActorForwardVector();
+		FVector EggLocation = GPLocation + GPForward * YOSHI_EGG_HOLD_OFFSET;
+
+		Egg->SetActorLocation(EggLocation);
+	}
+}
+
+void AGamePlayer::Server_DropEgg_Implementation()
+{
+	Multicast_DropEgg();
+}
+
+void AGamePlayer::Multicast_DropEgg_Implementation()
+{
+	DropEgg();
+}
+
+
+void AGamePlayer::DropEgg()
+{
+	if (GetCharacterKind() == LOBBY_CHARACTER_KIND::YOSHI)
+	{
+		if (AEgg* CastedEgg = Cast<AEgg>(Egg))
+		{
+			CastedEgg->SetIsHold(false);
+			Egg = nullptr;
+		}
+	}
+}
+
+void AGamePlayer::SetCanMove(bool bFlag)
+{
+	StatusComponent->SetCanMove(bFlag);
 }
 
 

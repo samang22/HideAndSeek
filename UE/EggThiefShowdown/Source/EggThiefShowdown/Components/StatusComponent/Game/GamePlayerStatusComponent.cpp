@@ -47,3 +47,11 @@ void UGamePlayerStatusComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 
 	DOREPLIFETIME(ThisClass, AnimationStatus);
 }
+
+bool UGamePlayerStatusComponent::CanMove() const
+{
+	bool bSuperCanMove = Super::CanMove();
+	if (!bSuperCanMove) return false;
+
+	return bCanMove;
+}

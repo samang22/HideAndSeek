@@ -46,9 +46,9 @@ FStimulusToProcess는?
 AEgg에 UAIPerceptionStimuliSourceComponent를 추가?
 일단 안됨
 
-
-ProcessStimuli 함수내에서 PerceptualData
-
+		StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
+		StimuliSource->RegisterWithPerceptionSystem();
+        이 두 함수를 BeginPlay에서 호출하는 것으로 해결
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

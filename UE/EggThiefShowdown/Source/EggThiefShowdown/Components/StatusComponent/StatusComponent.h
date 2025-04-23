@@ -19,7 +19,7 @@ public:
 	UStatusComponent();
 
 	void SetAttack(const bool bFlag) { bAttack = bFlag; }
-	bool CanMove() const { return !bAttack && !bDie; }
+	virtual bool CanMove() const { return !bAttack && !bDie; }
 	bool IsDie() const { return bDie; }
 	float GetHP() const { return HP; }
 

@@ -46,4 +46,11 @@ public:
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+public:
+	virtual bool CanMove() const override;
+	void SetCanMove(bool _bFlag) { bCanMove = _bFlag; }
+protected:
+	bool bCanMove = true;
+
 };

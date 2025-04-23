@@ -14,6 +14,10 @@ void UAnimNotify_DamagedEnd::Notify(USkeletalMeshComponent* MeshComp, UAnimSeque
 	if (AGamePlayer* GP = Cast<AGamePlayer>(MeshComp->GetOwner()))
 	{
 		GP->SetCanMove(true);
+		if (GP->GetIsEgg())
+		{
+			GP->SetEgg(nullptr);
+		}
 	}
 	else if (ARealYoshi* RealYoshi = Cast<ARealYoshi>(MeshComp->GetOwner()))
 	{

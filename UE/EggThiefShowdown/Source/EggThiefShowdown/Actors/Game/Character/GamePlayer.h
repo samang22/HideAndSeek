@@ -96,7 +96,8 @@ protected:
 	bool bIsRun = false;
 public:
 	bool GetIsRun() const { return bIsRun; }
-
+public:
+	void SetCanMove(bool bFlag);
 
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_MaxWalkSpeed)
@@ -118,8 +119,18 @@ protected:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
-	bool bCanMove = true;
+	TObjectPtr<AActor> Egg = nullptr;
 public:
-	void SetCanMove(bool bFlag) { bCanMove = bFlag; };
+	void SetEgg(AActor* _Egg) { Egg = _Egg; }
+	bool GetIsEgg() { return Egg ? true : false; }
+protected:
+	void SetEggRelativePosition(float DeltaTime);
 
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_DropEgg();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DropEgg();
+
+	void DropEgg();
 };

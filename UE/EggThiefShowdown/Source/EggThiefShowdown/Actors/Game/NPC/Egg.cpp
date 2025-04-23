@@ -6,6 +6,8 @@
 #include "Misc/Utils.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISense_Sight.h"
+#include "Actors/Game/Character/GamePlayer.h"
+#include "Actors/Game/Projectile/Projectile.h"
 
 // Sets default values
 AEgg::AEgg()
@@ -27,7 +29,8 @@ AEgg::AEgg()
 
 	StatusComponent = CreateDefaultSubobject<UEggStatusComponent>(TEXT("StatusComponent"));
 
-	SetReplicates(true);
+    bReplicates = true;
+    SetReplicateMovement(true);
 }
 
 // Called when the game starts or when spawned
@@ -43,6 +46,25 @@ void AEgg::BeginPlay()
 		StimuliSource->RegisterForSense(TSubclassOf<UAISense_Sight>(UAISense_Sight::StaticClass()));
 		StimuliSource->RegisterWithPerceptionSystem();
 	}
+}
+
+float AEgg::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float DamageResult = StatusComponent->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (AProjectile* Proj = Cast<AProjectile>(DamageCauser))
+	{
+		if (AGamePlayer* GP = Cast<AGamePlayer>(Proj->GetOwner()))
+		{
+			if (LOBBY_CHARACTER_KIND::YOSHI == GP->GetCharacterKind())
+			{
+				GP->SetEgg(this);
+				SetIsHold(true);
+			}
+		}
+	}
+
+	return DamageResult;
 }
 
 // Called every frame

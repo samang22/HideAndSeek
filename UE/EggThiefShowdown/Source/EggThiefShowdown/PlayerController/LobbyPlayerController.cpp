@@ -224,7 +224,7 @@ void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
     APawn* ControlledPawn = GetPawn();
     if (AGamePlayer* GP = Cast<AGamePlayer>(ControlledPawn))
     {
-        if (!GP->GetIsRun())
+        if (!GP->GetIsRun() && !GP->GetIsEgg())
         {
             GP->Server_SetSpeedRun();
         }
