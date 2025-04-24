@@ -132,6 +132,17 @@ void ALobbyPlayerController::SetupInputComponent()
     {
         UE_LOG(LogTemp, Warning, TEXT("IA_DropEgg is disabled"));
     }
+
+    if (const UInputAction* InputAction = FUtils::GetInputActionFromName(IMC_Default, TEXT("IA_RightClick")))
+    {
+        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &ThisClass::OnRightClick);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("IA_RightClick is disabled"));
+    }
+
+    
 }
 
 void ALobbyPlayerController::OnPossess(APawn* InPawn)
@@ -274,6 +285,20 @@ void ALobbyPlayerController::OnDropEgg(const FInputActionValue& InputActionValue
             if (GP->IsMontage(GAME_PLAYER_MONTAGE::DROPEGG))
             {
                 GP->Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::DROPEGG);
+            }
+        }
+    }
+}
+
+void ALobbyPlayerController::OnRightClick(const FInputActionValue& InputActionValue)
+{
+    if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
+    {
+        if (!GP->GetIsEgg())
+        {
+            if (GP->IsMontage(GAME_PLAYER_MONTAGE::ATTACK))
+            {
+                GP->Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::ATTACK);
             }
         }
     }

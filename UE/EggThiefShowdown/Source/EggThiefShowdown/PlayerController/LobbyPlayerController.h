@@ -55,6 +55,7 @@ protected:
 	void OnRunOff(const FInputActionValue& InputActionValue);
 	void OnAttack(const FInputActionValue& InputActionValue);
 	void OnDropEgg(const FInputActionValue& InputActionValue);
+	void OnRightClick(const FInputActionValue& InputActionValue);
 public:
 	void SetInputModeGameOnly();
 };
