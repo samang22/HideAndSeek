@@ -56,11 +56,8 @@ float AEgg::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AControlle
 	{
 		if (AGamePlayer* GP = Cast<AGamePlayer>(Proj->GetOwner()))
 		{
-			if (LOBBY_CHARACTER_KIND::YOSHI == GP->GetCharacterKind())
-			{
-				GP->SetEgg(this);
-				SetIsHold(true);
-			}
+			GP->SetEgg(this);
+			SetIsHold(true);
 		}
 	}
 
@@ -72,6 +69,20 @@ void AEgg::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//if (!GetIsHold())
+	//{
+	//	if (IsOnGround())
+	//	{
+	//		Velocity = FVector::Zero();
+	//	}
+	//	else
+	//	{
+	//		FVector Location = GetActorLocation();
+	//		Velocity.Z -= 980.f * DeltaTime; // 수동 중력
+	//		Location += Velocity * DeltaTime;
+	//		SetActorLocation(Location);
+	//	}
+	//}
 }
 
 bool AEgg::IsCoolTime()
@@ -84,3 +95,14 @@ void AEgg::SetCoolTimeZero()
 	StatusComponent->SetCoolTimeZero();
 }
 
+bool AEgg::IsOnGround() const
+{
+	FVector Start = GetActorLocation();
+	FVector End = Start - FVector(0, 0, 5.0f); // 바로 아래로 짧게 트레이스
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this); // 자기 자신은 무시
+
+	FHitResult Hit;
+	return GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
+}

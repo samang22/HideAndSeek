@@ -123,6 +123,15 @@ void ALobbyPlayerController::SetupInputComponent()
     {
         UE_LOG(LogTemp, Warning, TEXT("IA_LookMouse is disabled"));
     }
+
+    if (const UInputAction* InputAction = FUtils::GetInputActionFromName(IMC_Default, TEXT("IA_DropEgg")))
+    {
+        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &ThisClass::OnDropEgg);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("IA_DropEgg is disabled"));
+    }
 }
 
 void ALobbyPlayerController::OnPossess(APawn* InPawn)
@@ -246,9 +255,26 @@ void ALobbyPlayerController::OnAttack(const FInputActionValue& InputActionValue)
 {
     if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
     {
-        if (GP->IsMontage(GAME_PLAYER_MONTAGE::PICKUP))
+        if (!GP->GetIsEgg())
         {
-            GP->Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::PICKUP);
+            if (GP->IsMontage(GAME_PLAYER_MONTAGE::PICKUP))
+            {
+                GP->Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::PICKUP);
+            }
+        }
+    }
+}
+
+void ALobbyPlayerController::OnDropEgg(const FInputActionValue& InputActionValue)
+{
+    if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
+    {
+        if (GP->GetIsEgg())
+        { 
+            if (GP->IsMontage(GAME_PLAYER_MONTAGE::DROPEGG))
+            {
+                GP->Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::DROPEGG);
+            }
         }
     }
 }

@@ -64,6 +64,8 @@ enum class GAME_PLAYER_MONTAGE : uint8
 {
 	DAMAGED = 0,
 	PICKUP,
+	ATTACK,
+	DROPEGG,
 	END,
 };
 
@@ -84,11 +86,13 @@ namespace CollisionProfileName
 	static inline FName MapMesh = TEXT("MapMesh");
 	static inline FName MarioAttack = TEXT("MarioAttack");
 	static inline FName YoshiPickup = TEXT("YoshiPickup");
+	static inline FName MarioPickup = TEXT("MarioPickup");
 }
 
 namespace ProjectileName
 {
 	static inline FName YoshiPickup = TEXT("YoshiPickup");
+	static inline FName MarioPickup = TEXT("MarioPickup");
 	static inline FName MarioAttack = TEXT("MarioAttack");
 }
 

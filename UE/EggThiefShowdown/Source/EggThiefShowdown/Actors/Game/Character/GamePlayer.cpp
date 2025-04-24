@@ -211,7 +211,7 @@ void AGamePlayer::InitDataTableByPlayerState()
 						AMarioSpawnPoint* MarioSP = Cast<AMarioSpawnPoint>(SpawnPoints[RandomIndex]);
 						if (MarioSP->GetIsSpawned()) continue;
 
-						MarioSP->SetIsSpawned(true);
+						//MarioSP->SetIsSpawned(true);
 						FVector Location = MarioSP->GetActorLocation();
 						SetActorLocationAndRotation(MarioSP->GetActorLocation(), MarioSP->GetActorRotation().Quaternion());
 						UE_LOG(LogTemp, Warning, TEXT("MarioSP %f %f %f"), Location.X, Location.Y, Location.Z);
@@ -360,10 +360,14 @@ void AGamePlayer::PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop)
 		UE_LOG(LogTemp, Warning, TEXT("PlayMontage DAMAGED"));
 		tempMontage = GamePlayerData->DamagedMontage;
 		break;
-	//case GAME_PLAYER_MONTAGE::ATTACK:
-	//	UE_LOG(LogTemp, Warning, TEXT("PlayMontage ATTACK"));
-	//	tempMontage = GamePlayerData->AttackMontage;
-	//	break;
+	case GAME_PLAYER_MONTAGE::ATTACK:
+		UE_LOG(LogTemp, Warning, TEXT("PlayMontage ATTACK"));
+		tempMontage = GamePlayerData->AttackMontage;
+		break;
+	case GAME_PLAYER_MONTAGE::DROPEGG:
+		UE_LOG(LogTemp, Warning, TEXT("PlayMontage DROPEGG"));
+		tempMontage = GamePlayerData->DropEggMontage;
+		break;
 	default:
 		break;
 	}
@@ -403,8 +407,10 @@ bool AGamePlayer::IsMontage(GAME_PLAYER_MONTAGE _InEnum)
 		return GamePlayerData->PickupMontage ? true : false;
 	case GAME_PLAYER_MONTAGE::PICKUP:
 		return GamePlayerData->DamagedMontage ? true : false;
-	//case GAME_PLAYER_MONTAGE::ATTACK:
-	//	return GamePlayerData->AttackMontage ? true : false;
+	case GAME_PLAYER_MONTAGE::ATTACK:
+		return GamePlayerData->AttackMontage ? true : false;
+	case GAME_PLAYER_MONTAGE::DROPEGG:
+		return GamePlayerData->DropEggMontage ? true : false;
 	default:
 		return false;
 	}
@@ -422,8 +428,10 @@ bool AGamePlayer::IsPlayingMontage(GAME_PLAYER_MONTAGE _InEnum)
 		return AnimInstance->Montage_IsPlaying(GamePlayerData->PickupMontage);
 	case GAME_PLAYER_MONTAGE::PICKUP:
 		return AnimInstance->Montage_IsPlaying(GamePlayerData->DamagedMontage);
-	//case GAME_PLAYER_MONTAGE::ATTACK:
-	//	return AnimInstance->Montage_IsPlaying(GamePlayerData->AttackMontage);
+	case GAME_PLAYER_MONTAGE::ATTACK:
+		return AnimInstance->Montage_IsPlaying(GamePlayerData->AttackMontage);
+	case GAME_PLAYER_MONTAGE::DROPEGG:
+		return AnimInstance->Montage_IsPlaying(GamePlayerData->DropEggMontage);
 	default:
 		return false;
 	}
@@ -550,13 +558,10 @@ void AGamePlayer::Multicast_DropEgg_Implementation()
 
 void AGamePlayer::DropEgg()
 {
-	if (GetCharacterKind() == LOBBY_CHARACTER_KIND::YOSHI)
+	if (AEgg* CastedEgg = Cast<AEgg>(Egg))
 	{
-		if (AEgg* CastedEgg = Cast<AEgg>(Egg))
-		{
-			CastedEgg->SetIsHold(false);
-			Egg = nullptr;
-		}
+		CastedEgg->SetIsHold(false);
+		Egg = nullptr;
 	}
 }
 

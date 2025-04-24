@@ -1,32 +1,24 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AnimNotify_YoshiPickup.h"
+#include "AnimNotify_MarioPickup.h"
 #include "Actors/Game/Character/GamePlayer.h"
 #include "Actors/Game/Projectile/Projectile.h"
-#include "Actors/Game/NPC/RealYoshi.h"
 #include "Misc/Utils.h"
-
-UAnimNotify_YoshiPickup::UAnimNotify_YoshiPickup()
+UAnimNotify_MarioPickup::UAnimNotify_MarioPickup()
 {
 }
 
-void UAnimNotify_YoshiPickup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
+void UAnimNotify_MarioPickup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 #if WITH_EDITOR
 	if (GIsEditor && MeshComp->GetWorld() != GWorld) { return; } // 에디터 프리뷰
 #endif
 
-
-	if (ARealYoshi* RY = Cast<ARealYoshi>(MeshComp->GetOwner()))
+	if (AGamePlayer* GP = Cast<AGamePlayer>(MeshComp->GetOwner()))
 	{
-		RY->StopMovement();
-
-	}
-	else if (AGamePlayer* GP = Cast<AGamePlayer>(MeshComp->GetOwner()))
-	{
-		if (GP->GetCharacterKind() == LOBBY_CHARACTER_KIND::YOSHI)
+		if (GP->GetCharacterKind() == LOBBY_CHARACTER_KIND::MARIO)
 		{
 			GP->SetCanMove(false);
 
@@ -41,12 +33,11 @@ void UAnimNotify_YoshiPickup::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 					FTransform::Identity, GP, GP, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 				FTransform NewTransform;
-				Projectile->SetData(ProjectileName::YoshiPickup, CollisionProfileName::YoshiPickup);
+				Projectile->SetData(ProjectileName::MarioPickup, CollisionProfileName::MarioPickup);
 				NewTransform.SetLocation(GPLocation + MARIOATTACK_LENGTH * ForwardVector);
 				NewTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
 				Projectile->FinishSpawning(NewTransform);
 			}
 		}
 	}
-
 }

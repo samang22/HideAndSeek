@@ -27,6 +27,8 @@ public: // Animation
 	UAnimMontage* DamagedMontage = nullptr;
 	UPROPERTY(EditAnywhere, Category = "GamePlayer|Animation")
 	UAnimMontage* AttackMontage = nullptr;
+	UPROPERTY(EditAnywhere, Category = "GamePlayer|Animation")
+	UAnimMontage* DropEggMontage = nullptr;
 
 public: // For RealYoshi
 	UPROPERTY(EditAnywhere, Category = "AI")

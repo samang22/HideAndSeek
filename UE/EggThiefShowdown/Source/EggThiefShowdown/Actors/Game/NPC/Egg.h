@@ -49,4 +49,8 @@ protected:
 public:
 	void SetIsHold(bool bFlag) { bIsHold = bFlag; }
 	bool GetIsHold() const { return bIsHold; }
+
+protected:
+	bool IsOnGround() const;
+	FVector Velocity = FVector::Zero();
 };
