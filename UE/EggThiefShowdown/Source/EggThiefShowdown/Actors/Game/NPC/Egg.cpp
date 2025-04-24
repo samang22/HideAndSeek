@@ -8,6 +8,7 @@
 #include "Perception/AISense_Sight.h"
 #include "Actors/Game/Character/GamePlayer.h"
 #include "Actors/Game/Projectile/Projectile.h"
+#include "Components/BoxComponent.h"
 
 // Sets default values
 AEgg::AEgg()
@@ -15,14 +16,18 @@ AEgg::AEgg()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	CollisionComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionComponent"));
+	CollisionComponent->SetBoxExtent(FVector(EGG_BOX_EXTENT, EGG_BOX_EXTENT, EGG_BOX_EXTENT));
+	CollisionComponent->SetCollisionProfileName(CollisionProfileName::Egg);
+	RootComponent = CollisionComponent;
+
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> Asset(TEXT("/Script/Engine.StaticMesh'/Game/Assets/Obj/pc07it00_egg_egg__egg_m.pc07it00_egg_egg__egg_m'"));
 	check(Asset.Object);
 	StaticMeshComponent->SetStaticMesh(Asset.Object);
 	StaticMeshComponent->SetRelativeScale3D(FVector(EGG_SCALE, EGG_SCALE, EGG_SCALE));
-	RootComponent = StaticMeshComponent;
-	StaticMeshComponent->SetCollisionProfileName(CollisionProfileName::Egg);
+	StaticMeshComponent->SetupAttachment(RootComponent);
 
 	// Stimuli Source 컴포넌트 생성
 	StimuliSource = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSource"));
@@ -37,7 +42,8 @@ AEgg::AEgg()
 void AEgg::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	CollisionComponent->SetBoxExtent(FVector(EGG_BOX_EXTENT, EGG_BOX_EXTENT, EGG_BOX_EXTENT));
+
 	// 퍼셉션 시스템에 등록
 	if (HasAuthority())
 	{
@@ -69,20 +75,27 @@ void AEgg::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//if (!GetIsHold())
-	//{
-	//	if (IsOnGround())
-	//	{
-	//		Velocity = FVector::Zero();
-	//	}
-	//	else
-	//	{
-	//		FVector Location = GetActorLocation();
-	//		Velocity.Z -= 980.f * DeltaTime; // 수동 중력
-	//		Location += Velocity * DeltaTime;
-	//		SetActorLocation(Location);
-	//	}
-	//}
+	if (HasAuthority())
+	{
+		if (!GetIsHold())
+		{
+			FHitResult HitResult;
+			if (IsOnGround(HitResult))
+			{      
+				Velocity = FVector::Zero();
+
+					// 위치 보정
+				SetActorLocation(HitResult.ImpactPoint + FVector(0, 0, EGG_BOX_EXTENT * 20)); // 필요 시
+			}
+			else
+			{
+				FVector Location = GetActorLocation();
+				Velocity.Z -= 980.f * DeltaTime; // 수동 중력
+				Location += Velocity * DeltaTime;
+				SetActorLocation(Location);
+			}
+		}
+	}
 }
 
 bool AEgg::IsCoolTime()
@@ -95,14 +108,13 @@ void AEgg::SetCoolTimeZero()
 	StatusComponent->SetCoolTimeZero();
 }
 
-bool AEgg::IsOnGround() const
+bool AEgg::IsOnGround(FHitResult& _HitResult) const
 {
 	FVector Start = GetActorLocation();
-	FVector End = Start - FVector(0, 0, 5.0f); // 바로 아래로 짧게 트레이스
+	FVector End = Start - FVector(0, 0, 7.0f); // 바로 아래로 짧게 트레이스
 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this); // 자기 자신은 무시
 
-	FHitResult Hit;
-	return GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
+	return GetWorld()->LineTraceSingleByChannel(_HitResult, Start, End, ECC_Visibility, Params);
 }

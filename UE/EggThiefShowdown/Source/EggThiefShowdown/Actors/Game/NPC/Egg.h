@@ -9,6 +9,8 @@
 class UEggStatusComponent;
 class UAIPerceptionStimuliSourceComponent;
 
+class UBoxComponent;
+
 UCLASS()
 class EGGTHIEFSHOWDOWN_API AEgg : public AActor
 {
@@ -35,7 +37,10 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UEggStatusComponent* StatusComponent;
 
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* CollisionComponent;
 
+	
 public:
 	bool IsCoolTime();
 	void SetCoolTimeZero();
@@ -51,6 +56,6 @@ public:
 	bool GetIsHold() const { return bIsHold; }
 
 protected:
-	bool IsOnGround() const;
+	bool IsOnGround(FHitResult& _HitResult) const;
 	FVector Velocity = FVector::Zero();
 };
