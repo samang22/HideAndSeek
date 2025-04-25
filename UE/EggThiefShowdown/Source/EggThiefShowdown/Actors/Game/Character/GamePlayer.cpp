@@ -20,6 +20,9 @@
 #include "Components/CapsuleComponent.h"
 
 #include "Actors/Game/NPC/Egg.h"
+#include "Components/WidgetComponent.h"
+#include "UI/HPStaminaWidget.h"
+
 
 // Sets default values
 AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
@@ -57,7 +60,6 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	SpringArm->bInheritYaw = true;
 	SpringArm->bInheritRoll = false;
 	SpringArm->ProbeSize = PROBE_SIZE;
-
 	SpringArm->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f)); // 약간 아래로 바라보게
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
@@ -68,6 +70,24 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	MovementComponent->SetIsReplicated(true);
 
 	MovementComponent->NetworkSmoothingMode = ENetworkSmoothingMode::Linear;
+
+	HPStaminaWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPStaminaWidgetComponent"));
+	HPStaminaWidgetComponent->SetupAttachment(RootComponent);
+	//float RelativeScale = 1.f / CHARACTER_DEFAULT_SCALE;
+	//HPStaminaWidgetComponent->SetRelativeScale3D(FVector(RelativeScale, RelativeScale, RelativeScale));
+	// Offset
+	HPStaminaWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
+	static UClass* WidgetClass = LoadClass<UHPStaminaWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_HPStamina.UI_HPStamina_C'"));
+
+
+	if (WidgetClass)
+	{
+		HPStaminaWidgetComponent->SetWidgetClass(WidgetClass);
+		//SelectButtonWidgetComponent->SetDrawSize(FVector2D(30.f, 10.f)); // 위젯 크기 설정
+		HPStaminaWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		HPStaminaWidgetComponent->SetVisibility(false); // 위젯 일단 가리기
+	}
+
 }
 
 void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -168,6 +188,7 @@ void AGamePlayer::OnRep_Controller()
 					LPC->SetInputMode(InputMode);
 					LPC->bShowMouseCursor = false;
 
+					HPStaminaWidgetComponent->SetVisibility(true); // 위젯 보이기
 				}
 
 				InitDataTableByPlayerState();
@@ -281,6 +302,8 @@ void AGamePlayer::InitDataTableByPlayerState()
 				return;
 				break;
 			}
+
+			StatusComponent->SetExtraInfoWithCharacterKind();
 		}
 	}
 }
@@ -333,6 +356,14 @@ void AGamePlayer::Tick(float DeltaTime)
 	if (HasAuthority())
 	{
 		SetEggRelativePosition(DeltaTime); // 그냥 바로 실행
+	}
+
+	if (UHPStaminaWidget* Widget = Cast<UHPStaminaWidget>(HPStaminaWidgetComponent->GetWidget()))
+	{
+		float StaminaPercent = StatusComponent->GetCurrentStamina() / StatusComponent->GetMaxStamina();
+		float HPPercent = StatusComponent->GetCurrentHP() / StatusComponent->GetMaxHP();
+		Widget->SetStaminaBarPercent(StaminaPercent);
+		Widget->SetHPBarPercent(HPPercent);
 	}
 }
 

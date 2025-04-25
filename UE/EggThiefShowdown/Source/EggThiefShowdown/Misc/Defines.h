@@ -18,10 +18,7 @@
 
 #define CHARACTER_CAPSULE_HALF_HEIGHT			45.f
 
-#define MARIO_WALK_SPEED						200.f
-#define MARIO_RUN_SPEED							400.f
-#define YOSHI_WALK_SPEED						200.f
-#define YOSHI_RUN_SPEED							400.f
+
 
 #define CHARACTER_TARGETARMLENGTH				300.f
 
@@ -39,3 +36,22 @@
 
 #define EGG_SCALE								60.0
 #define EGG_BOX_EXTENT							0.25
+
+#define MARIO_WALK_SPEED						200.f
+#define MARIO_RUN_SPEED							420.f
+#define YOSHI_WALK_SPEED						200.f
+#define YOSHI_RUN_SPEED							400.f
+
+#define YOSHI_MAX_STAMINA						150.f
+#define MARIO_MAX_STAMINA						100.f
+
+#define YOSHI_STAMINA_REGEN						15
+#define MARIO_STAMINA_REGEN						20
+#define YOSHI_STAMINA_CONSUME					30	
+#define MARIO_STAMINA_CONSUME					40
+
+#define YOSHI_MAX_HP							100.f
+#define MARIO_MAX_HP							100.f
+#define MARIO_ATTACK_DAMAGE						5.f
+
+#define EXHAUSTE_TIME							3.f

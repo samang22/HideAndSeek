@@ -17,7 +17,7 @@ class EGGTHIEFSHOWDOWN_API UGamePlayerStatusComponent : public UStatusComponent
 	
 public:
 	UGamePlayerStatusComponent();
-
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
 protected:
 	UPROPERTY(ReplicatedUsing = OnRep_AnimationStatus)
 	uint8 AnimationStatus;
@@ -53,4 +53,32 @@ public:
 protected:
 	bool bCanMove = true;
 
+
+protected:
+	UPROPERTY(Replicated)
+	float MaxStamina = 0.f;
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentStamina)
+	float CurrentStamina = 0.f;
+	UPROPERTY()
+	float StaminaRegenRate = 0.f;
+	UPROPERTY()
+	float StaminaConsumeRate = 0.f;
+
+	UPROPERTY(Replicated)
+	float ExhaustedTime = EXHAUSTE_TIME + 1.f;
+
+public:
+	float GetMaxStamina() const { return MaxStamina; }
+	float GetCurrentStamina() const { return CurrentStamina; }
+public:
+	void ConsumeStamina(float InDeltaTime);
+	void RegenStamina(float InDeltaTime);
+public:
+	void SetExtraInfoWithCharacterKind();
+	bool CanSprint();
+	void SetExhausted();
+	bool GetExhausted() const;
+protected:
+	UFUNCTION()
+	void OnRep_CurrentStamina();
 };

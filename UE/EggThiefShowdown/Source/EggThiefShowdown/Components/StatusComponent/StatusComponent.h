@@ -21,7 +21,8 @@ public:
 	void SetAttack(const bool bFlag) { bAttack = bFlag; }
 	virtual bool CanMove() const { return !bAttack && !bDie; }
 	bool IsDie() const { return bDie; }
-	float GetHP() const { return HP; }
+	float GetCurrentHP() const { return HP; }
+	float GetMaxHP() const { return MaxHP; }
 
 	AController* GetLastInstigator() const { return LastInstigator; }
 
@@ -39,11 +40,20 @@ public:
 protected:
 	bool bAttack = false;
 	bool bDie = false;
+	UPROPERTY(Replicated)
 	float MaxHP = 100.f;
+	UPROPERTY(Replicated)
 	float HP = 100.f;
+public:
+	void SetMaxHP(float InHP) { MaxHP = InHP; }
+	void SetCurrentHP(float InHP) { HP = InHP; }
+
 
 public:
 	AController* LastInstigator = nullptr;
+
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const;
 
 	//UPROPERTY(BlueprintAssignable)
 	//FOnHPChanged OnHPChanged;

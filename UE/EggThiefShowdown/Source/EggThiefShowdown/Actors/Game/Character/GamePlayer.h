@@ -13,6 +13,8 @@ class USoftWheelSpringArmComponent;
 class USpringArmComponent;
 struct FGamePlayerTableRow;
 
+class UWidgetComponent;
+
 UCLASS()
 class EGGTHIEFSHOWDOWN_API AGamePlayer : public ACharacter
 {
@@ -77,6 +79,11 @@ protected:
 	TObjectPtr<UGamePlayerStatusComponent> StatusComponent;
 public:
 	TObjectPtr<UGamePlayerStatusComponent> GetStatusComponent() { return StatusComponent; }
+
+protected:
+	TObjectPtr<UWidgetComponent> HPStaminaWidgetComponent;
+
+
 
 public:
 	void PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop = false);

@@ -2,6 +2,7 @@
 
 
 #include "StatusComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
 UStatusComponent::UStatusComponent()
@@ -54,5 +55,13 @@ float UStatusComponent::TakeDamage(float Damage, FDamageEvent const& DamageEvent
 	}
 
 	return NewDamage;
+}
+
+void UStatusComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, MaxHP);
+	DOREPLIFETIME(ThisClass, HP);
 }
 
