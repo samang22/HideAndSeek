@@ -68,8 +68,10 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 
 	UCharacterMovementComponent* MovementComponent = GetCharacterMovement();
 	MovementComponent->SetIsReplicated(true);
-
 	MovementComponent->NetworkSmoothingMode = ENetworkSmoothingMode::Linear;
+	MovementComponent->bCanWalkOffLedges = false;
+
+
 
 	HPStaminaWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPStaminaWidgetComponent"));
 	HPStaminaWidgetComponent->SetupAttachment(RootComponent);
