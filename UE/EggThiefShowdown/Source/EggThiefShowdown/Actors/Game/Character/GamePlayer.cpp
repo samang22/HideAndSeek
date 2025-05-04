@@ -23,6 +23,8 @@
 #include "Components/WidgetComponent.h"
 #include "UI/HPStaminaWidget.h"
 
+#include "GameMode/GameMapGameMode.h"
+
 
 // Sets default values
 AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
@@ -543,23 +545,28 @@ float AGamePlayer::TakeDamage(float Damage, FDamageEvent const& DamageEvent, ACo
 	//// 만약 죽지 않았다면, DamagedMontage가 풀릴 때 다시 움직이게 만들기 
 	//SetCanMove(false);
 
+	// 알 처리 
+	Server_DropEgg();
+
 	// 계산 결과 사망
 	if (StatusComponent->IsDie())
 	{
 		// @TODO : 사망처리
 		SetActorEnableCollision(false);
-		//PlayMontage(GAME_PLAYER_MONTAGE::DEAD);
 
+		if (AGameMapGameMode* GameMode = Cast<AGameMapGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			GameMode->HandlePlayerDeath(GetController());
+		}
+
+		Destroy();
+		return 0.f;
 	}
 	// 데미지만 입음
 	else if (!StatusComponent->IsDie() && GamePlayerData->DamagedMontage)
 	{
 		Server_PlayMontage((uint8)GAME_PLAYER_MONTAGE::DAMAGED);
 	}
-
-	// 알 처리 
-	Server_DropEgg();
-
 
 
 	return DamageResult;

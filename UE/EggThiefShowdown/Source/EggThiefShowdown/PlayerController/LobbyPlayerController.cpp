@@ -180,7 +180,7 @@ void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
         return;
     }
 
-    if (StatusComponent->GetExhausted()) return;
+
 
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
     const FRotator Rotation = K2_GetActorRotation();
@@ -200,7 +200,7 @@ void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
     {
         Server_OnMove(InputActionValue); // 입력 정보를 서버로 전송
     }
-    StatusComponent->Server_SetOnAnimationStatus(GP_ANIM_BIT_WALK);
+    if (StatusComponent) StatusComponent->Server_SetOnAnimationStatus(GP_ANIM_BIT_WALK);
 }
 
 void ALobbyPlayerController::Server_OnMove_Implementation(const FInputActionValue& InputActionValue)
@@ -228,7 +228,7 @@ void ALobbyPlayerController::Server_OnMove_Implementation(const FInputActionValu
 
 void ALobbyPlayerController::OnMoveOff(const FInputActionValue& InputActionValue)
 {
-    StatusComponent->Server_SetOffAnimationStatus(GP_ANIM_BIT_WALK);
+    if (StatusComponent) StatusComponent->Server_SetOffAnimationStatus(GP_ANIM_BIT_WALK);
 }
 
 void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
@@ -241,6 +241,8 @@ void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
 
 void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
 {
+    if (StatusComponent && StatusComponent->GetExhausted()) return;
+
     APawn* ControlledPawn = GetPawn();
     if (AGamePlayer* GP = Cast<AGamePlayer>(ControlledPawn))
     {
@@ -249,7 +251,7 @@ void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
             if (GP->GetStatusComponent()->CanSprint() && !GP->GetStatusComponent()->GetExhausted())
             {
                 GP->Server_SetSpeedRun();
-                StatusComponent->Server_SetOnAnimationStatus(GP_ANIM_BIT_RUN);
+                if (StatusComponent) StatusComponent->Server_SetOnAnimationStatus(GP_ANIM_BIT_RUN);
             }
         }
     }
@@ -257,7 +259,7 @@ void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
 
 void ALobbyPlayerController::OnRunOff(const FInputActionValue& InputActionValue)
 {
-    StatusComponent->Server_SetOffAnimationStatus(GP_ANIM_BIT_RUN);
+    if (StatusComponent) StatusComponent->Server_SetOffAnimationStatus(GP_ANIM_BIT_RUN);
 
     APawn* ControlledPawn = GetPawn();
     if (AGamePlayer* GP = Cast<AGamePlayer>(ControlledPawn))

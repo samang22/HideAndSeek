@@ -21,5 +21,5 @@ public:
 	void SetPlayerData(AController* NewPlayer);
 
 	virtual void BeginPlay() override;
-
+	virtual void HandlePlayerDeath(AController* PlayerController);
 };
