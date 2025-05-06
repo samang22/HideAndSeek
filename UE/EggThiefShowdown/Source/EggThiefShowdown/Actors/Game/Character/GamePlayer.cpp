@@ -533,6 +533,7 @@ LOBBY_CHARACTER_KIND AGamePlayer::GetCharacterKind()
 	return StatusComponent->GetCharacterKind();
 }
 
+// 서버에서만 실행
 float AGamePlayer::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (StatusComponent->IsDie()) { return 0.f; }

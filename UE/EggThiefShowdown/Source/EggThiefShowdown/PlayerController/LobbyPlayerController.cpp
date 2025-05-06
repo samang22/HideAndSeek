@@ -2,18 +2,21 @@
 
 
 #include "LobbyPlayerController.h"
-#include "../Actors/Lobby/LobbyCharacter.h"
-#include "../GameMode/LobbyMapGameMode.h"
-#include "Subsystem/HaServerSubsystem.h"
-#include "../PlayerState/LobbyMapPlayerState.h"
-#include "Kismet/GameplayStatics.h"
-#include "../Actors/Lobby/LobbyCamera.h"
-#include "../Actors/GameMapPlayerCameraManager.h"
-#include "../Components/StatusComponent/StatusComponent.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "../Components/StatusComponent/Game/GamePlayerStatusComponent.h"
-#include "../Actors/Game/Character/GamePlayer.h"
 
+#include "Actors/Lobby/LobbyCharacter.h"
+#include "Actors/Lobby/LobbyCamera.h"
+#include "Actors/GameMapPlayerCameraManager.h"
+#include "Actors/Game/Character/GamePlayer.h"
+#include "Actors/Game/Character/CustomSpectatorPawn.h"
+
+#include "Components/StatusComponent/StatusComponent.h"
+#include "Components/StatusComponent/Game/GamePlayerStatusComponent.h"
+
+#include "GameMode/LobbyMapGameMode.h"
+#include "Subsystem/HaServerSubsystem.h"
+#include "PlayerState/LobbyMapPlayerState.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ALobbyPlayerController::ALobbyPlayerController()
 {
@@ -188,14 +191,29 @@ void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
     const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
     const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
 
-    APawn* ControlledPawn = GetPawn();
-
-    // 서버/클라 둘다 계산
-    if (ControlledPawn)
+    // 서버에서 계산
+    if (ACustomSpectatorPawn* TempSpectatorPawn = Cast<ACustomSpectatorPawn>(GetPawn()))
+    {
+        TempSpectatorPawn->AddMovementInput(ForwardVector, ActionValue.X);
+        TempSpectatorPawn->AddMovementInput(RightVector, ActionValue.Y);
+	}
+    else if (APawn* ControlledPawn = GetPawn())
     {
         ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
         ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
     }
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::OnMove Failed - No Pawn"));
+
+        if (APawn* CurrentPawn = GetPawn())
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Current Pawn Class: %s"), *CurrentPawn->GetClass()->GetName());
+        }
+	}
+
+
+
     if (!HasAuthority()) // 클라이언트에서 로컬 움직임 시뮬레이션
     {
         Server_OnMove(InputActionValue); // 입력 정보를 서버로 전송
@@ -217,12 +235,26 @@ void ALobbyPlayerController::Server_OnMove_Implementation(const FInputActionValu
     const FVector ForwardVector = UKismetMathLibrary::GetForwardVector(RotationYaw);
     const FVector RightVector = UKismetMathLibrary::GetRightVector(RotationYaw);
 
-    APawn* ControlledPawn = GetPawn();
-    if (ControlledPawn)
+    if (ACustomSpectatorPawn* TempSpectatorPawn = Cast<ACustomSpectatorPawn>(GetPawn()))
+    {
+        TempSpectatorPawn->AddMovementInput(ForwardVector, ActionValue.X);
+        TempSpectatorPawn->AddMovementInput(RightVector, ActionValue.Y);
+	}
+    else if (APawn* ControlledPawn = GetPawn())
     {
         ControlledPawn->AddMovementInput(ForwardVector, ActionValue.X);
         ControlledPawn->AddMovementInput(RightVector, ActionValue.Y);
         StatusComponent->Server_SetOnAnimationStatus(GP_ANIM_BIT_WALK);
+    }    
+
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Server_OnMove Failed - No Pawn"));   
+
+        if (APawn* CurrentPawn = GetPawn())
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Current Pawn Class: %s"), *CurrentPawn->GetClass()->GetName());
+        }
     }
 }
 
