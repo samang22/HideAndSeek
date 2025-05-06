@@ -54,3 +54,16 @@ AEgg에 UAIPerceptionStimuliSourceComponent를 추가?
 
 같은 BehaviorTree를 사용하는 Pawn들이 한번에 같은 Task를 실행
 블랙보드 컴포넌트를 인스턴스화 시켜 해결
+
+
+///////////////////////////////////////////////////////////////
+
+사망한 플레이어를 관전자로 변경할 때, 
+
+        // 플레이어 상태를 관전자로 변경
+        PlayerController->ChangeState(NAME_Spectating);
+        // 관전자 Pawn을 플레이어 컨트롤러가 소유하도록 설정
+        PlayerController->Possess(SpectatorPawn);
+
+이 순서로 해야된다. 
+ChangeState에서 기존 Pawn을 삭제시키기 때문..
