@@ -110,8 +110,8 @@ void AEgg::SetCoolTimeZero()
 
 bool AEgg::IsOnGround(FHitResult& _HitResult) const
 {
-	FVector Start = GetActorLocation();
-	FVector End = Start - FVector(0, 0, 7.0f); // 바로 아래로 짧게 트레이스
+	FVector Start = GetActorLocation();  
+	FVector End = Start - FVector(0, 0, 50.0f); // 바로 아래로 짧게 트레이스
 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this); // 자기 자신은 무시
