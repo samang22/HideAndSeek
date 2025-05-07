@@ -22,6 +22,7 @@
 #include "Actors/Game/NPC/Egg.h"
 #include "Components/WidgetComponent.h"
 #include "UI/HPStaminaWidget.h"
+#include "UI/CountdownWidget.h"
 
 #include "GameMode/GameMapGameMode.h"
 
@@ -83,7 +84,6 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	HPStaminaWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
 	static UClass* WidgetClass = LoadClass<UHPStaminaWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_HPStamina.UI_HPStamina_C'"));
 
-
 	if (WidgetClass)
 	{
 		HPStaminaWidgetComponent->SetWidgetClass(WidgetClass);
@@ -91,6 +91,24 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 		HPStaminaWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 		HPStaminaWidgetComponent->SetVisibility(false); // 위젯 일단 가리기
 	}
+
+
+	CountdownWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("CountdownWidgetComponent"));
+	CountdownWidgetComponent->SetupAttachment(RootComponent);
+	CountdownWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
+	static UClass* CountdownWidgetClass = LoadClass<UCountdownWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_Countdown.UI_Countdown_C'"));
+
+	if (CountdownWidgetClass)
+	{
+		CountdownWidgetComponent->SetWidgetClass(CountdownWidgetClass);
+		CountdownWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		CountdownWidgetComponent->SetVisibility(false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CountdownWidgetClass load Failed"));
+	}
+
 
 }
 
@@ -376,6 +394,27 @@ void AGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void AGamePlayer::SetCountdown(int32 Countdown)
+{
+	if (UCountdownWidget* Widget = Cast<UCountdownWidget>(CountdownWidgetComponent->GetWidget()))
+	{
+		if (Countdown <= 6 && Countdown > 0)
+		{
+			CountdownWidgetComponent->SetVisibility(true); // 위젯 보이기
+		}
+		else
+		{
+			CountdownWidgetComponent->SetVisibility(false); // 위젯 보이기
+		}
+		Widget->SetCountdown(Countdown);
+
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::SetCountdown Failed"));
+	}
 }
 
 void AGamePlayer::PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop)

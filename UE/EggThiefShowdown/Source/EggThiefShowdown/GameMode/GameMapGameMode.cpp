@@ -30,6 +30,8 @@ void AGameMapGameMode::SetPlayerData(AController* NewPlayer)
 void AGameMapGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StartCountdown();
 }
 
 void AGameMapGameMode::HandlePlayerDeath(AController* PlayerController)
@@ -62,4 +64,46 @@ void AGameMapGameMode::HandlePlayerDeath(AController* PlayerController)
 	{
 		UE_LOG(LogGameMode, Error, TEXT("Failed to spawn SpectatorPawn."));
 	}
+}
+
+void AGameMapGameMode::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	if (CountdownTime > 0)
+	{
+
+	}
+}
+
+void AGameMapGameMode::StartCountdown()
+{
+	CountdownTime = 10;
+	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, this, &AGameMapGameMode::CountdownTick, 1.f, true);
+}
+
+void AGameMapGameMode::CountdownTick()
+{
+	CountdownTime--;
+	UE_LOG(LogGameMode, Warning, TEXT("Countdown: %d"), CountdownTime);
+
+
+	// PlayerState 또는 PlayerController에 남은 시간 전달
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
+		{
+			PC->Client_UpdateCountdown(CountdownTime); // RPC로 클라이언트 UI 갱신
+		}
+	}
+
+	if (CountdownTime <= 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
+		StartGame(); // 본격 게임 시작
+	}
+}
+
+void AGameMapGameMode::StartGame()
+{
 }

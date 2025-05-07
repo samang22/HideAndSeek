@@ -58,4 +58,8 @@ protected:
 	void OnRightClick(const FInputActionValue& InputActionValue);
 public:
 	void SetInputModeGameOnly();
+
+public:
+	UFUNCTION(Client, Reliable)
+	void Client_UpdateCountdown(int32 Countdown);
 };

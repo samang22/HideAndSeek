@@ -22,4 +22,17 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void HandlePlayerDeath(AController* PlayerController);
+
+protected:
+	virtual void Tick(float DeltaSeconds) override;
+
+
+protected:
+	FTimerHandle CountdownTimerHandle;
+	int32 CountdownTime = 10;
+
+protected:
+	void StartCountdown();
+	void CountdownTick();
+	void StartGame();
 };

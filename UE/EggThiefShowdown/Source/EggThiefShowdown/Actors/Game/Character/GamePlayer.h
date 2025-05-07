@@ -82,8 +82,10 @@ public:
 
 protected:
 	TObjectPtr<UWidgetComponent> HPStaminaWidgetComponent;
+	TObjectPtr<UWidgetComponent> CountdownWidgetComponent;
 
-
+public:
+	void SetCountdown(int32 Countdown);
 
 public:
 	void PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop = false);
