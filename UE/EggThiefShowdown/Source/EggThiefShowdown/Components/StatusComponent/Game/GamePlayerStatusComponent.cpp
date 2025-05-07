@@ -47,7 +47,7 @@ void UGamePlayerStatusComponent::SetOffAnimationStatus(uint8 InBit)
 void UGamePlayerStatusComponent::Server_SetOnAnimationStatus_Implementation(uint8 InBit)
 {
 	SetOnAnimationStatus(InBit);
-	UE_LOG(LogTemp, Warning, TEXT("Server_SetOnAnimationStatus_Implementation"));
+	//UE_LOG(LogTemp, Warning, TEXT("Server_SetOnAnimationStatus_Implementation"));
 }
 
 void UGamePlayerStatusComponent::Server_SetOffAnimationStatus_Implementation(uint8 InBit)
