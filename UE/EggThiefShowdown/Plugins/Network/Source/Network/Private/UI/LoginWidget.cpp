@@ -9,6 +9,13 @@ void ULoginWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	UsernameTextBox->OnTextChanged.AddDynamic(this, &ThisClass::OnUsernameTextChanged);
+	PasswordTextBox->OnTextChanged.AddDynamic(this, &ThisClass::OnPasswordTextChanged);
+	PasswordTextBox->OnTextCommitted.AddDynamic(this, &ThisClass::OnPasswordCommitted);
+	PasswordTextBox->SetIsPassword(true);
+
+	SendButton->OnClicked.AddDynamic(this, &ThisClass::OnSend);
+
 	HaServerSubsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>();
 	if (!HaServerSubsystem->GetLoginChannel())
 	{
@@ -16,12 +23,6 @@ void ULoginWidget::NativeConstruct()
 	}
 	HaServerSubsystem->GetLoginChannel()->OnCreateAccountResult.AddDynamic(this, &ThisClass::OnCreateAccountResult);
 	HaServerSubsystem->GetLoginChannel()->OnLoginResult.AddDynamic(this, &ThisClass::OnLoginResult);
-
-	UsernameTextBox->OnTextChanged.AddDynamic(this, &ThisClass::OnUsernameTextChanged);
-	PasswordTextBox->OnTextChanged.AddDynamic(this, &ThisClass::OnPasswordTextChanged);
-	PasswordTextBox->OnTextCommitted.AddDynamic(this, &ThisClass::OnPasswordCommitted);
-	PasswordTextBox->SetIsPassword(true);
-	SendButton->OnClicked.AddDynamic(this, &ThisClass::OnSend);
 }
 
 void ULoginWidget::OnSend()
