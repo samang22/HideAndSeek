@@ -27,4 +27,7 @@ protected:
 
 	UFUNCTION()
 	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
+
+public:
+	void SetAIEnabled(bool bEnabled);
 };

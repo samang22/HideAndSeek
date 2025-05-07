@@ -74,6 +74,7 @@ void UGamePlayerStatusComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(ThisClass, bCanMove);
 	DOREPLIFETIME(ThisClass, AnimationStatus);
 	DOREPLIFETIME(ThisClass, MaxStamina);
 	DOREPLIFETIME(ThisClass, CurrentStamina);

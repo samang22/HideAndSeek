@@ -13,6 +13,7 @@
 #include "../PlayerState/LobbyMapPlayerState.h"
 #include "GameFramework/SpectatorPawn.h"
 #include "Actors/Game/Character/CustomSpectatorPawn.h"
+#include "Actors/Game/NPC/RealYoshiAIController.h"
 
 AGameMapGameMode::AGameMapGameMode()
 {
@@ -69,16 +70,35 @@ void AGameMapGameMode::HandlePlayerDeath(AController* PlayerController)
 void AGameMapGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	if (CountdownTime > 0)
-	{
-
-	}
 }
 
 void AGameMapGameMode::StartCountdown()
 {
 	CountdownTime = 10;
 	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, this, &AGameMapGameMode::CountdownTick, 1.f, true);
+
+	// Player들의 움직임 제한
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
+		{
+			if (AGamePlayer* GamePlayer = Cast<AGamePlayer>(PC->GetPawn()))
+			{
+				GamePlayer->SetCanMove(false);
+			}
+		}
+	}
+
+	TArray<AActor*> FoundAIControllers;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARealYoshiAIController::StaticClass(), FoundAIControllers);
+
+	for (AActor* Actor : FoundAIControllers)
+	{
+		if (ARealYoshiAIController* AIController = Cast<ARealYoshiAIController>(Actor))
+		{
+			AIController->SetAIEnabled(false);
+		}
+	}
 }
 
 void AGameMapGameMode::CountdownTick()
@@ -106,4 +126,26 @@ void AGameMapGameMode::CountdownTick()
 
 void AGameMapGameMode::StartGame()
 {
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
+		{
+			if (AGamePlayer* GamePlayer = Cast<AGamePlayer>(PC->GetPawn()))
+			{
+				GamePlayer->SetCanMove(true);
+			}
+		}
+
+	}
+
+	TArray<AActor*> FoundAIControllers;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARealYoshiAIController::StaticClass(), FoundAIControllers);
+
+	for (AActor* Actor : FoundAIControllers)
+	{
+		if (ARealYoshiAIController* AIController = Cast<ARealYoshiAIController>(Actor))
+		{
+			AIController->SetAIEnabled(true);
+		}
+	}
 }

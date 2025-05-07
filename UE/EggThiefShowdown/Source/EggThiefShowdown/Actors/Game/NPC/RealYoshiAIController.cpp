@@ -36,7 +36,6 @@ ARealYoshiAIController::ARealYoshiAIController()
 
 	// 감지 업데이트 이벤트 바인딩
 	PerceptionComponent->OnPerceptionUpdated.AddDynamic(this, &ARealYoshiAIController::OnPerceptionUpdated);
-
 }
 void ARealYoshiAIController::BeginPlay()
 {
@@ -128,5 +127,17 @@ void ARealYoshiAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedA
 		{
 			Blackboard->ClearValue(TEXT("DetectedEgg"));
 		}
+	}
+}
+
+void ARealYoshiAIController::SetAIEnabled(bool bEnabled)
+{
+	if (bEnabled)
+	{
+		BrainComponent->ResumeLogic(TEXT("Countdown End"));
+	}
+	else
+	{
+		BrainComponent->PauseLogic(TEXT("Countdown Active"));
 	}
 }

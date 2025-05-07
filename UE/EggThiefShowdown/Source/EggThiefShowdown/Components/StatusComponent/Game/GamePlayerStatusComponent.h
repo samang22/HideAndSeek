@@ -51,6 +51,7 @@ public:
 	virtual bool CanMove() const override;
 	void SetCanMove(bool _bFlag) { bCanMove = _bFlag; }
 protected:
+	UPROPERTY(Replicated)
 	bool bCanMove = true;
 
 
