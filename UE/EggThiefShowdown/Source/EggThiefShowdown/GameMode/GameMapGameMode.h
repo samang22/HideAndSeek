@@ -38,4 +38,8 @@ protected:
 
 public:
 	void UpdateEggCount();
+
+protected:
+	void EnablePlayersMove(bool bFlag);
+	void EnableAIControllers(bool bFlag);
 };

@@ -14,59 +14,34 @@ UCountdownWidget::UCountdownWidget(const FObjectInitializer& ObjectInitializer)
 	static ConstructorHelpers::FObjectFinder<UTexture2D> TextureAsset_MarioFont_Start(TEXT("/Script/Engine.Texture2D'/Game/Assets/Font/MarioFont_Start.MarioFont_Start'"));
 
 	if (TextureAsset_MarioFont_5.Succeeded())
-	{
 		Texture2D_MarioFont_5 = TextureAsset_MarioFont_5.Object;
-	}
     else
-    {
 		UE_LOG(LogTemp, Error, TEXT("TextureAsset_MarioFont_5 failed to load"));
-    }
 
     if (TextureAsset_MarioFont_4.Succeeded())
-	{
 		Texture2D_MarioFont_4 = TextureAsset_MarioFont_4.Object;
-	}
     else
-    {
 		UE_LOG(LogTemp, Error, TEXT("TextureAsset_MarioFont_4 failed to load"));
-    }
 
 	if (TextureAsset_MarioFont_3.Succeeded())
-	{
 		Texture2D_MarioFont_3 = TextureAsset_MarioFont_3.Object;
-	}
 	else
-	{
 		UE_LOG(LogTemp, Error, TEXT("TextureAsset_MarioFont_3 failed to load"));
-	}
 
 	if (TextureAsset_MarioFont_2.Succeeded())
-	{
 		Texture2D_MarioFont_2 = TextureAsset_MarioFont_2.Object;
-	}
 	else
-	{
 		UE_LOG(LogTemp, Error, TEXT("TextureAsset_MarioFont_2 failed to load"));
-	}
 
 	if (TextureAsset_MarioFont_1.Succeeded())
-	{
 		Texture2D_MarioFont_1 = TextureAsset_MarioFont_1.Object;
-	}
 	else
-	{
 		UE_LOG(LogTemp, Error, TEXT("TextureAsset_MarioFont_1 failed to load"));
-	}
 
 	if (TextureAsset_MarioFont_Start.Succeeded())
-	{
 		Texture2D_MarioFont_Start = TextureAsset_MarioFont_Start.Object;
-	}
 	else
-	{
 		UE_LOG(LogTemp, Error, TEXT("TextureAsset_MarioFont_Start failed to load"));
-	}
-
 }
 
 void UCountdownWidget::SetCountdown(int32 Countdown)
@@ -79,7 +54,6 @@ void UCountdownWidget::SetCountdown(int32 Countdown)
     }
 
 	UE_LOG(LogTemp, Warning, TEXT("Countdown : %d"), Countdown);
-
 
     UTexture2D* SelectedTexture = nullptr;
 
@@ -115,6 +89,7 @@ void UCountdownWidget::SetCountdown(int32 Countdown)
 
         // 이미지 크기를 텍스처 크기에 맞게 설정
         FVector2D TextureSize(SelectedTexture->GetSizeX(), SelectedTexture->GetSizeY());
+        UE_LOG(LogTemp, Warning, TEXT("TextureSize : %d, %d"), SelectedTexture->GetSizeX(), SelectedTexture->GetSizeY());
         CountdownImage->SetBrushSize(TextureSize);
     }
 }

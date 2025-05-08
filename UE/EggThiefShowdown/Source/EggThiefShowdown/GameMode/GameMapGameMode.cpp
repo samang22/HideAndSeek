@@ -81,27 +81,9 @@ void AGameMapGameMode::StartCountdown()
 	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, this, &AGameMapGameMode::CountdownTick, 1.f, true);
 
 	// Player들의 움직임 제한
-	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-	{
-		if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
-		{
-			if (AGamePlayer* GamePlayer = Cast<AGamePlayer>(PC->GetPawn()))
-			{
-				GamePlayer->SetCanMove(false);
-			}
-		}
-	}
-
-	TArray<AActor*> FoundAIControllers;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARealYoshiAIController::StaticClass(), FoundAIControllers);
-
-	for (AActor* Actor : FoundAIControllers)
-	{
-		if (ARealYoshiAIController* AIController = Cast<ARealYoshiAIController>(Actor))
-		{
-			AIController->SetAIEnabled(false);
-		}
-	}
+	EnablePlayersMove(false);
+	// AIController들의 움직임 제한
+	EnableAIControllers(false);
 }
 
 void AGameMapGameMode::CountdownTick()
@@ -129,28 +111,8 @@ void AGameMapGameMode::CountdownTick()
 
 void AGameMapGameMode::StartGame()
 {
-	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
-	{
-		if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
-		{
-			if (AGamePlayer* GamePlayer = Cast<AGamePlayer>(PC->GetPawn()))
-			{
-				GamePlayer->SetCanMove(true);
-			}
-		}
-
-	}
-
-	TArray<AActor*> FoundAIControllers;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARealYoshiAIController::StaticClass(), FoundAIControllers);
-
-	for (AActor* Actor : FoundAIControllers)
-	{
-		if (ARealYoshiAIController* AIController = Cast<ARealYoshiAIController>(Actor))
-		{
-			AIController->SetAIEnabled(true);
-		}
-	}
+	EnablePlayersMove(true);
+	EnableAIControllers(true);
 }
 
 void AGameMapGameMode::UpdateEggCount()
@@ -173,5 +135,33 @@ void AGameMapGameMode::UpdateEggCount()
 		float EggGauge = GameMapGameState->GetEggGauge();
 		EggGauge += EggCount * EGG_GAUGE_COEFFICIENT; // EggGauge를 EggCount에 비례하여 증가    
 		GameMapGameState->SetEggGauge(EggGauge);
+	}
+}
+
+void AGameMapGameMode::EnablePlayersMove(bool bFlag)
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
+		{
+			if (AGamePlayer* GamePlayer = Cast<AGamePlayer>(PC->GetPawn()))
+			{
+				GamePlayer->SetCanMove(bFlag);
+			}
+		}
+	}
+}
+
+void AGameMapGameMode::EnableAIControllers(bool bFlag)
+{
+	TArray<AActor*> FoundAIControllers;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ARealYoshiAIController::StaticClass(), FoundAIControllers);
+
+	for (AActor* Actor : FoundAIControllers)
+	{
+		if (ARealYoshiAIController* AIController = Cast<ARealYoshiAIController>(Actor))
+		{
+			AIController->SetAIEnabled(bFlag);
+		}
 	}
 }
