@@ -55,3 +55,5 @@
 #define MARIO_ATTACK_DAMAGE						5.f
 
 #define EXHAUSTE_TIME							3.f
+
+#define EGG_GAUGE_COEFFICIENT					0.01f

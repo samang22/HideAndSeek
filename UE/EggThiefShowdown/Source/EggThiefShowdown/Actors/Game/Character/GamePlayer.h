@@ -83,6 +83,7 @@ public:
 protected:
 	TObjectPtr<UWidgetComponent> HPStaminaWidgetComponent;
 	TObjectPtr<UWidgetComponent> CountdownWidgetComponent;
+	TObjectPtr<UWidgetComponent> EggGaugeWidgetComponent;
 
 public:
 	void SetCountdown(int32 Countdown);

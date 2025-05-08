@@ -14,12 +14,15 @@
 #include "GameFramework/SpectatorPawn.h"
 #include "Actors/Game/Character/CustomSpectatorPawn.h"
 #include "Actors/Game/NPC/RealYoshiAIController.h"
+#include "GameState/GameMapGameState.h"
+
+#include "Actors/Game/TriggerBox/EggCountTriggerBox.h"
 
 AGameMapGameMode::AGameMapGameMode()
 {
     PlayerStateClass = AGameMapPlayerState::StaticClass();
-
-	SpectatorClass = ACustomSpectatorPawn::StaticClass(); // 커스텀 SpectatorPawn도 가능
+	SpectatorClass = ACustomSpectatorPawn::StaticClass(); 
+	GameStateClass = AGameMapGameState::StaticClass();
 }
 
 void AGameMapGameMode::SetPlayerData(AController* NewPlayer)
@@ -147,5 +150,28 @@ void AGameMapGameMode::StartGame()
 		{
 			AIController->SetAIEnabled(true);
 		}
+	}
+}
+
+void AGameMapGameMode::UpdateEggCount()
+{
+	TArray<AActor*> FoundEggTriggerBox;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEggCountTriggerBox::StaticClass(), FoundEggTriggerBox);
+
+	int32 EggCount = 0;
+	for (AActor* Actor : FoundEggTriggerBox)
+	{
+		if (AEggCountTriggerBox* TriggerBox = Cast<AEggCountTriggerBox>(Actor))
+		{
+			EggCount += TriggerBox->GetEggCount();
+		}
+	}
+
+	// GameMapGameState에 EggCount 설정
+	if (AGameMapGameState* GameMapGameState = GetGameState<AGameMapGameState>())
+	{
+		float EggGauge = GameMapGameState->GetEggGauge();
+		EggGauge += EggCount * EGG_GAUGE_COEFFICIENT; // EggGauge를 EggCount에 비례하여 증가    
+		GameMapGameState->SetEggGauge(EggGauge);
 	}
 }

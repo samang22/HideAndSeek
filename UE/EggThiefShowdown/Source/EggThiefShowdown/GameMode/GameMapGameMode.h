@@ -35,4 +35,7 @@ protected:
 	void StartCountdown();
 	void CountdownTick();
 	void StartGame();
+
+public:
+	void UpdateEggCount();
 };

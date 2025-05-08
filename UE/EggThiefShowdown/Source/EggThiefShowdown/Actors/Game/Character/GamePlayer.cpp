@@ -23,6 +23,7 @@
 #include "Components/WidgetComponent.h"
 #include "UI/HPStaminaWidget.h"
 #include "UI/CountdownWidget.h"
+#include "UI/EggGaugeWidget.h"
 
 #include "GameMode/GameMapGameMode.h"
 
@@ -106,10 +107,24 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CountdownWidgetClass load Failed"));
+		UE_LOG(LogTemp, Error, TEXT("CountdownWidgetClass load Failed"));
 	}
 
+	EggGaugeWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("EggGaugeWidgetComponent"));
+	EggGaugeWidgetComponent->SetupAttachment(RootComponent);
+	EggGaugeWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
+	static UClass* EggGaugeWidgetClass = LoadClass<UEggGaugeWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_EggGauge.UI_EggGauge_C'"));
 
+	if (EggGaugeWidgetClass)
+	{
+		EggGaugeWidgetComponent->SetWidgetClass(EggGaugeWidgetClass);
+		EggGaugeWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		EggGaugeWidgetComponent->SetVisibility(false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("EggGaugeWidgetClass load Failed"));
+	}
 }
 
 void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -150,7 +165,7 @@ void AGamePlayer::PossessedBy(AController* NewController)
 	if (HasAuthority())
 	{
 		InitDataTableByPlayerState();
-		OnRep_UpdateDataTableRowHandle();         
+		//OnRep_UpdateDataTableRowHandle();         
 	}
 
 
@@ -211,6 +226,7 @@ void AGamePlayer::OnRep_Controller()
 					LPC->bShowMouseCursor = false;
 
 					HPStaminaWidgetComponent->SetVisibility(true); // 위젯 보이기
+					EggGaugeWidgetComponent->SetVisibility(true); // 위젯 보이기
 				}
 
 				InitDataTableByPlayerState();
