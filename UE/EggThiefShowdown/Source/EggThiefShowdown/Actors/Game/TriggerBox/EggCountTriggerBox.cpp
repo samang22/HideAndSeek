@@ -3,7 +3,6 @@
 
 #include "Actors/Game/TriggerBox/EggCountTriggerBox.h"
 #include "Actors/Game/NPC/Egg.h"
-#include "GameMode/GameMapGameMode.h"
 
 AEggCountTriggerBox::AEggCountTriggerBox()
 {
@@ -22,12 +21,6 @@ void AEggCountTriggerBox::OnTriggerBeginOverlap(AActor* OverlappedActor, AActor*
 	{
 		InsideEggs.Add(OtherActor);
 		UE_LOG(LogTemp, Log, TEXT("[EggCountTriggerBox] Entered: %s | Count: %d"), *OtherActor->GetName(), InsideEggs.Num());
-
-		if (AGameMapGameMode* GameMode = Cast<AGameMapGameMode>(GetWorld()->GetAuthGameMode()))
-		{
-			GameMode->UpdateEggCount();
-			// 직접 값을 전달하지 않고, 간접적으로 갱신하는 이유는 맵에 여러 개 있는 트리거 박스의 개수를 다 갱신하기 위함임.
-		}
 	}
 }
 

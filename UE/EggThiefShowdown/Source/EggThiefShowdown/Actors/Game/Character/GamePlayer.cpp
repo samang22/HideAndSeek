@@ -24,6 +24,7 @@
 #include "UI/HPStaminaWidget.h"
 #include "UI/CountdownWidget.h"
 #include "UI/EggGaugeWidget.h"
+#include "UI/GameResultWidget.h"
 
 #include "GameMode/GameMapGameMode.h"
 
@@ -125,6 +126,24 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	{
 		UE_LOG(LogTemp, Error, TEXT("EggGaugeWidgetClass load Failed"));
 	}
+
+	GameResultWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("GameResultWidgetComponent"));
+	GameResultWidgetComponent->SetupAttachment(RootComponent);
+	GameResultWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
+	static UClass* GameResultWidgetClass = LoadClass<UGameResultWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_GameResult.UI_GameResult_C'"));
+
+	if (GameResultWidgetClass)
+	{
+		GameResultWidgetComponent->SetWidgetClass(GameResultWidgetClass);
+		GameResultWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		GameResultWidgetComponent->SetVisibility(false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("GameResultWidgetClass load Failed"));
+	}
+
+	
 }
 
 void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -430,6 +449,19 @@ void AGamePlayer::SetCountdown(int32 Countdown)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::SetCountdown Failed"));
+	}
+}
+
+void AGamePlayer::UpdateGameResultWidget(bool bResult)
+{
+	if (UGameResultWidget* Widget = Cast<UGameResultWidget>(GameResultWidgetComponent->GetWidget()))
+	{
+		GameResultWidgetComponent->SetVisibility(true); // 위젯 보이기
+		Widget->SetGameResult(bResult);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::UpdateGameResultWidget Failed"));
 	}
 }
 

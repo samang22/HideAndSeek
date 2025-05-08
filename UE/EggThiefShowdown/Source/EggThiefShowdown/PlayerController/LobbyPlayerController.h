@@ -62,4 +62,6 @@ public:
 public:
 	UFUNCTION(Client, Reliable)
 	void Client_UpdateCountdown(int32 Countdown);
+	UFUNCTION(Client, Reliable)
+	void Client_UpdateGameEnd(bool bFlag);
 };

@@ -2,6 +2,7 @@
 
 
 #include "UI/CountdownWidget.h"
+#include "Components/Image.h"
 
 UCountdownWidget::UCountdownWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -89,7 +90,6 @@ void UCountdownWidget::SetCountdown(int32 Countdown)
 
         // 이미지 크기를 텍스처 크기에 맞게 설정
         FVector2D TextureSize(SelectedTexture->GetSizeX(), SelectedTexture->GetSizeY());
-        UE_LOG(LogTemp, Warning, TEXT("TextureSize : %d, %d"), SelectedTexture->GetSizeX(), SelectedTexture->GetSizeY());
         CountdownImage->SetBrushSize(TextureSize);
     }
 }

@@ -37,8 +37,7 @@ protected:
 	void StartGame();
 
 public:
-	void UpdateEggCount();
-
+	void UpdateEggCountAndCheckEnd(float _fDeltaTime);
 protected:
 	void EnablePlayersMove(bool bFlag);
 	void EnableAIControllers(bool bFlag);

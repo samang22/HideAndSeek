@@ -73,6 +73,7 @@ void AGameMapGameMode::HandlePlayerDeath(AController* PlayerController)
 void AGameMapGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	UpdateEggCountAndCheckEnd(DeltaSeconds);
 }
 
 void AGameMapGameMode::StartCountdown()
@@ -115,7 +116,7 @@ void AGameMapGameMode::StartGame()
 	EnableAIControllers(true);
 }
 
-void AGameMapGameMode::UpdateEggCount()
+void AGameMapGameMode::UpdateEggCountAndCheckEnd(float _fDeltaTime)
 {
 	TArray<AActor*> FoundEggTriggerBox;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEggCountTriggerBox::StaticClass(), FoundEggTriggerBox);
@@ -129,12 +130,45 @@ void AGameMapGameMode::UpdateEggCount()
 		}
 	}
 
+	if (0 == EggCount) return;
+
+	float EggGauge = 0.f;
 	// GameMapGameState에 EggCount 설정
 	if (AGameMapGameState* GameMapGameState = GetGameState<AGameMapGameState>())
 	{
-		float EggGauge = GameMapGameState->GetEggGauge();
-		EggGauge += EggCount * EGG_GAUGE_COEFFICIENT; // EggGauge를 EggCount에 비례하여 증가    
+		EggGauge = GameMapGameState->GetEggGauge();
+		EggGauge += EggCount * EGG_GAUGE_COEFFICIENT * _fDeltaTime; // EggGauge를 EggCount에 비례하여 증가    
 		GameMapGameState->SetEggGauge(EggGauge);
+	}
+
+	if (EggGauge >= 1.f)
+	{
+		// EggGauge가 1.0 이상이면 게임 종료
+		EnablePlayersMove(false);
+		EnableAIControllers(false);
+
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
+			{
+				if (AGamePlayer* GamePlayer = Cast<AGamePlayer>(PC->GetPawn()))
+				{
+					const LOBBY_CHARACTER_KIND eKind = GamePlayer->GetCharacterKind();
+					switch (eKind)
+					{
+						case LOBBY_CHARACTER_KIND::MARIO:
+							PC->Client_UpdateGameEnd(false);
+							break;
+						case LOBBY_CHARACTER_KIND::YOSHI:
+							PC->Client_UpdateGameEnd(true);
+							break;
+						default:
+							UE_LOG(LogTemp, Error, TEXT("Unknown character kind"));
+						break;
+					}
+				}
+			}
+		}
 	}
 }
 

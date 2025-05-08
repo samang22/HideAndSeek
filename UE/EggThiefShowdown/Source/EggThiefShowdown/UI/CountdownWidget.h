@@ -4,12 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/Image.h"
 #include "CountdownWidget.generated.h"
 
-/**
- * 
- */
+class UImage;
+
 UCLASS()
 class EGGTHIEFSHOWDOWN_API UCountdownWidget : public UUserWidget
 {
