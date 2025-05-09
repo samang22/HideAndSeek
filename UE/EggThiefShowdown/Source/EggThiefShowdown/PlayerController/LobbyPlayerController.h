@@ -64,4 +64,10 @@ public:
 	void Client_UpdateCountdown(int32 Countdown);
 	UFUNCTION(Client, Reliable)
 	void Client_UpdateGameEnd(bool bFlag);
+	UFUNCTION(Client, Reliable)
+	void Client_UpdateTimeLimit(int32 MinuteTen, int32 MinuteOne, int32 SecondTen, int32 SecondOne);
+	UFUNCTION(Client, Reliable)
+	void Client_ExposeTimeLimitWidget(bool bFlag);
+	UFUNCTION(Client, Reliable)
+	void Client_ExposeGameResultWidget(bool bFlag);
 };

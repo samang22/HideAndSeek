@@ -85,11 +85,14 @@ protected:
 	TObjectPtr<UWidgetComponent> CountdownWidgetComponent;
 	TObjectPtr<UWidgetComponent> EggGaugeWidgetComponent;
 	TObjectPtr<UWidgetComponent> GameResultWidgetComponent;
+	TObjectPtr<UWidgetComponent> TimeLimitWidgetComponent;
 
 public:
 	void SetCountdown(int32 Countdown);
 	void UpdateGameResultWidget(bool bResult);
-
+	void UpdateTimeLimitWidget(int32 MinuteTen, int32 MinuteOne, int32 SecondTen, int32 SecondOne);
+	void ExposeTimeLimitWidget(bool bFlag);
+	void ExposeGameResultWidget(bool bFlag);
 
 public:
 	void PlayMontage(GAME_PLAYER_MONTAGE _InEnum, bool bIsLoop = false);

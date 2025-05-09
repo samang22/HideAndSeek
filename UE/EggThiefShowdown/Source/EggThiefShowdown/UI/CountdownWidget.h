@@ -40,4 +40,6 @@ protected:
 public:
 	UFUNCTION()
 	void SetCountdown(int32 Countdown);
+
+	UImage* GetCountdownImage() const { return CountdownImage; }
 };

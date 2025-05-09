@@ -57,3 +57,5 @@
 #define EXHAUSTE_TIME							3.f
 
 #define EGG_GAUGE_COEFFICIENT					0.01f
+
+#define GAME_TIME_LIMIT							30

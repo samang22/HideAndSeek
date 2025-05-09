@@ -23,6 +23,7 @@ AGameMapGameMode::AGameMapGameMode()
     PlayerStateClass = AGameMapPlayerState::StaticClass();
 	SpectatorClass = ACustomSpectatorPawn::StaticClass(); 
 	GameStateClass = AGameMapGameState::StaticClass();
+	RemainingTime = GAME_TIME_LIMIT;
 }
 
 void AGameMapGameMode::SetPlayerData(AController* NewPlayer)
@@ -114,6 +115,27 @@ void AGameMapGameMode::StartGame()
 {
 	EnablePlayersMove(true);
 	EnableAIControllers(true);
+
+	GetWorld()->GetTimerManager().SetTimer(
+		TimeLimitTimerHandle,
+		this,
+		&AGameMapGameMode::UpdateTimeLimitWidget,
+		1.0f, // 매 초마다 호출
+		true  // 반복 실행
+	);
+	
+	UpdateTimeLimitWidget();
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
+		{
+			if (AGamePlayer* GamePlayer = Cast<AGamePlayer>(PC->GetPawn()))
+			{
+				PC->Client_ExposeTimeLimitWidget(true);
+			}
+		}
+	}
 }
 
 void AGameMapGameMode::UpdateEggCountAndCheckEnd(float _fDeltaTime)
@@ -153,6 +175,9 @@ void AGameMapGameMode::UpdateEggCountAndCheckEnd(float _fDeltaTime)
 			{
 				if (AGamePlayer* GamePlayer = Cast<AGamePlayer>(PC->GetPawn()))
 				{
+					PC->Client_ExposeGameResultWidget(true);
+
+
 					const LOBBY_CHARACTER_KIND eKind = GamePlayer->GetCharacterKind();
 					switch (eKind)
 					{
@@ -196,6 +221,65 @@ void AGameMapGameMode::EnableAIControllers(bool bFlag)
 		if (ARealYoshiAIController* AIController = Cast<ARealYoshiAIController>(Actor))
 		{
 			AIController->SetAIEnabled(bFlag);
+		}
+	}
+}
+
+void AGameMapGameMode::UpdateTimeLimitWidget()
+{
+	// 남은 시간 감소
+	RemainingTime--;
+
+	int minutes = RemainingTime / 60;
+	int seconds = RemainingTime % 60;
+
+	int minTens = minutes / 10;
+	int minOnes = minutes % 10;
+	int secTens = seconds / 10;
+	int secOnes = seconds % 10;
+
+	// 위젯 갱신 로직
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
+		{
+			PC->Client_UpdateTimeLimit(minTens, minOnes, secTens, secOnes);
+		}
+	}
+
+
+	// 시간이 0이 되면 타이머 중지
+	if (RemainingTime <= 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(TimeLimitTimerHandle);
+		UE_LOG(LogTemp, Warning, TEXT("Time is up!"));
+
+		EnablePlayersMove(false);
+		EnableAIControllers(false);
+
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			if (ALobbyPlayerController* PC = Cast<ALobbyPlayerController>(*It))
+			{
+				if (AGamePlayer* GamePlayer = Cast<AGamePlayer>(PC->GetPawn()))
+				{
+					PC->Client_ExposeGameResultWidget(true);
+
+					const LOBBY_CHARACTER_KIND eKind = GamePlayer->GetCharacterKind();
+					switch (eKind)
+					{
+					case LOBBY_CHARACTER_KIND::MARIO:
+						PC->Client_UpdateGameEnd(true);
+						break;
+					case LOBBY_CHARACTER_KIND::YOSHI:
+						PC->Client_UpdateGameEnd(false);
+						break;
+					default:
+						UE_LOG(LogTemp, Error, TEXT("Unknown character kind"));
+						break;
+					}
+				}
+			}
 		}
 	}
 }

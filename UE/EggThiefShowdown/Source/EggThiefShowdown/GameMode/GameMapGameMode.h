@@ -41,4 +41,9 @@ public:
 protected:
 	void EnablePlayersMove(bool bFlag);
 	void EnableAIControllers(bool bFlag);
+
+protected:
+	FTimerHandle TimeLimitTimerHandle;
+	int32 RemainingTime;
+	void UpdateTimeLimitWidget();
 };

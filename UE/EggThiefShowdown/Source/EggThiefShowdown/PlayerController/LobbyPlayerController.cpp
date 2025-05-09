@@ -351,6 +351,30 @@ void ALobbyPlayerController::SetInputModeGameOnly()
     bShowMouseCursor = false; // UI도 같이 쓸 거면 true
 }
 
+void ALobbyPlayerController::Client_ExposeGameResultWidget_Implementation(bool bFlag)
+{
+    if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
+    {
+        GP->ExposeGameResultWidget(bFlag);
+    }
+}
+
+void ALobbyPlayerController::Client_ExposeTimeLimitWidget_Implementation(bool bFlag)
+{
+    if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
+    {
+        GP->ExposeTimeLimitWidget(bFlag);
+	}
+}
+
+void ALobbyPlayerController::Client_UpdateTimeLimit_Implementation(int32 MinuteTen, int32 MinuteOne, int32 SecondTen, int32 SecondOne)
+{
+    if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
+    {
+        GP->UpdateTimeLimitWidget(MinuteTen, MinuteOne, SecondTen, SecondOne);
+    }
+}
+
 void ALobbyPlayerController::Client_UpdateGameEnd_Implementation(bool bFlag)
 {
     UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::Client_UpdateGameEnd_Implementation"));

@@ -25,9 +25,11 @@
 #include "UI/CountdownWidget.h"
 #include "UI/EggGaugeWidget.h"
 #include "UI/GameResultWidget.h"
+#include "UI/TimeLimitWidget.h"
 
 #include "GameMode/GameMapGameMode.h"
 
+#include "Components/Image.h"
 
 // Sets default values
 AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
@@ -144,6 +146,21 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	}
 
 	
+	TimeLimitWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimeLimitWidgetComponent"));
+	TimeLimitWidgetComponent->SetupAttachment(RootComponent);
+	TimeLimitWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
+	static UClass* TimeLimitWidgetClass = LoadClass<UTimeLimitWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_TimeLimit.UI_TimeLimit_C'"));
+
+	if (TimeLimitWidgetClass)
+	{
+		TimeLimitWidgetComponent->SetWidgetClass(TimeLimitWidgetClass);
+		TimeLimitWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		TimeLimitWidgetComponent->SetVisibility(false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("TimeLimitWidgetClass load Failed"));
+	}
 }
 
 void AGamePlayer::SetData(const FDataTableRowHandle& InDataTableRowHandle)
@@ -173,6 +190,35 @@ void AGamePlayer::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::BeginPlay"));
 
 	Super::BeginPlay();
+
+	if (UCountdownWidget* CountdownWidget = Cast<UCountdownWidget>(CountdownWidgetComponent->GetWidget()))
+	{
+		CountdownWidget->SetCountdown(6);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("CountdownWidget is null"));
+	}
+
+	//if (UTimeLimitWidget* TimeLimitWidget = Cast<UTimeLimitWidget>(TimeLimitWidgetComponent->GetWidget()))
+	//{
+	//	TimeLimitWidget->(6);
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Log, TEXT("CountdownWidget is null"));
+	//}
+
+
+	//if (UCountdownWidget* CountdownWidget = Cast<UCountdownWidget>(CountdownWidgetComponent->GetWidget()))
+	//{
+	//	CountdownWidget->SetCountdown(6);
+	//}
+	//else
+	//{
+	//	UE_LOG(LogTemp, Log, TEXT("CountdownWidget is null"));
+	//}
+
 }
 
 void AGamePlayer::PossessedBy(AController* NewController)
@@ -462,6 +508,42 @@ void AGamePlayer::UpdateGameResultWidget(bool bResult)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::UpdateGameResultWidget Failed"));
+	}
+}
+
+void AGamePlayer::UpdateTimeLimitWidget(int32 MinuteTen, int32 MinuteOne, int32 SecondTen, int32 SecondOne)
+{
+	if (UTimeLimitWidget* Widget = Cast<UTimeLimitWidget>(TimeLimitWidgetComponent->GetWidget()))
+	{
+		Widget->SetRemainTime(MinuteTen, MinuteOne, SecondTen, SecondOne);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AGamePlayer::UpdateTimeLimitWidget // No Widget"))
+	}
+}
+
+void AGamePlayer::ExposeTimeLimitWidget(bool bFlag)
+{
+	if (UTimeLimitWidget* Widget = Cast<UTimeLimitWidget>(TimeLimitWidgetComponent->GetWidget()))
+	{
+		TimeLimitWidgetComponent->SetVisibility(bFlag);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AGamePlayer::ExposeTimeLimitWidget // No Widget"))
+	}
+}
+
+void AGamePlayer::ExposeGameResultWidget(bool bFlag)
+{
+	if (UGameResultWidget* Widget = Cast<UGameResultWidget>(GameResultWidgetComponent->GetWidget()))
+	{
+		GameResultWidgetComponent->SetVisibility(bFlag);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AGamePlayer::ExposeGameResultWidget // No Widget"))
 	}
 }
 
