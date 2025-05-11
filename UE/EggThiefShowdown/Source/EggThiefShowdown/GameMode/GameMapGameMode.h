@@ -30,12 +30,14 @@ protected:
 protected:
 	FTimerHandle CountdownTimerHandle;
 	int32 CountdownTime = 10;
+		
+	FTimerHandle ServerTravelToLobbyMapTimerHandle; 
 
 protected:
 	void StartCountdown();
 	void CountdownTick();
 	void StartGame();
-
+	void ServerTravelToLobbyMap();
 public:
 	void UpdateEggCountAndCheckEnd(float _fDeltaTime);
 protected:

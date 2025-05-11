@@ -138,6 +138,13 @@ void AGameMapGameMode::StartGame()
 	}
 }
 
+void AGameMapGameMode::ServerTravelToLobbyMap()
+{
+	// 서버 여행을 위한 URL 설정
+	FString TravelURL = TEXT("/Game/Level/LobbyMap?game=/Game/GameMode/BPGM_LobbyMap.BPGM_LobbyMap_C");
+	GetWorld()->ServerTravel(TravelURL);
+}
+
 void AGameMapGameMode::UpdateEggCountAndCheckEnd(float _fDeltaTime)
 {
 	TArray<AActor*> FoundEggTriggerBox;
@@ -194,6 +201,15 @@ void AGameMapGameMode::UpdateEggCountAndCheckEnd(float _fDeltaTime)
 				}
 			}
 		}
+
+		// 
+		GetWorld()->GetTimerManager().SetTimer(
+			ServerTravelToLobbyMapTimerHandle,
+			this,
+			&AGameMapGameMode::ServerTravelToLobbyMap,
+			5.0f, // 3초 후에 서버 여행
+			false // 단발성 실행
+		);
 	}
 }
 
@@ -281,5 +297,13 @@ void AGameMapGameMode::UpdateTimeLimitWidget()
 				}
 			}
 		}
+
+		GetWorld()->GetTimerManager().SetTimer(
+			ServerTravelToLobbyMapTimerHandle,
+			this,
+			&AGameMapGameMode::ServerTravelToLobbyMap,
+			5.0f, // 3초 후에 서버 여행
+			false // 단발성 실행
+		);
 	}
 }

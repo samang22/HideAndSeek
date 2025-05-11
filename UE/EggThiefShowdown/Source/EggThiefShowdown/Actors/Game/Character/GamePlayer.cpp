@@ -249,11 +249,14 @@ void AGamePlayer::PossessedBy(AController* NewController)
 
 	Super::PossessedBy(NewController);
 
-	if (HasAuthority())
-	{
-		InitDataTableByPlayerState();
-		//OnRep_UpdateDataTableRowHandle();         
-	}
+
+	InitDataTableByPlayerState();
+
+	//if (HasAuthority())
+	//{
+	//	InitDataTableByPlayerState();
+	//	//OnRep_UpdateDataTableRowHandle();         
+	//}
 
 
 	SetData(DataTableRowHandle);
@@ -366,7 +369,7 @@ void AGamePlayer::InitDataTableByPlayerState()
 
 					}
 
-					static UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_GamePlayer.DT_GamePlayer"));
+					UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_GamePlayer.DT_GamePlayer"));
 
 					if (DataTable)
 					{
@@ -406,7 +409,7 @@ void AGamePlayer::InitDataTableByPlayerState()
 						break;
 					}
 
-					static UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_GamePlayer.DT_GamePlayer"));
+					UDataTable* DataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DT_GamePlayer.DT_GamePlayer"));
 
 					if (DataTable)
 					{
