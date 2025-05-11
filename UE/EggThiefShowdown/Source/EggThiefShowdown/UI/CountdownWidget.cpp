@@ -89,8 +89,10 @@ void UCountdownWidget::SetCountdown(int32 Countdown)
         CountdownImage->SetBrushFromTexture(SelectedTexture);
 
         // 이미지 크기를 텍스처 크기에 맞게 설정
-        //FVector2D TextureSize(SelectedTexture->GetSizeX(), SelectedTexture->GetSizeY());
-        //CountdownImage->SetDesiredSizeOverride(TextureSize);
-        //CountdownImage->ForceLayoutPrepass();
+        FVector2D TextureSize(SelectedTexture->GetSizeX(), SelectedTexture->GetSizeY());
+        FWidgetTransform Transform = CountdownImage->GetRenderTransform();
+		TextureSize = TextureSize * 0.05f; // 크기를 줄이기 위해 0.5배로 설정
+        Transform.Scale = TextureSize;
+        CountdownImage->SetRenderTransform(Transform);
     }
 }

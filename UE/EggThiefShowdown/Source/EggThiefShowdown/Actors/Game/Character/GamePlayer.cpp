@@ -191,13 +191,35 @@ void AGamePlayer::BeginPlay()
 
 	Super::BeginPlay();
 
+	// 이미지들을 캐시에 올리기위해서 실행하는데 임시 코드
 	if (UCountdownWidget* CountdownWidget = Cast<UCountdownWidget>(CountdownWidgetComponent->GetWidget()))
 	{
 		CountdownWidget->SetCountdown(6);
+		CountdownWidgetComponent->SetVisibility(false);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("CountdownWidget is null"));
+	}
+
+	if (UGameResultWidget* GameResultWidget = Cast<UGameResultWidget>(GameResultWidgetComponent->GetWidget()))
+	{
+		GameResultWidget->SetGameResult(true);
+		GameResultWidgetComponent->SetVisibility(false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("GameResultWidget is null"));
+	}
+
+	if (UTimeLimitWidget* TimeLimitWidget = Cast<UTimeLimitWidget>(TimeLimitWidgetComponent->GetWidget()))
+	{
+		TimeLimitWidget->SetRemainTime(6, 6, 6, 6);
+		TimeLimitWidgetComponent->SetVisibility(false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("TimeLimitWidget is null"));
 	}
 
 	//if (UTimeLimitWidget* TimeLimitWidget = Cast<UTimeLimitWidget>(TimeLimitWidgetComponent->GetWidget()))

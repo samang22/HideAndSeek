@@ -46,8 +46,10 @@ void UGameResultWidget::SetGameResult(bool bResult)
 
 		// 이미지 크기를 텍스처 크기에 맞게 설정
 		FVector2D TextureSize(SelectedTexture->GetSizeX(), SelectedTexture->GetSizeY());
-		GameResultImage->SetBrushSize(TextureSize);
-		GameResultImage->ForceLayoutPrepass();
+		FWidgetTransform Transform = GameResultImage->GetRenderTransform();
+		TextureSize = TextureSize * 0.05f; // 크기를 줄이기 위해 0.5배로 설정
+		Transform.Scale = TextureSize;
+		GameResultImage->SetRenderTransform(Transform);
 	}
 	else
 	{

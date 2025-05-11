@@ -242,31 +242,41 @@ void UTimeLimitWidget::SetRemainTime(int32 MinuteTen, int32 MinuteOne, int32 Sec
 		return;
 	}
 
+	FWidgetTransform Transform = FWidgetTransform();
+
 	MinuteTenImage->SetBrushFromTexture(MinuteTenTexture);
 	FVector2D MinuteTenTextureSize(MinuteTenTexture->GetSizeX(), MinuteTenTexture->GetSizeY());
-	MinuteTenImage->SetBrushSize(MinuteTenTextureSize);
-	MinuteTenImage->ForceLayoutPrepass(); // 즉시 적용
+	Transform = MinuteTenImage->GetRenderTransform();
+	MinuteTenTextureSize = MinuteTenTextureSize * 0.03f; // 크기를 줄이기 위해 0.5배로 설정
+	Transform.Scale = MinuteTenTextureSize;
+	MinuteTenImage->SetRenderTransform(Transform);
 
 	MinuteOneImage->SetBrushFromTexture(MinuteOneTexture);
 	FVector2D MinuteOneTextureSize(MinuteOneTexture->GetSizeX(), MinuteOneTexture->GetSizeY());
-	MinuteOneImage->SetBrushSize(MinuteOneTextureSize);
-	MinuteOneImage->ForceLayoutPrepass(); // 즉시 적용
+	Transform = MinuteOneImage->GetRenderTransform();
+	MinuteOneTextureSize = MinuteOneTextureSize * 0.03f; // 크기를 줄이기 위해 0.5배로 설정
+	Transform.Scale = MinuteOneTextureSize;
+	MinuteOneImage->SetRenderTransform(Transform);
 
 	SecondTenImage->SetBrushFromTexture(SecondTenTexture);
 	FVector2D SecondTenTextureSize(SecondTenTexture->GetSizeX(), SecondTenTexture->GetSizeY());
-	SecondTenImage->SetBrushSize(SecondTenTextureSize);
-	SecondTenImage->ForceLayoutPrepass(); // 즉시 적용
+	Transform = SecondTenImage->GetRenderTransform();
+	SecondTenTextureSize = SecondTenTextureSize * 0.03f; // 크기를 줄이기 위해 0.5배로 설정
+	Transform.Scale = SecondTenTextureSize;
+	SecondTenImage->SetRenderTransform(Transform);
 
 	SecondOneImage->SetBrushFromTexture(SecondOneTexture);
 	FVector2D SecondOneTextureSize(SecondOneTexture->GetSizeX(), SecondOneTexture->GetSizeY());
-	SecondOneImage->SetBrushSize(SecondOneTextureSize);
-	SecondOneImage->ForceLayoutPrepass(); // 즉시 적용
+	Transform = SecondOneImage->GetRenderTransform();
+	SecondOneTextureSize = SecondOneTextureSize * 0.03f; // 크기를 줄이기 위해 0.5배로 설정
+	Transform.Scale = SecondOneTextureSize;
+	SecondOneImage->SetRenderTransform(Transform);
 
 	ColonImage->SetBrushFromTexture(Texture2D_MarioFont_Colon);
 	FVector2D ColonTextureSize(Texture2D_MarioFont_Colon->GetSizeX(), Texture2D_MarioFont_Colon->GetSizeY());
-	ColonImage->SetBrushSize(ColonTextureSize);
-	ColonImage->ForceLayoutPrepass(); // 즉시 적용
-
-	
+	Transform = ColonImage->GetRenderTransform();
+	ColonTextureSize = ColonTextureSize * 0.03f; // 크기를 줄이기 위해 0.5배로 설정
+	Transform.Scale = ColonTextureSize;
+	ColonImage->SetRenderTransform(Transform);
 }
 
