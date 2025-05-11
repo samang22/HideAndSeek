@@ -26,6 +26,7 @@
 #include "UI/EggGaugeWidget.h"
 #include "UI/GameResultWidget.h"
 #include "UI/TimeLimitWidget.h"
+#include "../Plugins/Network/Source/Network/Public/UI/ChatWidget.h"
 
 #include "GameMode/GameMapGameMode.h"
 
@@ -160,6 +161,22 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("TimeLimitWidgetClass load Failed"));
+	}
+
+	ChatWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("ChatWidgetComponent"));
+	ChatWidgetComponent->SetupAttachment(RootComponent);
+	ChatWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
+	static UClass* ChatWidgetClass = LoadClass<UChatWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/Chat/UI_Chat.UI_Chat_C'"));
+
+	if (ChatWidgetClass)
+	{
+		ChatWidgetComponent->SetWidgetClass(ChatWidgetClass);
+		ChatWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		ChatWidgetComponent->SetVisibility(false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("ChatWidgetClass load Failed"));
 	}
 }
 
@@ -317,6 +334,7 @@ void AGamePlayer::OnRep_Controller()
 
 					HPStaminaWidgetComponent->SetVisibility(true); // 위젯 보이기
 					EggGaugeWidgetComponent->SetVisibility(true); // 위젯 보이기
+					ChatWidgetComponent->SetVisibility(true);
 				}
 
 				InitDataTableByPlayerState();
@@ -798,6 +816,12 @@ void AGamePlayer::DropEgg()
 		CastedEgg->SetIsHold(false);
 		Egg = nullptr;
 	}
+}
+
+UChatWidget* AGamePlayer::GetChatWidget()
+{
+	UChatWidget* ChatWidget = Cast<UChatWidget>(ChatWidgetComponent->GetWidget());
+	return ChatWidget;
 }
 
 void AGamePlayer::SetCanMove(bool bFlag)

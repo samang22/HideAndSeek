@@ -56,8 +56,13 @@ protected:
 	void OnAttack(const FInputActionValue& InputActionValue);
 	void OnDropEgg(const FInputActionValue& InputActionValue);
 	void OnRightClick(const FInputActionValue& InputActionValue);
+	void OnEnter(const FInputActionValue& InputActionValue);
+
+protected:
+	bool bStartChat = false;
+
 public:
-	void SetInputModeGameOnly();
+	void SetInputModeGameOnly(bool bFlag = true);
 
 public:
 	UFUNCTION(Client, Reliable)

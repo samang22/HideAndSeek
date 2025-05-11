@@ -18,6 +18,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "../Plugins/Network/Source/Network/Public/UI/ChatWidget.h"
+
 ALobbyPlayerController::ALobbyPlayerController()
 {
     {
@@ -145,7 +147,14 @@ void ALobbyPlayerController::SetupInputComponent()
         UE_LOG(LogTemp, Warning, TEXT("IA_RightClick is disabled"));
     }
 
-    
+    if (const UInputAction* InputAction = FUtils::GetInputActionFromName(IMC_Default, TEXT("IA_Enter")))
+    {
+        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &ThisClass::OnEnter);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("IA_Enter is disabled"));
+    }
 }
 
 void ALobbyPlayerController::OnPossess(APawn* InPawn)
@@ -342,13 +351,34 @@ void ALobbyPlayerController::OnRightClick(const FInputActionValue& InputActionVa
     }
 }
 
-void ALobbyPlayerController::SetInputModeGameOnly()
+void ALobbyPlayerController::OnEnter(const FInputActionValue& InputActionValue)
+{
+    if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
+    {
+        if (UChatWidget* ChatWidget = GP->GetChatWidget())
+        {
+            SetInputModeGameOnly(bStartChat);
+            bStartChat = !bStartChat;
+        }
+    }
+}
+
+void ALobbyPlayerController::SetInputModeGameOnly(bool bFlag)
 {
     UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::SetInputModeGameOnly()"));
 
-    FInputModeGameOnly InputMode;
-    SetInputMode(InputMode);
-    bShowMouseCursor = false; // UI도 같이 쓸 거면 true
+    if (bFlag)
+    {
+        FInputModeGameOnly InputMode;
+        SetInputMode(InputMode);
+        bShowMouseCursor = false; // UI도 같이 쓸 거면 true
+    }
+    else
+    {
+        FInputModeUIOnly InputMode;
+        SetInputMode(InputMode);
+        bShowMouseCursor = true; // UI도 같이 쓸 거면 true
+    }
 }
 
 void ALobbyPlayerController::Client_ExposeGameResultWidget_Implementation(bool bFlag)

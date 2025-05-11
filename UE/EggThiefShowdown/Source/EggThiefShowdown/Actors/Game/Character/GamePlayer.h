@@ -14,6 +14,7 @@ class USpringArmComponent;
 struct FGamePlayerTableRow;
 
 class UWidgetComponent;
+class UChatWidget;
 
 UCLASS()
 class EGGTHIEFSHOWDOWN_API AGamePlayer : public ACharacter
@@ -86,6 +87,7 @@ protected:
 	TObjectPtr<UWidgetComponent> EggGaugeWidgetComponent;
 	TObjectPtr<UWidgetComponent> GameResultWidgetComponent;
 	TObjectPtr<UWidgetComponent> TimeLimitWidgetComponent;
+	TObjectPtr<UWidgetComponent> ChatWidgetComponent;
 
 public:
 	void SetCountdown(int32 Countdown);
@@ -149,4 +151,8 @@ public:
 	void Multicast_DropEgg();
 
 	void DropEgg();
+
+
+public:
+	UChatWidget* GetChatWidget();
 };
