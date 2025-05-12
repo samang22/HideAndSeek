@@ -149,7 +149,7 @@ void ALobbyPlayerController::SetupInputComponent()
 
     if (const UInputAction* InputAction = FUtils::GetInputActionFromName(IMC_Default, TEXT("IA_Enter")))
     {
-        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Triggered, this, &ThisClass::OnEnter);
+        EnhancedInputComponent->BindAction(InputAction, ETriggerEvent::Completed, this, &ThisClass::OnEnter);
     }
     else
     {

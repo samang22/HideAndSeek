@@ -82,12 +82,13 @@ public:
 	TObjectPtr<UGamePlayerStatusComponent> GetStatusComponent() { return StatusComponent; }
 
 protected:
-	TObjectPtr<UWidgetComponent> HPStaminaWidgetComponent;
-	TObjectPtr<UWidgetComponent> CountdownWidgetComponent;
-	TObjectPtr<UWidgetComponent> EggGaugeWidgetComponent;
-	TObjectPtr<UWidgetComponent> GameResultWidgetComponent;
-	TObjectPtr<UWidgetComponent> TimeLimitWidgetComponent;
-	TObjectPtr<UWidgetComponent> ChatWidgetComponent;
+	//TObjectPtr<UWidgetComponent> HPStaminaWidgetComponent;
+	//TObjectPtr<UWidgetComponent> CountdownWidgetComponent;
+	//TObjectPtr<UWidgetComponent> EggGaugeWidgetComponent;
+	//TObjectPtr<UWidgetComponent> GameResultWidgetComponent;
+	//TObjectPtr<UWidgetComponent> TimeLimitWidgetComponent;
+	//TObjectPtr<UWidgetComponent> ChatWidgetComponent;
+	TObjectPtr<UWidgetComponent> InGameLayoutWidgetComponent;
 
 public:
 	void SetCountdown(int32 Countdown);

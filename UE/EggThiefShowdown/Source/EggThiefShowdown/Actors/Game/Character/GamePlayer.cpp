@@ -27,6 +27,7 @@
 #include "UI/GameResultWidget.h"
 #include "UI/TimeLimitWidget.h"
 #include "../Plugins/Network/Source/Network/Public/UI/ChatWidget.h"
+#include "UI/InGameLayoutWidget.h"
 
 #include "GameMode/GameMapGameMode.h"
 
@@ -79,104 +80,22 @@ AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	MovementComponent->NetworkSmoothingMode = ENetworkSmoothingMode::Linear;
 	MovementComponent->bCanWalkOffLedges = false;
 
+	InGameLayoutWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("InGameLayoutWidgetComponent"));
+	InGameLayoutWidgetComponent->SetupAttachment(RootComponent);
+	//InGameLayoutWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
+	static UClass* InGameLayoutWidgetClass = LoadClass<UInGameLayoutWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_InGameLayout.UI_InGameLayout_C'"));
 
-
-	HPStaminaWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPStaminaWidgetComponent"));
-	HPStaminaWidgetComponent->SetupAttachment(RootComponent);
-	//float RelativeScale = 1.f / CHARACTER_DEFAULT_SCALE;
-	//HPStaminaWidgetComponent->SetRelativeScale3D(FVector(RelativeScale, RelativeScale, RelativeScale));
-	// Offset
-	HPStaminaWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
-	static UClass* WidgetClass = LoadClass<UHPStaminaWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_HPStamina.UI_HPStamina_C'"));
-
-	if (WidgetClass)
+	if (InGameLayoutWidgetClass)
 	{
-		HPStaminaWidgetComponent->SetWidgetClass(WidgetClass);
-		//SelectButtonWidgetComponent->SetDrawSize(FVector2D(30.f, 10.f)); // 위젯 크기 설정
-		HPStaminaWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-		HPStaminaWidgetComponent->SetVisibility(false); // 위젯 일단 가리기
-	}
-
-
-	CountdownWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("CountdownWidgetComponent"));
-	CountdownWidgetComponent->SetupAttachment(RootComponent);
-	CountdownWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
-	static UClass* CountdownWidgetClass = LoadClass<UCountdownWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_Countdown.UI_Countdown_C'"));
-
-	if (CountdownWidgetClass)
-	{
-		CountdownWidgetComponent->SetWidgetClass(CountdownWidgetClass);
-		CountdownWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-		CountdownWidgetComponent->SetVisibility(false);
+		InGameLayoutWidgetComponent->SetWidgetClass(InGameLayoutWidgetClass);
+		InGameLayoutWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		InGameLayoutWidgetComponent->SetDrawSize(FVector2D(1920, 1080)); 
+		InGameLayoutWidgetComponent->SetPivot(FVector2D(0.5f, 0.5f));    
+		InGameLayoutWidgetComponent->SetVisibility(false);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("CountdownWidgetClass load Failed"));
-	}
-
-	EggGaugeWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("EggGaugeWidgetComponent"));
-	EggGaugeWidgetComponent->SetupAttachment(RootComponent);
-	EggGaugeWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
-	static UClass* EggGaugeWidgetClass = LoadClass<UEggGaugeWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_EggGauge.UI_EggGauge_C'"));
-
-	if (EggGaugeWidgetClass)
-	{
-		EggGaugeWidgetComponent->SetWidgetClass(EggGaugeWidgetClass);
-		EggGaugeWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-		EggGaugeWidgetComponent->SetVisibility(false);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("EggGaugeWidgetClass load Failed"));
-	}
-
-	GameResultWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("GameResultWidgetComponent"));
-	GameResultWidgetComponent->SetupAttachment(RootComponent);
-	GameResultWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
-	static UClass* GameResultWidgetClass = LoadClass<UGameResultWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_GameResult.UI_GameResult_C'"));
-
-	if (GameResultWidgetClass)
-	{
-		GameResultWidgetComponent->SetWidgetClass(GameResultWidgetClass);
-		GameResultWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-		GameResultWidgetComponent->SetVisibility(false);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("GameResultWidgetClass load Failed"));
-	}
-
-	
-	TimeLimitWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("TimeLimitWidgetComponent"));
-	TimeLimitWidgetComponent->SetupAttachment(RootComponent);
-	TimeLimitWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
-	static UClass* TimeLimitWidgetClass = LoadClass<UTimeLimitWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/InGame/UI_TimeLimit.UI_TimeLimit_C'"));
-
-	if (TimeLimitWidgetClass)
-	{
-		TimeLimitWidgetComponent->SetWidgetClass(TimeLimitWidgetClass);
-		TimeLimitWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-		TimeLimitWidgetComponent->SetVisibility(false);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("TimeLimitWidgetClass load Failed"));
-	}
-
-	ChatWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("ChatWidgetComponent"));
-	ChatWidgetComponent->SetupAttachment(RootComponent);
-	ChatWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.4f));
-	static UClass* ChatWidgetClass = LoadClass<UChatWidget>(nullptr, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/Chat/UI_Chat.UI_Chat_C'"));
-
-	if (ChatWidgetClass)
-	{
-		ChatWidgetComponent->SetWidgetClass(ChatWidgetClass);
-		ChatWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-		ChatWidgetComponent->SetVisibility(false);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("ChatWidgetClass load Failed"));
+		UE_LOG(LogTemp, Error, TEXT("InGameLayoutWidgetClass load Failed"));
 	}
 }
 
@@ -208,55 +127,19 @@ void AGamePlayer::BeginPlay()
 
 	Super::BeginPlay();
 
-	// 이미지들을 캐시에 올리기위해서 실행하는데 임시 코드
-	if (UCountdownWidget* CountdownWidget = Cast<UCountdownWidget>(CountdownWidgetComponent->GetWidget()))
+	
+	FString LevelName = GetLevel()->GetOuter()->GetName();
+	if (LevelName == TEXT("GameMap"))
 	{
-		CountdownWidget->SetCountdown(6);
-		CountdownWidgetComponent->SetVisibility(false);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("CountdownWidget is null"));
-	}
-
-	if (UGameResultWidget* GameResultWidget = Cast<UGameResultWidget>(GameResultWidgetComponent->GetWidget()))
-	{
-		GameResultWidget->SetGameResult(true);
-		GameResultWidgetComponent->SetVisibility(false);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("GameResultWidget is null"));
+		InGameLayoutWidgetComponent->SetVisibility(true); // 위젯 보이기
+		if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
+		{
+			InGameLayoutWidget->GetCountdownWidget()->SetVisibility(ESlateVisibility::Hidden);
+			InGameLayoutWidget->GetGameResultWidget()->SetVisibility(ESlateVisibility::Hidden);
+			InGameLayoutWidget->GetTimeLimitWidget()->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 
-	if (UTimeLimitWidget* TimeLimitWidget = Cast<UTimeLimitWidget>(TimeLimitWidgetComponent->GetWidget()))
-	{
-		TimeLimitWidget->SetRemainTime(6, 6, 6, 6);
-		TimeLimitWidgetComponent->SetVisibility(false);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("TimeLimitWidget is null"));
-	}
-
-	//if (UTimeLimitWidget* TimeLimitWidget = Cast<UTimeLimitWidget>(TimeLimitWidgetComponent->GetWidget()))
-	//{
-	//	TimeLimitWidget->(6);
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Log, TEXT("CountdownWidget is null"));
-	//}
-
-
-	//if (UCountdownWidget* CountdownWidget = Cast<UCountdownWidget>(CountdownWidgetComponent->GetWidget()))
-	//{
-	//	CountdownWidget->SetCountdown(6);
-	//}
-	//else
-	//{
-	//	UE_LOG(LogTemp, Log, TEXT("CountdownWidget is null"));
-	//}
 
 }
 
@@ -331,10 +214,6 @@ void AGamePlayer::OnRep_Controller()
 					FInputModeGameOnly InputMode;
 					LPC->SetInputMode(InputMode);
 					LPC->bShowMouseCursor = false;
-
-					HPStaminaWidgetComponent->SetVisibility(true); // 위젯 보이기
-					EggGaugeWidgetComponent->SetVisibility(true); // 위젯 보이기
-					ChatWidgetComponent->SetVisibility(true);
 				}
 
 				InitDataTableByPlayerState();
@@ -504,13 +383,17 @@ void AGamePlayer::Tick(float DeltaTime)
 		SetEggRelativePosition(DeltaTime); // 그냥 바로 실행
 	}
 
-	if (UHPStaminaWidget* Widget = Cast<UHPStaminaWidget>(HPStaminaWidgetComponent->GetWidget()))
+	if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
 	{
-		float StaminaPercent = StatusComponent->GetCurrentStamina() / StatusComponent->GetMaxStamina();
-		float HPPercent = StatusComponent->GetCurrentHP() / StatusComponent->GetMaxHP();
-		Widget->SetStaminaBarPercent(StaminaPercent);
-		Widget->SetHPBarPercent(HPPercent);
+		if (UHPStaminaWidget* HPStaminaWidget = InGameLayoutWidget->GetHPStaminaWidget())
+		{
+			float StaminaPercent = StatusComponent->GetCurrentStamina() / StatusComponent->GetMaxStamina();
+			float HPPercent = StatusComponent->GetCurrentHP() / StatusComponent->GetMaxHP();
+			HPStaminaWidget->SetStaminaBarPercent(StaminaPercent);
+			HPStaminaWidget->SetHPBarPercent(HPPercent);
+		}
 	}
+		
 }
 
 // Called to bind functionality to input
@@ -522,71 +405,88 @@ void AGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 void AGamePlayer::SetCountdown(int32 Countdown)
 {
-	if (UCountdownWidget* Widget = Cast<UCountdownWidget>(CountdownWidgetComponent->GetWidget()))
+	if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
 	{
-		if (Countdown <= 6 && Countdown > 0)
+		if (UCountdownWidget* CountdownWidgetComponent = Cast<UCountdownWidget>(InGameLayoutWidget->GetCountdownWidget()))
 		{
-			CountdownWidgetComponent->SetVisibility(true); // 위젯 보이기
+			if (Countdown <= 6 && Countdown > 0)
+			{
+				CountdownWidgetComponent->SetVisibility(ESlateVisibility::Visible); // 위젯 보이기
+			}
+			else
+			{
+				CountdownWidgetComponent->SetVisibility(ESlateVisibility::Hidden); // 위젯 보이기
+			}
+			CountdownWidgetComponent->SetCountdown(Countdown);
+
 		}
 		else
 		{
-			CountdownWidgetComponent->SetVisibility(false); // 위젯 보이기
+			UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::SetCountdown Failed"));
 		}
-		Widget->SetCountdown(Countdown);
 
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::SetCountdown Failed"));
-	}
+
 }
 
 void AGamePlayer::UpdateGameResultWidget(bool bResult)
 {
-	if (UGameResultWidget* Widget = Cast<UGameResultWidget>(GameResultWidgetComponent->GetWidget()))
+	if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
 	{
-		GameResultWidgetComponent->SetVisibility(true); // 위젯 보이기
-		Widget->SetGameResult(bResult);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::UpdateGameResultWidget Failed"));
+		if (UGameResultWidget* GameResultWidget = Cast<UGameResultWidget>(InGameLayoutWidget->GetGameResultWidget()))
+		{
+			GameResultWidget->SetVisibility(ESlateVisibility::Visible); // 위젯 보이기
+			GameResultWidget->SetGameResult(bResult);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AGamePlayer::UpdateGameResultWidget Failed"));
+		}
 	}
 }
 
 void AGamePlayer::UpdateTimeLimitWidget(int32 MinuteTen, int32 MinuteOne, int32 SecondTen, int32 SecondOne)
 {
-	if (UTimeLimitWidget* Widget = Cast<UTimeLimitWidget>(TimeLimitWidgetComponent->GetWidget()))
+	if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
 	{
-		Widget->SetRemainTime(MinuteTen, MinuteOne, SecondTen, SecondOne);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("AGamePlayer::UpdateTimeLimitWidget // No Widget"))
+		if (UTimeLimitWidget* Widget = Cast<UTimeLimitWidget>(InGameLayoutWidget->GetTimeLimitWidget()))
+		{
+			Widget->SetRemainTime(MinuteTen, MinuteOne, SecondTen, SecondOne);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("AGamePlayer::UpdateTimeLimitWidget // No Widget"))
+		}
 	}
 }
 
 void AGamePlayer::ExposeTimeLimitWidget(bool bFlag)
 {
-	if (UTimeLimitWidget* Widget = Cast<UTimeLimitWidget>(TimeLimitWidgetComponent->GetWidget()))
+	if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
 	{
-		TimeLimitWidgetComponent->SetVisibility(bFlag);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("AGamePlayer::ExposeTimeLimitWidget // No Widget"))
+		if (UTimeLimitWidget* TimeLimitWidgetComponent = Cast<UTimeLimitWidget>(InGameLayoutWidget->GetTimeLimitWidget()))
+		{
+			TimeLimitWidgetComponent->SetVisibility(bFlag ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("AGamePlayer::ExposeTimeLimitWidget // No Widget"))
+		}
 	}
 }
 
 void AGamePlayer::ExposeGameResultWidget(bool bFlag)
 {
-	if (UGameResultWidget* Widget = Cast<UGameResultWidget>(GameResultWidgetComponent->GetWidget()))
+	if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
 	{
-		GameResultWidgetComponent->SetVisibility(bFlag);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("AGamePlayer::ExposeGameResultWidget // No Widget"))
+		if (UGameResultWidget* Widget = Cast<UGameResultWidget>(InGameLayoutWidget->GetGameResultWidget()))
+		{
+			Widget->SetVisibility(bFlag ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("AGamePlayer::ExposeGameResultWidget // No Widget"))
+		}
 	}
 }
 
@@ -820,7 +720,11 @@ void AGamePlayer::DropEgg()
 
 UChatWidget* AGamePlayer::GetChatWidget()
 {
-	UChatWidget* ChatWidget = Cast<UChatWidget>(ChatWidgetComponent->GetWidget());
+	UChatWidget* ChatWidget = nullptr;
+	if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
+	{
+		ChatWidget = Cast<UChatWidget>(InGameLayoutWidget->GetChatWidget());
+	}
 	return ChatWidget;
 }
 
