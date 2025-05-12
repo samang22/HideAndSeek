@@ -302,8 +302,8 @@ void AGameMapGameMode::UpdateTimeLimitWidget()
 			ServerTravelToLobbyMapTimerHandle,
 			this,
 			&AGameMapGameMode::ServerTravelToLobbyMap,
-			5.0f, // 3초 후에 서버 여행
-			false // 단발성 실행
+			5.0f, 
+			false 
 		);
 	}
 }

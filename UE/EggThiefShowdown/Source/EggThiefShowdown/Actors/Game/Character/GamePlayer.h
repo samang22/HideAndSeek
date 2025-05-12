@@ -4,6 +4,7 @@
 
 #include "../../../Misc/Utils.h"
 #include "GameFramework/Character.h"
+#include "UI/ChatWidget.h"
 #include "GamePlayer.generated.h"
 
 class USkeletalMeshComponent;
@@ -14,7 +15,6 @@ class USpringArmComponent;
 struct FGamePlayerTableRow;
 
 class UWidgetComponent;
-class UChatWidget;
 
 UCLASS()
 class EGGTHIEFSHOWDOWN_API AGamePlayer : public ACharacter
@@ -156,4 +156,9 @@ public:
 
 public:
 	UChatWidget* GetChatWidget();
+protected:
+	UFUNCTION()
+	void SendChat(const FString& Chat);
+	UFUNCTION()
+	void RecvChat(FString UserName, FString Message);
 };

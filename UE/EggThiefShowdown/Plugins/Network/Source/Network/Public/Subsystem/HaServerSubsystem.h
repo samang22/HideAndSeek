@@ -73,6 +73,7 @@ protected:
     UEchoChannel* EchoChannel = nullptr;
     UChatChannel* ChatChannel = nullptr;
     ULoginChannel* LoginChannel = nullptr;
+
 protected:
     // UE Deci Server가 자체 서버와 통신하는 Channel
     // 편의상 분리하지 않고 나머지 Channel을 그대로 둔다

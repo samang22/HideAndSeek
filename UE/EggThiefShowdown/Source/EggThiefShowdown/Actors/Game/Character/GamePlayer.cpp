@@ -33,6 +33,9 @@
 
 #include "Components/Image.h"
 
+#include "Subsystem/HaServerSubsystem.h"
+#include "../Plugins/Network/Source/Network/Public/Channel/ChatChannel.h"
+
 // Sets default values
 AGamePlayer::AGamePlayer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -137,10 +140,16 @@ void AGamePlayer::BeginPlay()
 			InGameLayoutWidget->GetCountdownWidget()->SetVisibility(ESlateVisibility::Hidden);
 			InGameLayoutWidget->GetGameResultWidget()->SetVisibility(ESlateVisibility::Hidden);
 			InGameLayoutWidget->GetTimeLimitWidget()->SetVisibility(ESlateVisibility::Hidden);
+			
+			if (UChatWidget* ChatWidget = InGameLayoutWidget->GetChatWidget())
+			{
+				ChatWidget->ChatDelegate.AddDynamic(this, &AGamePlayer::SendChat);
+			}
+
+			UChatChannel* ChatChannel = GetGameInstance()->GetSubsystem<UHaServerSubsystem>()->GetChatChannel();
+			ChatChannel->OnChatMessage.AddDynamic(this, &AGamePlayer::RecvChat);
 		}
 	}
-
-
 }
 
 void AGamePlayer::PossessedBy(AController* NewController)
@@ -726,6 +735,33 @@ UChatWidget* AGamePlayer::GetChatWidget()
 		ChatWidget = Cast<UChatWidget>(InGameLayoutWidget->GetChatWidget());
 	}
 	return ChatWidget;
+}
+
+void AGamePlayer::SendChat(const FString& Chat)
+{
+	if (UHaServerSubsystem* Subsystem = GetGameInstance()->GetSubsystem<UHaServerSubsystem>())
+	{
+		Subsystem->SendChatMessage(Chat);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AGamePlayer::SendChat Failed, No Subsystem"));
+	}
+}
+
+void AGamePlayer::RecvChat(FString UserName, FString Message)
+{
+	if (UChatWidget* ChatWidget = GetChatWidget())
+	{
+		FChatMessage ChatMessage;
+		ChatMessage.UserName = UserName;
+		ChatMessage.Message = Message;
+		ChatWidget->AddChatMessage(ChatMessage);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AGamePlayer::SendChat Failed, No ChatWidget"));
+	}
 }
 
 void AGamePlayer::SetCanMove(bool bFlag)

@@ -58,4 +58,4 @@
 
 #define EGG_GAUGE_COEFFICIENT					0.01f
 
-#define GAME_TIME_LIMIT							30
+#define GAME_TIME_LIMIT							500

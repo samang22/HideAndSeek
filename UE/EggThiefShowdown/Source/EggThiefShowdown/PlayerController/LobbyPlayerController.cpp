@@ -186,6 +186,8 @@ void ALobbyPlayerController::OnRep_Pawn()
 
 void ALobbyPlayerController::OnMove(const FInputActionValue& InputActionValue)
 {
+    if (bStartChat) return;
+
     if (StatusComponent && !StatusComponent->CanMove())
     {
         UE_LOG(LogTemp, Warning, TEXT("ALobbyPlayerController::OnMove Failed"));
@@ -274,6 +276,8 @@ void ALobbyPlayerController::OnMoveOff(const FInputActionValue& InputActionValue
 
 void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
 {
+    if (bStartChat) return;
+
     const FVector2D ActionValue = InputActionValue.Get<FVector2D>();
 
     AddYawInput(-1 * ActionValue.X);
@@ -282,6 +286,8 @@ void ALobbyPlayerController::OnLook(const FInputActionValue& InputActionValue)
 
 void ALobbyPlayerController::OnRun(const FInputActionValue& InputActionValue)
 {
+    if (bStartChat) return;
+
     if (StatusComponent && StatusComponent->GetExhausted()) return;
 
     APawn* ControlledPawn = GetPawn();
@@ -311,6 +317,8 @@ void ALobbyPlayerController::OnRunOff(const FInputActionValue& InputActionValue)
 
 void ALobbyPlayerController::OnAttack(const FInputActionValue& InputActionValue)
 {
+    if (bStartChat) return;
+
     if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
     {
         if (!GP->GetIsEgg())
@@ -325,6 +333,8 @@ void ALobbyPlayerController::OnAttack(const FInputActionValue& InputActionValue)
 
 void ALobbyPlayerController::OnDropEgg(const FInputActionValue& InputActionValue)
 {
+    if (bStartChat) return;
+
     if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
     {
         if (GP->GetIsEgg())
@@ -339,6 +349,8 @@ void ALobbyPlayerController::OnDropEgg(const FInputActionValue& InputActionValue
 
 void ALobbyPlayerController::OnRightClick(const FInputActionValue& InputActionValue)
 {
+    if (bStartChat) return;
+
     if (AGamePlayer* GP = Cast<AGamePlayer>(GetPawn()))
     {
         if (!GP->GetIsEgg())
@@ -375,7 +387,7 @@ void ALobbyPlayerController::SetInputModeGameOnly(bool bFlag)
     }
     else
     {
-        FInputModeUIOnly InputMode;
+        FInputModeGameAndUI InputMode;
         SetInputMode(InputMode);
         bShowMouseCursor = true; // UI도 같이 쓸 거면 true
     }

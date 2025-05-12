@@ -67,3 +67,8 @@ AEgg에 UAIPerceptionStimuliSourceComponent를 추가?
 
 이 순서로 해야된다. 
 ChangeState에서 기존 Pawn을 삭제시키기 때문..
+
+//////////////////////////////////////////////////////////////
+
+레벨 전환 시 DataTable이 유지되지 않는 문제 발생
+Static으로 선언된다고 항상 유지되지는 않더라
