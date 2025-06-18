@@ -8,8 +8,11 @@ public class EggThiefShowdown : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
-                "UMG", "MoviePlayer", "AIModule", "Paper2D", "RenderCore", "RHI", /*"Graphics",*/
+		PublicDependencyModuleNames.AddRange(new string[] 
+        { 
+            "Core", "CoreUObject", "Engine", 
+            "InputCore", "EnhancedInput", "UMG",
+            "MoviePlayer", "AIModule", "Paper2D", "RenderCore", "RHI", /*"Graphics",*/
 				"Network"
 		});
 

@@ -134,20 +134,23 @@ void AGamePlayer::BeginPlay()
 	FString LevelName = GetLevel()->GetOuter()->GetName();
 	if (LevelName == TEXT("GameMap"))
 	{
-		InGameLayoutWidgetComponent->SetVisibility(true); // 위젯 보이기
-		if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
+		if (IsLocallyControlled())
 		{
-			InGameLayoutWidget->GetCountdownWidget()->SetVisibility(ESlateVisibility::Hidden);
-			InGameLayoutWidget->GetGameResultWidget()->SetVisibility(ESlateVisibility::Hidden);
-			InGameLayoutWidget->GetTimeLimitWidget()->SetVisibility(ESlateVisibility::Hidden);
-			
-			if (UChatWidget* ChatWidget = InGameLayoutWidget->GetChatWidget())
+			InGameLayoutWidgetComponent->SetVisibility(true); // 위젯 보이기
+			if (UInGameLayoutWidget* InGameLayoutWidget = Cast<UInGameLayoutWidget>(InGameLayoutWidgetComponent->GetWidget()))
 			{
-				ChatWidget->ChatDelegate.AddDynamic(this, &AGamePlayer::SendChat);
-			}
+				InGameLayoutWidget->GetCountdownWidget()->SetVisibility(ESlateVisibility::Hidden);
+				InGameLayoutWidget->GetGameResultWidget()->SetVisibility(ESlateVisibility::Hidden);
+				InGameLayoutWidget->GetTimeLimitWidget()->SetVisibility(ESlateVisibility::Hidden);
 
-			UChatChannel* ChatChannel = GetGameInstance()->GetSubsystem<UHaServerSubsystem>()->GetChatChannel();
-			ChatChannel->OnChatMessage.AddDynamic(this, &AGamePlayer::RecvChat);
+				if (UChatWidget* ChatWidget = InGameLayoutWidget->GetChatWidget())
+				{
+					ChatWidget->ChatDelegate.AddDynamic(this, &AGamePlayer::SendChat);
+				}
+
+				UChatChannel* ChatChannel = GetGameInstance()->GetSubsystem<UHaServerSubsystem>()->GetChatChannel();
+				ChatChannel->OnChatMessage.AddDynamic(this, &AGamePlayer::RecvChat);
+			}
 		}
 	}
 }
